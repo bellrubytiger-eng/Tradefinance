@@ -1,0 +1,518 @@
+<title>GBS India FX Screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: GBS 3단 구조 유지 — 상단 TRX 바 / 좌측 업무메뉴 / 중앙 입력폼 + 하단 실행바. 필드 색은 GBS 관례(노랑=필수, 하늘=조회전용) */
+:root{
+  --bg:#eef2f7; --panel:#ffffff; --panel-2:#f5f8fc; --fg:#1d2733; --muted:#5d6b7c; --line:#c9d4e2;
+  --brand:#1559a6; --brand-2:#0f437f; --brand-fg:#ffffff;
+  --nav:#2f3d4f; --nav-2:#3c4c61; --nav-fg:#e6edf6; --nav-sub:#9fb4cc;
+  --req:#fbf3c2; --ro:#d6e5f5; --input:#ffffff;
+  --ok:#1f7a4d; --ok-bg:#e1f3e9; --warn:#9a6400; --warn-bg:#fff1d0; --err:#b3261e; --err-bg:#fde4e2; --info-bg:#e3eefb;
+  --mono:"IBM Plex Mono",Consolas,monospace; --sans:"IBM Plex Sans KR","Malgun Gothic",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121821; --panel:#1a222d; --panel-2:#202a37; --fg:#e3e9f1; --muted:#9aa8b9; --line:#33404f;
+  --brand:#3d7fcc; --brand-2:#285e9c; --brand-fg:#ffffff;
+  --nav:#151c26; --nav-2:#202b39; --nav-fg:#dbe4ef; --nav-sub:#8ea3bb;
+  --req:#3a3519; --ro:#1f3147; --input:#121a24;
+  --ok:#6fd3a0; --ok-bg:#16352a; --warn:#f2c05c; --warn-bg:#3a2e12; --err:#ff8a80; --err-bg:#3d1a18; --info-bg:#1b2b40; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121821; --panel:#1a222d; --panel-2:#202a37; --fg:#e3e9f1; --muted:#9aa8b9; --line:#33404f;
+  --brand:#3d7fcc; --brand-2:#285e9c; --brand-fg:#ffffff;
+  --nav:#151c26; --nav-2:#202b39; --nav-fg:#dbe4ef; --nav-sub:#8ea3bb;
+  --req:#3a3519; --ro:#1f3147; --input:#121a24;
+  --ok:#6fd3a0; --ok-bg:#16352a; --warn:#f2c05c; --warn-bg:#3a2e12; --err:#ff8a80; --err-bg:#3d1a18; --info-bg:#1b2b40; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:13px/1.45 var(--sans);margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--brand)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:linear-gradient(90deg,var(--brand-2),var(--brand));color:var(--brand-fg);
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top b{letter-spacing:.06em;font-size:12px}
+.top input{font:600 13px var(--mono);width:84px;padding:4px 6px;border:0;border-radius:2px;background:#fff;color:#1d2733;text-transform:uppercase}
+.top .ttl{font-weight:600;font-size:15px;border-left:3px solid #f6d34a;padding-left:8px;min-width:0}
+.top .sp{flex:1}
+.top .biz{font:12px var(--mono);opacity:.9}
+.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:calc(100% - 46px)}
+nav{background:var(--nav);color:var(--nav-fg);padding:8px 0 24px;overflow:auto}
+nav h4{margin:12px 0 4px;padding:6px 16px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--nav-sub);font-weight:600}
+nav a{display:flex;gap:8px;padding:7px 16px;color:var(--nav-fg);text-decoration:none;font-size:12.5px;border-left:3px solid transparent}
+nav a span{font:600 11.5px var(--mono);color:#8fc1ff;min-width:34px}
+nav a:hover{background:var(--nav-2)}
+nav a.on{background:var(--nav-2);border-left-color:#f6d34a}
+nav a em{font-style:normal;font-size:10px;margin-left:auto;padding:0 5px;border-radius:2px;background:#f6d34a;color:#2a2200;height:16px;align-self:center}
+main{padding-block:14px 90px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+.mselect{display:none}
+.hdr{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
+.hdr h1{font-size:19px;margin:0;text-wrap:balance}
+.hdr .sid{font:600 12px var(--mono);background:var(--brand);color:var(--brand-fg);padding:2px 7px;border-radius:2px}
+.hdr .tag{font-size:11px;padding:1px 7px;border-radius:9px;background:var(--info-bg);color:var(--fg)}
+.hdr p{flex-basis:100%;margin:0;color:var(--muted);max-width:110ch}
+.sec{background:var(--panel);border:1px solid var(--line);margin-bottom:10px}
+.sec>h3{margin:0;padding:6px 10px;font-size:12.5px;background:var(--panel-2);border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.sec>h3::before{content:"";width:8px;height:8px;background:#e8792b;border-radius:1px}
+.sec>h3 small{font-weight:400;color:var(--muted);margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(var(--c,3),minmax(0,1fr));gap:7px 16px;padding:10px}
+.f{display:grid;grid-template-columns:132px minmax(0,1fr);align-items:center;gap:8px;min-width:0}
+.f.s2{grid-column:span 2}.f.s3{grid-column:1/-1}
+.f label{text-align:right;color:var(--muted);font-size:12px;line-height:1.2}
+.f label.rq::after{content:" *";color:var(--err)}
+.f .v{display:flex;gap:4px;min-width:0}
+input,select,textarea{font:13px var(--sans);color:var(--fg);background:var(--input);border:1px solid var(--line);border-radius:2px;padding:4px 6px;min-width:0;width:100%}
+input.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+input.rq,select.rq{background:var(--req)}
+input[readonly],select[disabled]{background:var(--ro);color:var(--fg)}
+input:focus,select:focus,textarea:focus,button:focus-visible,a:focus-visible{outline:2px solid #f6a623;outline-offset:1px}
+.bad{border-color:var(--err)!important;box-shadow:0 0 0 1px var(--err)}
+button{font:500 12.5px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:5px 12px;border-radius:2px;cursor:pointer;white-space:nowrap}
+button.pri{background:var(--brand);border-color:var(--brand);color:var(--brand-fg)}
+button.ic{padding:4px 8px}
+.tabs{display:flex;flex-wrap:wrap;gap:2px;padding:8px 10px 0;border-bottom:1px solid var(--line);background:var(--panel)}
+.tabs button{border-bottom:0;border-radius:3px 3px 0 0;background:var(--panel-2);font-weight:600}
+.tabs button.on{background:var(--brand);color:var(--brand-fg);border-color:var(--brand)}
+.tw{overflow-x:auto;padding:8px 10px}
+table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+th{background:var(--brand-2);color:var(--brand-fg);font-weight:600;padding:5px 7px;text-align:left;white-space:nowrap}
+td{border-bottom:1px solid var(--line);padding:4px 7px;white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--mono)}
+tr.sel td{background:var(--info-bg)}
+.pill{display:inline-block;font:600 10.5px var(--sans);padding:1px 7px;border-radius:9px}
+.p-ok{background:var(--ok-bg);color:var(--ok)}.p-warn{background:var(--warn-bg);color:var(--warn)}.p-err{background:var(--err-bg);color:var(--err)}.p-info{background:var(--info-bg);color:var(--fg)}
+.msg{margin:8px 10px;padding:7px 10px;border-left:4px solid;font-size:12.5px}
+.msg.ok{background:var(--ok-bg);border-color:var(--ok)}.msg.warn{background:var(--warn-bg);border-color:var(--warn)}.msg.err{background:var(--err-bg);border-color:var(--err)}.msg.info{background:var(--info-bg);border-color:var(--brand)}
+.msg code,.rule{font:11px var(--mono);color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;padding:10px}
+.kpi{border:1px solid var(--line);padding:8px 10px;background:var(--panel-2)}
+.kpi b{display:block;font:600 20px var(--mono)}
+.kpi span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.gauge{height:12px;background:var(--panel-2);border:1px solid var(--line);margin:4px 0;position:relative}
+.gauge i{position:absolute;inset:0 auto 0 0;background:var(--brand)}
+.gauge i.cur{background:#f6a623}
+.tl{display:flex;flex-wrap:wrap;gap:0;padding:12px 10px}
+.tl div{flex:1 1 140px;border-top:4px solid var(--line);padding:6px 8px 0;position:relative}
+.tl div::before{content:"";position:absolute;top:-8px;left:6px;width:12px;height:12px;border-radius:50%;background:var(--panel);border:3px solid var(--line)}
+.tl div.done{border-color:var(--ok)}.tl div.done::before{border-color:var(--ok);background:var(--ok)}
+.tl div.due{border-color:var(--warn)}.tl div.due::before{border-color:var(--warn)}
+.tl div.over{border-color:var(--err)}.tl div.over::before{border-color:var(--err)}
+.tl b{display:block;font:600 12.5px var(--mono)}.tl span{font-size:11.5px;color:var(--muted)}
+pre.mt{font:12px/1.5 var(--mono);background:var(--panel-2);border:1px solid var(--line);padding:10px;margin:0;overflow-x:auto;white-space:pre}
+.mtw{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;padding:10px}
+.mtw h5{margin:0 0 4px;font-size:11.5px;color:var(--muted)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-end;
+  padding-block:8px calc(8px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));z-index:4}
+.bar .log{margin-right:auto;font-size:12px;color:var(--muted);min-width:0;flex:1 1 260px}
+.modal{position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal .box{background:var(--panel);border:1px solid var(--line);max-width:460px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.modal .box h4{margin:0;padding:10px 14px;background:var(--warn-bg);color:var(--warn);font-size:14px}
+.modal .box p{padding:12px 14px;margin:0}
+.modal .box div{display:flex;gap:8px;justify-content:flex-end;padding:0 14px 14px}
+.cat{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;padding:10px}
+.cat label{border:1px solid var(--line);padding:8px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;background:var(--panel-2)}
+.cat label:has(input:checked){border-color:var(--brand);background:var(--info-bg)}
+.cat input{width:auto;margin-top:3px}
+.cat small{display:block;color:var(--muted)}
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr}
+  nav{display:none}
+  .mselect{display:block;margin-bottom:10px}
+  .grid{--c:1!important}
+  .f.s2,.f.s3{grid-column:auto}
+  .f{grid-template-columns:110px minmax(0,1fr)}
+}
+@media (max-width:420px){.f{grid-template-columns:1fr}.f label{text-align:left}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top">
+  <b>TRX CODE</b><input id="trx" value="RT13" aria-label="화면코드 입력 후 Enter">
+  <div class="ttl" id="ttl">Remittance (Trade Finance)</div>
+  <div class="sp"></div>
+  <div class="biz">India Noida · AD Cat-I · TRX DATE <span id="bizd"></span></div>
+</header>
+<div class="wrap">
+  <nav id="nav" aria-label="업무 메뉴"></nav>
+  <main>
+    <select class="mselect" id="msel" aria-label="화면 선택"></select>
+    <div id="view"></div>
+  </main>
+</div>
+<div class="bar">
+  <div class="log" id="log">화면을 선택하세요. 노란 칸은 필수, 하늘색은 CH11 등에서 조회되는 값입니다(예시 데이터).</div>
+  <button id="bClr">Clear</button><button id="bChk">Validate</button><button class="pri" id="bExe">Execute</button>
+</div>
+<div class="modal" id="modal" hidden><div class="box"><h4 id="mT">Warning</h4><p id="mB"></p><div><button id="mN">N (중단)</button><button class="pri" id="mY">Y (계속)</button></div></div></div>
+
+<script>
+"use strict";
+const BIZ = "2026-10-31";               // 영업일(예시) - 기한계산 기준
+const P = {                             // TB_FX_PARAM (요약)
+  LRS_LIMIT_USD:250000, TCS_TH:1000000, TCS_GEN:20, TCS_EDU:5, TCS_LOAN:0, LEI_INR:500000000,
+  IMP_ADV_M:6, IMP_ADV_CAP_M:36, IMP_GRACE:15, BG_USD:200000, BOE_REG:180, PROFORMA_DAYS:180,
+  EXP_REAL_M:9, EXP_DOC:21, FDI_ALLOT:60, FDI_REFUND:15, FCGPR:30, FLAT_COMM:750, GST:18
+};
+const RATE = {USD:88.42, EUR:102.35, JPY:0.5841, GBP:117.9, AED:24.07, KRW:0.0634};
+const CUST = {                          // CH11 예시 고객 (가상 데이터)
+  "00000038":{name:"HANBIT AGRO INDIA PVT LTD", type:"CORP", pan:"AAACH4821K", iec:"AAACH4821K", lei:"5493001KJTIIGC8Y1R12", leiExp:"2026-08-14", gstin:"09AAACH4821K1Z5", acct:[["6015907000250","CA","INR",18452300.55],["6015907100013","EEFC","USD",215400.00]]},
+  "00000052":{name:"SEOUL PRECISION PARTS INDIA LTD", type:"CORP", pan:"AABCS7710Q", iec:"AABCS7710Q", lei:"984500A1B2C3D4E5F627", leiExp:"2027-03-02", gstin:"06AABCS7710Q1ZT", acct:[["6015907000412","CA","INR",612004110.00]]},
+  "00000107":{name:"PRIYA MEHTA", type:"IND", pan:"BQRPM5521L", iec:"", lei:"", leiExp:"", gstin:"", acct:[["6015907200871","SA","INR",3804210.00]], fyUsd:182500, fyInr:16050000, otherBank:12000}
+};
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const fmt = (n,d=2) => (isFinite(n)?Number(n):0).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+const num = id => parseFloat(String(($("#"+id)||{}).value||"0").replace(/,/g,""))||0;
+const val = id => ($("#"+id)||{}).value||"";
+const D = s => new Date(s+"T00:00:00Z");
+const iso = d => d.toISOString().slice(0,10);
+const addD = (s,n) => { const d=D(s); d.setUTCDate(d.getUTCDate()+n); return iso(d); };
+const addM = (s,n) => { const d=D(s), day=d.getUTCDate(); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth()+n);
+  const last=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,0)).getUTCDate(); d.setUTCDate(Math.min(day,last)); return iso(d); };
+const diff = (a,b) => Math.round((D(b)-D(a))/864e5);
+const fy = s => { const d=D(s), y=d.getUTCMonth()>=3?d.getUTCFullYear():d.getUTCFullYear()-1; return `${y}-${String(y+1).slice(2)}`; };
+const pill = (t,k) => `<span class="pill p-${k}">${t}</span>`;
+const log = (t) => { $("#log").innerHTML = t; };
+const leiValid = l => { if(!/^[A-Z0-9]{18}[0-9]{2}$/.test(l)) return false;
+  let r=0; for(const c of l){ const v=parseInt(c,36).toString(); for(const ch of v) r=(r*10+ +ch)%97; } return r===1; };
+
+/* ---------- 필드 빌더 ---------- */
+function F(o){ // {l,id,v,t,o,s,rq,ro,ph,btn}
+  const cls=[o.t==="num"?"n":"", o.rq?"rq":""].join(" ").trim();
+  let ctl;
+  if(o.t==="sel") ctl=`<select id="${o.id}" class="${cls}" ${o.ro?"disabled":""}>${o.o.map(x=>{const[k,v]=Array.isArray(x)?x:[x,x];return `<option value="${k}" ${String(k)===String(o.v)?"selected":""}>${v}</option>`}).join("")}</select>`;
+  else if(o.t==="area") ctl=`<textarea id="${o.id}" rows="2" maxlength="${o.max||500}">${o.v||""}</textarea>`;
+  else ctl=`<input id="${o.id}" class="${cls}" type="${o.t==="date"?"date":"text"}" value="${o.v??""}" ${o.ro?"readonly":""} ${o.max?`maxlength="${o.max}"`:""} placeholder="${o.ph||""}">`;
+  return `<div class="f ${o.s?"s"+o.s:""}"><label for="${o.id}" class="${o.rq?"rq":""}">${o.l}</label><div class="v">${ctl}${o.btn?`<button class="ic" type="button" data-act="${o.btn}" aria-label="조회">🔍</button>`:""}${o.suf||""}</div></div>`;
+}
+const SEC = (t,body,c=3,sub="") => `<section class="sec"><h3>${t}${sub?`<small>${sub}</small>`:""}</h3>${c?`<div class="grid" style="--c:${c}">${body}</div>`:body}</section>`;
+const TABLE = (h,rows,id="") => `<div class="tw"><table ${id?`id="${id}"`:""}><thead><tr>${h.map(x=>{const[n,c]=Array.isArray(x)?x:[x,""];return `<th class="${c}">${n}</th>`}).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+const TR = (cells,cls="") => `<tr class="${cls}">${cells.map(c=>Array.isArray(c)?`<td class="${c[1]}">${c[0]}</td>`:`<td>${c}</td>`).join("")}</tr>`;
+const ccyOpt = ["USD","EUR","JPY","GBP","AED","KRW"];
+
+/* 공통: 고객 헤더 (CH11 조회값, 수정불가) */
+function custBlock(cno="00000038", title="Applicant (CH11)"){
+  const c=CUST[cno];
+  return SEC(title,
+    F({l:"Customer No",id:"cno",v:cno,rq:1,btn:"cust"})+F({l:"Customer Name",id:"cnm",v:c.name,ro:1,s:2})+
+    F({l:"PANCARD",id:"pan",v:c.pan,ro:1})+F({l:"IEC No",id:"iec",v:c.iec||"-",ro:1})+
+    F({l:"LEI No",id:"lei",v:c.lei||"-",ro:1,suf:`<input id="leiExp" readonly value="${c.leiExp||""}" style="max-width:110px" aria-label="LEI 만료일">`})+
+    F({l:"Account No",id:"acct",t:"sel",rq:1,o:c.acct.map(a=>[a[0],`${a[0]} · ${a[1]} · ${a[2]} ${fmt(a[3])}`]),s:2})+
+    F({l:"Cust Type",id:"ctype",v:c.type,ro:1}));
+}
+/* 공통: Dealing Information */
+function dealingBlock(fcy=100000, ccy="USD"){
+  const r=RATE[ccy]||1;
+  return SEC("Dealing Information", TABLE(["Deal Type","Date","Ref No. (GBS MM)","Manual","FX Rate",["Current INR","n"],["Current "+ccy,"n"],["Total INR","n"],["Total "+ccy,"n"]],[
+    TR(["SPOT",BIZ,"MM2610310041","N",[r.toFixed(4),"n"],[fmt(fcy*r),"n"],[fmt(fcy),"n"],[fmt(fcy*2*r),"n"],[fmt(fcy*2),"n"]])
+  ]) + `<div class="msg info">딜 전체금액(Total)과 당해 송금 사용분(Current)을 분리 기록합니다. GBS MM 거래 조회가 안 되면 Ref No 수기입력(Manual=Y). <span class="rule">R-CM-07 · TB_FX_DEAL_LINK</span></div>`,0,"RBI 요구: 송금-딜링 맵핑");
+}
+function purposeField(def, dir="O"){
+  const list = dir==="O" ? [["S0101","S0101 Advance payment against imports"],["S0102","S0102 Payment towards imports - settlement of invoice"],["S1004","S1004 Consultancy / professional services"],["S0001","S0001 Portfolio investment abroad - equity"],["S0003","S0003 Direct investment abroad - equity"],["S0305","S0305 Travel for education"],["S0303","S0303 Travel for medical treatment"],["S1301","S1301 Family maintenance"],["S1302","S1302 Personal gifts and donations"],["OTHRS","Others (5자리 + 설명 직접입력)"]]
+    : [["P0103","P0103 Advance receipts against export contracts"],["P0102","P0102 Realisation of export bills on collection"],["P0101","P0101 Export bills negotiated/purchased"],["P0006","P0006 FDI in India - equity"],["P1301","P1301 Family maintenance"],["OTHRS","Others (5자리 + 설명 직접입력)"]];
+  return F({l:"Purpose Code",id:"pc",t:"sel",o:list,v:def,rq:1,s:2})+F({l:"Others Code / Desc",id:"pcf",ph:"5자리",max:5,suf:`<input id="pcd" placeholder="Description (100자)" maxlength="100">`,s:3});
+}
+
+/* ---------- 화면 정의 ---------- */
+const S = {};
+
+S.ch11 = {id:"CH11", t:"Customer FX Profile", g:"고객", tag:"변경", d:"PAN·IEC·LEI(+갱신일)·GSTIN·거주성을 등록하는 기준 화면. 송금 화면은 이 값만 조회해 표시하고 송금 시점에 스냅샷으로 저장합니다.",
+  html:()=>SEC("Customer",F({l:"Customer No",id:"cno",v:"00000038",rq:1,btn:"cust"})+F({l:"Name",id:"cnm",v:CUST["00000038"].name,s:2})+
+      F({l:"Customer Type",id:"ct",t:"sel",o:[["IND","IND 개인"],["NRI","NRI 비거주 개인"],["PROP","PROP 개인사업자"],["CORP","CORP 법인"],["PSU","PSU 공기업"]],v:"CORP",rq:1})+
+      F({l:"Residency",id:"rs",t:"sel",o:[["R","Resident"],["NR","Non-Resident"]],v:"R",rq:1})+F({l:"CIN / LLPIN",id:"cin",v:"U01403UP2016FTC084512"}))+
+    SEC("Regulatory IDs",F({l:"PAN",id:"pan",v:"AAACH4821K",rq:1,max:10,ph:"AAAAA9999A"})+F({l:"IEC (10자리)",id:"iec",v:"AAACH4821K",max:10})+F({l:"GSTIN",id:"gst",v:"09AAACH4821K1Z5",max:15})+
+      F({l:"LEI (20자리)",id:"lei",v:"5493001KJTIIGC8Y1R12",max:20})+F({l:"LEI Next Renewal",id:"leiExp",t:"date",v:"2026-08-14"})+F({l:"EEFC Account",id:"eefc",v:"6015907100013"}),3,"외부검증: PAN(Protean) · IEC(DGFT) · LEI(GLEIF)")+
+    `<section class="sec"><h3>Validation Result</h3><div id="ch11r"></div></section>`,
+  chk(){
+    const out=[], pan=val("pan"), lei=val("lei"), iec=val("iec"), exp=val("leiExp"), ct=val("ct");
+    const panOk=/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan); out.push(panOk?["ok","PAN 형식 정상"+(pan[3]==="C"?" (4번째 C = Company)":pan[3]==="P"?" (4번째 P = Individual)":"")]:["err","PAN 형식 오류 (AAAAA9999A)"]);
+    if(iec) out.push(/^[A-Z0-9]{10}$/.test(iec)?["ok","IEC 10자리 정상"+(iec===pan?" · PAN과 동일(법인 IEC 관행)":"")]:["err","IEC는 DGFT 10자리입니다"]);
+    if(lei){ out.push(leiValid(lei)?["ok","LEI 체크디지트(ISO 7064 MOD 97-10) 정상"]:["err","LEI 체크디지트 오류"]);
+      const left=diff(BIZ,exp); out.push(left<0?["warn",`LEI 갱신일 경과 (${-left}일). INR 50 crore 이상 거래 차단, 미만은 경고 후 진행`]:left<=30?["warn",`LEI 갱신 ${left}일 전`]:["ok",`LEI 유효 (${left}일 남음)`]); }
+    else if(["CORP","PSU"].includes(ct)) out.push(["warn","법인 LEI 미등록: INR 50 crore 이상 송금 불가"]);
+    const g=val("gst"); if(g) out.push(g.slice(2,12)===pan?["ok",`GSTIN-PAN 일치 · 주코드 ${g.slice(0,2)} → 지점(UP 09)과 ${g.slice(0,2)==="09"?"동일주: CGST 9% + SGST 9%":"타주: IGST 18%"}`]:["err","GSTIN 3~12자리가 PAN과 불일치"]);
+    $("#ch11r").innerHTML=out.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("");
+    show(out.filter(o=>o[0]!=="ok").length?out.filter(o=>o[0]!=="ok"):[["ok","PAN·IEC·LEI·GSTIN 검증 통과"]]);
+  }};
+
+S.rt11 = {id:"RT11", t:"Outward Remittance (General)", g:"당발송금", tag:"변경", d:"기업 무역외 일반송금(서비스 대가, 기타). 15CA/15CB, LEI 기준, 딜링 맵핑을 검증합니다. 개인 LRS는 RT12로 분리되었습니다.",
+  html:()=>custBlock("00000052")+SEC("Remit Information",
+      F({l:"Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="620,000.00">`,s:2})+F({l:"INR Equivalent",id:"inr",ro:1,t:"num"})+
+      purposeField("S1004")+F({l:"Remit Country",id:"rc",t:"sel",o:["KR","US","SG","AE","JP","DE"],v:"KR",rq:1})+
+      F({l:"Charge Type",id:"chg",t:"sel",o:["OUR","SHA","BEN"],v:"SHA",rq:1})+F({l:"Message",id:"msgf",v:"pacs.008 (CBPR+)",ro:1}))+
+    SEC("Tax (Income-tax Act s.195)",F({l:"Form 15CA Ack No",id:"ca",v:"",ph:"15자리",max:15})+F({l:"Form 15CB UDIN",id:"cb",v:"",max:18})+F({l:"Exempt (Rule 37BB)",id:"ex",t:"sel",o:[["N","해당없음"],["Y","면제목록 해당"]],v:"N"}))+
+    SEC("Beneficiary",F({l:"Name",id:"bn",v:"HANBIT ENGINEERING CO LTD",rq:1,s:2})+F({l:"Account / IBAN",id:"ba",v:"1002-334-551200"})+F({l:"Town",id:"bt",v:"SEOUL",rq:1})+F({l:"Country",id:"bc",v:"KR",rq:1})+F({l:"BIC",id:"bb",v:"HVBKKRSE"})+
+      F({l:"Remittance Info (Tag70)",id:"t70",v:"INV 2026-0912 ENGINEERING FEE",s:3,max:140})+F({l:"To Next Agent (Tag72)",id:"t72",v:"",s:3,max:210}),3,"ISO 20022 구조화주소: Town/Country 필수")+
+    dealingBlock(620000,"USD"),
+  init(){ const u=()=>{$("#inr").value=fmt(num("amt")*RATE[val("ccy")]);}; ["amt","ccy"].forEach(i=>$("#"+i).addEventListener("input",u)); u(); },
+  chk(){ const inr=num("amt")*RATE[val("ccy")], m=[];
+    if(val("ex")==="N" && !val("ca")) m.push(["err","비거주자 지급: Form 15CA 접수번호가 필요합니다. <span class='rule'>R-CM-09</span>"]);
+    m.push(...leiCheck(inr));
+    if(val("pc")==="OTHRS" && !/^[A-Z0-9]{5}$/.test(val("pcf"))) m.push(["err","Others 선택 시 Purpose 5자리 코드를 입력하세요. <span class='rule'>R-CM-05</span>"]);
+    return show(m.length?m:[["ok","검증 통과: 책임자 승인 대기 → pacs.008 생성"]]); }};
+
+S.rt12 = {id:"RT12", t:"LRS Outward Remittance", g:"당발송금", tag:"신규", d:"거주 개인의 LRS 송금. PAN 기준 회계연도(4/1~3/31) 누적 USD 250,000 한도, Form A2 자기신고, TCS(INR 10 lakh 초과분)를 자동 계산합니다.",
+  html:()=>custBlock("00000107","Remitter (CH11)")+SEC("LRS Purpose",
+      `<div class="cat" style="grid-column:1/-1">${[["EDU","교육(유학)","TCS 5% / 교육대출 0%"],["MED","의료","TCS 5%"],["TRV","여행","TCS 20%"],["GIFT","증여·기부","TCS 20%"],["MAINT","친척 생활비","TCS 20%"],["INV","해외투자(OPI/ODI)","TCS 20% · OI Rules"]].map(([k,n,s],i)=>`<label><input type="radio" name="lc" value="${k}" ${i===0?"checked":""}><span>${n}<small>${s}</small></span></label>`).join("")}</div>`+
+      purposeField("S0305")+F({l:"Education Loan",id:"loan",t:"sel",o:[["N","N - 자기자금"],["Y","Y - 금융기관 교육대출"]],v:"N"})+F({l:"Loan Sanction Ref",id:"lref"}),3)+
+    SEC("Amount",F({l:"Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="45,000.00">`,s:2})+F({l:"INR Equivalent",id:"inr",ro:1})+
+      F({l:"Form A2 징구",id:"a2",t:"sel",o:[["Y","Y"],["N","N"]],v:"Y",rq:1})+F({l:"타행 기송금 신고(USD)",id:"ob",t:"num",v:fmt(CUST["00000107"].otherBank)})+F({l:"Fiscal Year",id:"fy",v:fy(BIZ),ro:1}))+
+    `<section class="sec"><h3>LRS Limit &amp; TCS <small>TB_LRS_FY_SUM (PAN 행잠금)</small></h3><div id="lrsbox"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); $$("input[name=lc]").forEach(e=>e.addEventListener("change",u)); u(); },
+  calc(){ const c=CUST["00000107"], usd=num("amt")*RATE[val("ccy")]/RATE.USD, inr=num("amt")*RATE[val("ccy")];
+    $("#inr").value=fmt(inr);
+    const before=c.fyUsd+num("ob"), after=before+usd, left=P.LRS_LIMIT_USD-after;
+    const cat=($("input[name=lc]:checked")||{}).value, loan=val("loan")==="Y";
+    const rate = cat==="EDU"?(loan?P.TCS_LOAN:P.TCS_EDU):cat==="MED"?P.TCS_EDU:P.TCS_GEN;
+    const base=Math.max(0,c.fyInr+inr-Math.max(P.TCS_TH,c.fyInr)), tcs=base*rate/100;
+    const w=v=>Math.min(100,v/P.LRS_LIMIT_USD*100).toFixed(1)+"%";
+    this.r={left,tcs,rate,base};
+    $("#lrsbox").innerHTML=`<div class="kpis"><div class="kpi"><span>FY ${fy(BIZ)} 당행 누적</span><b>$${fmt(c.fyUsd,0)}</b></div><div class="kpi"><span>타행 신고</span><b>$${fmt(num("ob"),0)}</b></div><div class="kpi"><span>금회 송금</span><b>$${fmt(usd,0)}</b></div><div class="kpi"><span>잔여 한도</span><b style="color:var(${left<0?"--err":"--ok"})">$${fmt(left,0)}</b></div><div class="kpi"><span>TCS (${rate}%)</span><b>₹${fmt(tcs,0)}</b></div></div>
+      <div style="padding:0 10px 10px"><div class="gauge" role="img" aria-label="LRS 한도 사용률"><i class="cur" style="width:${w(after)}"></i><i style="width:${w(before)}"></i></div>
+      <span class="rule">한도 USD ${fmt(P.LRS_LIMIT_USD,0)} · TCS 과세표준 ₹${fmt(base,0)} = FY 누적 INR ₹${fmt(c.fyInr+inr,0)} 중 ₹${fmt(P.TCS_TH,0)} 초과분 · R-LRS-02/04</span></div>`; },
+  chk(){ this.calc(); const m=[];
+    if(this.r.left<0) m.push(["err",`LRS 한도 초과: USD ${fmt(-this.r.left,0)} 초과. 송금 불가 <span class='rule'>R-LRS-02</span>`]);
+    if(val("a2")!=="Y") m.push(["err","Form A2 및 FY 기송금 자기신고를 징구하세요. <span class='rule'>R-LRS-03</span>"]);
+    if(val("loan")==="Y" && !val("lref")) m.push(["err","교육대출 TCS 0% 적용 시 대출약정번호가 필요합니다."]);
+    return show(m.length?m:[["ok",`검증 통과 · TCS ₹${fmt(this.r.tcs,0)} 징수 · 익영업일 CIMS LRS 일일보고 대상`]]); }};
+
+S.rt13 = {id:"RT13", t:"Remittance (Trade Finance)", g:"당발송금", tag:"변경", d:"수입선수금(01) / 수입대금(02) / Direct Import(03) / 서비스(04) / ODI(05). 인보이스 Total·Consumed·Balance와 BoE 잔액 안에서 분할송금하고 IDPMS ORM을 생성합니다.",
+  inv:[["INV-2026-0912","PROFORMA","2026-09-12","2027-03-11","USD",120000,0],["HB/2026/0877","COMMERCIAL","2026-08-28","","USD",48500,20000],["HB/2026/0731","COMMERCIAL","2026-07-31","","USD",555,555]],
+  html(){ return `<section class="sec"><div class="grid" style="--c:3">${F({l:"Ref No",id:"ref",v:"",ph:"신규",btn:"ref"})}${F({l:"Product Type",id:"pt",t:"sel",rq:1,v:"01",s:2,o:[["01","01 Advance Import Remit"],["02","02 Import Bill Remit (BoE)"],["03","03 Direct Import Bill Remit"],["04","04 Import of Services"],["05","05 ODI / Overseas Investment"]]})}</div></section>`+
+    custBlock("00000038")+SEC("Basic Processing Info",
+      F({l:"Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="100,000.00">`,s:2})+F({l:"INR Equivalent",id:"inr",ro:1})+
+      purposeField("S0101")+F({l:"Country",id:"rc",t:"sel",o:["KR","CN","US","DE","JP"],v:"KR",rq:1})+F({l:"Nationality",id:"nat",v:"KR"})+
+      F({l:"Charge Type",id:"chg",t:"sel",o:["OUR","SHA","BEN"],v:"OUR",rq:1})+F({l:"TCS Y/N",id:"tcs",t:"sel",o:["N","Y"],v:"N"})+F({l:"Value Date",id:"vd",t:"date",v:BIZ,rq:1}))+
+    `<section class="sec"><div class="tabs" role="tablist">${["Default","Product Type","Amount Limit","Dealing Information"].map((t,i)=>`<button role="tab" data-tab="${i}" class="${i===2?"on":""}">${t}</button>`).join("")}</div><div id="tabc"></div></section>`+
+    SEC("Fee / Tax (CM-CMGL)",`<div id="fee"></div>`,0,"42020601 Commission + GST 18% · TCS · In lieu of Exchange"); },
+  tabs(i){ const c=$("#tabc");
+    if(i===0) c.innerHTML=`<div class="grid">${F({l:"Bene Name",id:"bn",v:"HANBIT SEED CO LTD",rq:1,s:2})+F({l:"Bene Acct",id:"ba",v:"301-0221-7781-21",rq:1})+F({l:"Town / Country",id:"bt",v:"ANSEONG / KR",rq:1})+F({l:"Receiver's Correspondent",id:"rcv",v:"HVBKKRSE"})+F({l:"Reimbursement Bank (Nostro)",id:"rb",v:"4001 · IRVTUS3N",ro:1})+F({l:"TAG 70 (Additional Details)",id:"t70",v:"ADVANCE PAYMENT PI INV-2026-0912",s:3})+F({l:"TAG 72 (Instr. for Receiving Bank)",id:"t72",s:3})}</div><div class="msg info">Reimbursement Bank은 통화별 기본 Nostro(USD → 4001)로 자동 세팅됩니다. <span class="rule">R-IMP-14</span></div>`;
+    else if(i===1) c.innerHTML=`<div class="grid">${F({l:"Capital Goods",id:"cap",t:"sel",o:[["N","N - 일반재 (6개월)"],["Y","Y - 자본재 (3년)"]],v:"N"})+F({l:"BG / SBLC No",id:"bg",v:""})+F({l:"BG Expiry",id:"bgx",t:"date"})+F({l:"Shipment Date (B/L)",id:"shp",t:"date",v:"2026-08-30"})+F({l:"Incoterms",id:"inc",t:"sel",o:["EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"],v:"CIF"})+F({l:"Form A2",id:"a2",t:"sel",o:["Y","N"],v:"Y"})}</div><div id="advbox"></div>`;
+    else if(i===2) c.innerHTML=`<div class="kpis"><div class="kpi"><span>Total Remittance FY ${fy(BIZ)}</span><b>$1,284,300</b></div><div class="kpi"><span>FY 기간</span><b style="font-size:14px">${fy(BIZ).slice(0,4)}-04-01 ~ ${+fy(BIZ).slice(0,4)+1}-03-31</b></div></div>`+
+      TABLE(["",["Invoice No",""],"Category","Issue","Valid To","CCY",["Total","n"],["Consumed","n"],["Balance","n"],["This Remit","n"]],this.inv.map((r,k)=>TR([`<input type="radio" name="inv" value="${k}" ${k===0?"checked":""} aria-label="${r[0]} 선택">`,r[0],r[1],r[2],r[3]||"-",r[4],[fmt(r[5]),"n"],[fmt(r[6]),"n"],[fmt(r[5]-r[6]),"n"],[`<input class="n" id="al${k}" value="${k===0?"100,000.00":""}" style="width:110px" aria-label="배분액">`,"n"]])),"invt")+
+      `<div class="grid">${F({l:"Bill of Entry No",id:"boe",v:"",btn:"boe",ph:"Product 02/03 필수"})+F({l:"BoE Registration Date",id:"boed",t:"date",v:""})+F({l:"BoE Value / Product",id:"boev",v:"",ro:1})}</div><div id="invmsg"></div>`;
+    else c.innerHTML=dealingBlock(num("amt")||100000,val("ccy")||"USD").replace(/^<section class="sec">|<\/section>$/g,"");
+    $$("#tabc input,#tabc select").forEach(e=>e.addEventListener("input",()=>this.calc()));
+    $$("[data-tab]").forEach(b=>b.classList.toggle("on",+b.dataset.tab===i)); this.cur=i; this.calc(); },
+  init(){ $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>this.tabs(+b.dataset.tab)));
+    ["amt","ccy","pt","acct","vd"].forEach(i=>$("#"+i).addEventListener("input",()=>this.calc()));
+    $("#pt").addEventListener("change",()=>{ $("#pc").value={"01":"S0101","02":"S0102","03":"S0102","04":"S1004","05":"S0003"}[val("pt")]; this.calc(); });
+    this.tabs(2); },
+  calc(){ const inr=num("amt")*RATE[val("ccy")], pt=val("pt"); $("#inr").value=fmt(inr);
+    const eefc=(CUST["00000038"].acct.find(a=>a[0]===val("acct"))||[])[1]==="EEFC";
+    const comm = pt==="03"?P.FLAT_COMM:Math.max(500,Math.min(inr*0.00125,15000));
+    const rows=[["42020601","Commission"+(pt==="03"?" (Direct Import 정액)":""),"INR",comm],["20990017","CGST 9% (동일주 UP)","INR",comm*.09],["20990018","SGST 9%","INR",comm*.09]];
+    if(eefc) rows.push(["4202xxxx","In lieu of Exchange (EEFC 출금)","INR",Math.min(inr*0.0025,10000)]);
+    if(val("tcs")==="Y") rows.push(["TCS-NEW","TCS (예외 수기)","INR",0]);
+    $("#fee").innerHTML=TABLE(["GL","Description","CCY",["Amount","n"],"Manual"],[...rows.map(r=>TR([r[0],r[1],r[2],[fmt(r[3]),"n"],"N"])),TR(["","<b>Total</b>","INR",[`<b>${fmt(rows.reduce((a,r)=>a+r[3],0))}</b>`,"n"],""])])+
+      `<div class="msg info">GSTIN 주코드가 지점(UP)과 같으면 CGST+SGST, 다르면 IGST 18%(20990016). Commission은 CCY/Amount 수기입력 가능. <span class="rule">R-CM-10 · R-IMP-12/13</span></div>`;
+    if(this.cur===1){ const cap=val("cap")==="Y", due=addM(val("vd")||BIZ,cap?P.IMP_ADV_CAP_M:P.IMP_ADV_M), ev=addD(due,P.IMP_GRACE), usd=inr/RATE.USD;
+      $("#advbox").innerHTML= pt==="01"? `<div class="tl"><div class="done"><b>${val("vd")}</b><span>선수금 송금</span></div><div class="due"><b>${due}</b><span>수입기한 (+${cap?36:6}M)</span></div><div><b>${ev}</b><span>BoE 증빙기한 (+15일)</span></div></div>`+
+        (usd>P.BG_USD?`<div class="msg ${val("bg")?"ok":"err"}">USD ${fmt(usd,0)} &gt; ${fmt(P.BG_USD,0)}: BG/SBLC 정보 ${val("bg")?"입력됨":"필수"} <span class="rule">R-IMP-06</span></div>`:"")
+        : `<div class="msg info">Shipment ${val("shp")} → 결제기한 ${addM(val("shp"),6)} (선적+6개월) <span class="rule">R-IMP-05</span></div>`; }
+    if(this.cur===2){ const m=[]; this.inv.forEach((r,k)=>{ const a=num("al"+k); if(a>r[5]-r[6]) m.push(["err",`${r[0]}: 배분액 ${fmt(a)} &gt; Balance ${fmt(r[5]-r[6])} <span class='rule'>R-IMP-02</span>`]);
+        if(a && r[1]==="PROFORMA" && r[3] && (val("vd")>r[3])) m.push(["err",`${r[0]}: Proforma 유효기간(${r[3]}) 경과 <span class='rule'>R-IMP-03</span>`]); });
+      const tot=this.inv.reduce((s,r,k)=>s+num("al"+k),0); if(Math.abs(tot-num("amt"))>0.005) m.push(["warn",`인보이스 배분 합계 ${fmt(tot)} ≠ 송금액 ${fmt(num("amt"))}`]);
+      const bd=val("boed"); if(bd && diff(val("vd"),bd)>P.BOE_REG) m.push(["err","Bill of Entry should have registered within 6 months after the remittance transfer <span class='rule'>R-IMP-08</span>"]);
+      if(val("boe")) m.push(["info","BoE Product Code와 RT13 Product Type이 달라도 진행합니다(정보 표시). <span class='rule'>R-IMP-09</span>"]);
+      if(["02","03"].includes(pt) && !val("boe")) m.push(["warn","Product 02/03: Bill of Entry 맵핑이 필요합니다."]);
+      $("#invmsg").innerHTML=m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")||`<div class="msg ok">배분 정상: 승인 시 Consumed 증가 · Balance 차감 (TB_TRD_PAY_ALLOC)</div>`; } },
+  chk(){ this.calc(); const inr=num("amt")*RATE[val("ccy")], m=[...leiCheck(inr)];
+    if(this.cur===2 && $("#invmsg .msg.err")) m.push(["err","인보이스/BoE 검증 오류가 있습니다 (Amount Limit 탭)."]);
+    return show(m.length?m:[["ok",`검증 통과 · 승인 시 IDPMS ORM(A) 생성${val("pt")==="01"?" · 선수금 증빙기한(OBLIGATION) 생성":""}`]]); }};
+
+S.rt73 = {id:"RT73", t:"Invoice / Bill of Entry Mgmt", g:"수출입서류", tag:"변경", d:"상업송장·Packing List·Bill of Entry 등록. 한도관리는 Invoice Total Amount 기준이며, Invoice 탭 값은 BoE 탭으로 자동 복사됩니다.",
+  html:()=>`<section class="sec"><div class="tabs">${["INVOICE","BILL OF ENTRY"].map((t,i)=>`<button data-tab="${i}" class="${i?"":"on"}">${t}</button>`).join("")}</div><div id="tabc"></div></section>`,
+  tab(i){ $$("[data-tab]").forEach(b=>b.classList.toggle("on",+b.dataset.tab===i)); const c=$("#tabc"), g=x=>`<div class="grid">${x}</div>`;
+    if(i===0) c.innerHTML=g(F({l:"Invoice Category",id:"icat",t:"sel",o:["PROFORMA","COMMERCIAL","CONSULAR","CUSTOMS"],v:"COMMERCIAL",rq:1})+F({l:"Invoice No",id:"ino",v:"HB/2026/0877",rq:1})+F({l:"Issue Date",id:"idt",t:"date",v:"2026-08-28",rq:1})+
+        F({l:"Valid To (Proforma)",id:"ivt",t:"date"})+F({l:"Remit Type",id:"rt",t:"sel",o:[["O","O Outward (수입)"],["I","I Inward (수출)"]],v:"O"})+F({l:"Cust No",id:"cno",v:"00000038",btn:"cust"})+
+        F({l:"Ccy / Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="41,101.69">`})+F({l:"IGST Rate % (선택)",id:"igr",t:"num",v:"18"})+F({l:"IGST Amount",id:"iga",ro:1,t:"num"})+
+        F({l:"Total Amount",id:"tot",ro:1,t:"num"})+F({l:"Consumed",id:"con",ro:1,t:"num",v:"20,000.00"})+F({l:"Balance",id:"bal",ro:1,t:"num"})+
+        F({l:"INCOTERMS 2020",id:"inc",t:"sel",o:["EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"],v:"CIF"})+F({l:"Mode of Ship",id:"mos",t:"sel",o:[["1","1 Land"],["2","2 Ship"],["3","3 Airway"],["4","4 Combined"]],v:"2"})+
+        F({l:"Shipping Date",id:"sdt",t:"date",v:"2026-11-20"})+F({l:"Vessel Name (Flight No)",id:"ves",v:"HMM ALGECIRAS",max:20})+F({l:"Voyage No",id:"voy",v:"0041W",max:20})+F({l:"Transport Doc No",id:"tdn",v:"HDMUBUSA2611207"})+
+        F({l:"Port of Shipment",id:"pos",v:"BUSAN"})+F({l:"Country of Origin",id:"coo",t:"sel",o:["KR","CN","JP","US"],v:"KR"})+F({l:"Country of Consignment",id:"coc",t:"sel",o:[["","(원산지와 같음)"],"SG","AE","HK"],v:""})+
+        F({l:"Port of Discharge",id:"pod",v:"NHAVA SHEVA"})+F({l:"Port Code",id:"pcd",v:"INNSA1",max:6})+F({l:"Place of Destination",id:"pld",v:"NOIDA"})+F({l:"HS Code",id:"hs",v:"12099190",max:8})+F({l:"Bene Name",id:"bn",v:"HANBIT SEED CO LTD",s:2}))+
+      SEC("Packing Lists Detail",TABLE(["No","Marks & No of PKG","Desc of Goods",["Qty","n"],["Unit Price","n"],["Amount","n"]],[TR(["1","HB-01~40","VEGETABLE SEEDS (HYBRID TOMATO)",["400","n"],["62.50","n"],["25,000.00","n"]]),TR(["2","HB-41~60","VEGETABLE SEEDS (CHILLI)",["200","n"],["80.51","n"],["16,101.69","n"]])]),0,"선적일이 미래이면 생략 가능")+`<div id="r73"></div>`;
+    else c.innerHTML=`<div class="msg info">Invoice 탭의 포트·국가·금액·IGST가 자동 복사되었습니다. IDPMS 수신 BoE가 있으면 🔍로 불러와 매칭합니다. <span class="rule">R-INV-05</span></div>`+
+      g(F({l:"BoE Type",id:"bt",t:"sel",o:[["1","1 Home Consumption"],["2","2 Warehousing"],["3","3 Ex-bond Goods"]],v:"1",rq:1})+F({l:"Bill of Entry No",id:"bno",v:"4718263",rq:1,btn:"idpms",max:7})+F({l:"BoE Date",id:"bdt",t:"date",v:"2026-09-18",rq:1})+
+        F({l:"Port Code",id:"bpc",v:val("pcd")||"INNSA1",rq:1})+F({l:"Amount",id:"ba",t:"num",v:fmt(this.s?.amt||41101.69)})+F({l:"IGST Rate / Amount",id:"bir",v:(this.s?.igr||18)+" %",suf:`<input id="bia" class="n" readonly value="${fmt((this.s?.amt||41101.69)*(this.s?.igr||18)/100)}">`})+
+        F({l:"Total Amount",id:"btot",ro:1,v:fmt((this.s?.amt||41101.69)*(1+(this.s?.igr||18)/100))})+F({l:"Settled",id:"bset",ro:1,v:"20,000.00"})+F({l:"Outstanding",id:"bout",ro:1,v:fmt((this.s?.amt||41101.69)*(1+(this.s?.igr||18)/100)-20000)})+
+        F({l:"Source",id:"src",v:"I · IDPMS 수신",ro:1})+F({l:"Registration Date",id:"brd",t:"date",v:BIZ})+F({l:"IDPMS Status",id:"bst",v:"PART",ro:1}));
+    $$("#tabc input,#tabc select").forEach(e=>e.addEventListener("input",()=>this.calc())); this.calc(); },
+  init(){ $$("[data-tab]").forEach(b=>b.addEventListener("click",()=>{ if(+b.dataset.tab===1) this.s={amt:num("amt"),igr:num("igr")}; this.tab(+b.dataset.tab); })); this.tab(0); },
+  calc(){ if(!$("#amt")) return; const a=num("amt"), ig=a*num("igr")/100, t=a+ig; $("#iga").value=fmt(ig); $("#tot").value=fmt(t); $("#bal").value=fmt(t-num("con"));
+    const m=[], fut=val("sdt")>BIZ;
+    m.push(fut?["info",`Shipping Date ${val("sdt")} &gt; ${BIZ}(미래): Packing List 입력 생략 가능 <span class='rule'>R-INV-02</span>`]:["info","선적 완료건: Packing List 1건 이상 필수"]);
+    if(val("icat")==="PROFORMA" && !val("ivt")) m.push(["warn",`Proforma 유효기간 미입력 → ${addD(val("idt"),P.PROFORMA_DAYS)} (발행일+${P.PROFORMA_DAYS}일) 적용`]);
+    m.push(["info",`보고용 Country = ${val("coc")||val("coo")} (${val("coc")?"위탁국":"원산지"}) <span class='rule'>R-INV-04</span>`]);
+    if(!/^[A-Z]{2}[A-Z0-9]{4}$/.test(val("pcd"))) m.push(["err","Port Code는 ICEGATE 6자리(예: INNSA1)"]);
+    $("#r73").innerHTML=m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join(""); },
+  chk(){ this.calc(); return show($("#r73 .msg.err")?[["err","입력 오류를 확인하세요."]]:[["ok","인보이스 저장 가능 · CUST_NO+INV_NO+INV_DT 중복 없음"]]); }};
+
+S.rt21 = {id:"RT21", t:"Inward Remittance Registry", g:"타발송금", tag:"변경", d:"타발 수신(pacs.008/MT103) 등록. Purpose Code에 따라 수출 IRM 자동생성(EDPMS), FDI는 FD11로 이관, INR Vostro 지급지시는 VS21로 연결됩니다.",
+  html:()=>SEC("R/T Info",F({l:"Their Ref",id:"tr",v:"KEBH261031778812",rq:1})+F({l:"UETR",id:"uetr",v:"8a562c67-ca16-48ba-b074-65581be6f001",ro:1,s:2})+
+      F({l:"Ccy / Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="86,400.00">`})+F({l:"Value Date",id:"vd",t:"date",v:BIZ})+F({l:"Charge",id:"chg",t:"sel",o:["SHA","OUR","BEN"],v:"SHA"})+
+      purposeField("P0103","I")+F({l:"Remitter",id:"rn",v:"DAESUNG FOODS CO LTD",s:2})+F({l:"Remit Country",id:"rc",v:"KR"}))+custBlock("00000052","Beneficiary (CH11)")+
+    `<section class="sec"><h3>Routing by Purpose</h3><div id="route"></div></section>`+dealingBlock(86400,"USD"),
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const pc=val("pc"), inr=num("amt")*RATE[val("ccy")]; let h;
+    if(/^P01/.test(pc)) h=`<div class="msg ok">수출 관련 입금: IRM 자동생성 → EDPMS 송신 <span class="rule">R-EXP-03</span></div>`+TABLE(["IRM No","IEC","Remitter","CCY",["Amount","n"],["INR","n"],"Advance","Ship Due"],[TR(["0291402261031000017",val("iec")||"-",val("rn"),val("ccy"),[fmt(num("amt")),"n"],[fmt(inr),"n"],pc==="P0103"?"Y":"N",pc==="P0103"?addM(BIZ,12):"-"])]);
+    else if(pc==="P0006") h=`<div class="msg info">FDI 입금: FD11 FDI Inflow Registry로 이관 · 배정기한 ${addD(BIZ,60)} · 반환기한 ${addD(BIZ,75)}</div>`;
+    else h=`<div class="msg info">일반 타발: 고객계좌 입금 / FIRC 발급</div>`;
+    $("#route").innerHTML=h; },
+  chk(){ return show(leiCheck(num("amt")*RATE[val("ccy")]).concat([["ok","등록 가능"]])); }};
+
+S.rt25 = {id:"RT25", t:"Export Realization (IRM ↔ SB)", g:"타발송금", tag:"신규", d:"EDPMS Shipping Bill과 IRM(타발)을 다건 맵핑해 회수 보고합니다. 잔여 미회수분은 연장·상각·상계로 처리합니다.",
+  sb:[["5521907","2026-02-11","INMAA1","2026-02-12","USD",64000,40000],["5630118","2026-03-20","INNSA1","2026-03-20","USD",38500,0],["5799021","2026-06-02","INDEL4","2026-06-03","USD",22000,0]],
+  html(){ return custBlock("00000052","Exporter (CH11)")+SEC("Inward Remittance (IRM)",TABLE(["IRM No","Remitter","CCY",["Amount","n"],["Utilized","n"],["Balance","n"]],[TR(["0291402261031000017","DAESUNG FOODS CO LTD","USD",["86,400.00","n"],["0.00","n"],["86,400.00","n"]],"sel")]),0)+
+    SEC("Shipping Bills (EDPMS)",TABLE(["SB No","SB Date","Port","LEO","CCY",["FOB","n"],["Realized","n"],["Outstanding","n"],"Realize Due","Status",["Map Amt","n"]],this.sb.map((r,k)=>{const due=addM(r[3],P.EXP_REAL_M), left=diff(BIZ,due);
+      return TR([r[0],r[1],r[2],r[3],r[4],[fmt(r[5]),"n"],[fmt(r[6]),"n"],[fmt(r[5]-r[6]),"n"],due,left<0?pill(`OVERDUE ${-left}d`,"err"):left<=30?pill(`D-${left}`,"warn"):pill("OPEN","info"),[`<input class="n" id="m${k}" style="width:110px" value="${k===0?"24,000.00":k===1?"38,500.00":""}" aria-label="맵핑액">`,"n"]]);}))+`<div id="r25"></div>`,0,"회수기한 = LEO + 9개월 (파라미터 이력 적용)"); },
+  init(){ $$("#view input").forEach(e=>e.addEventListener("input",()=>this.calc())); this.calc(); },
+  calc(){ const m=[]; let tot=0; this.sb.forEach((r,k)=>{const a=num("m"+k); tot+=a; if(a>r[5]-r[6]) m.push(["err",`SB ${r[0]}: 맵핑액이 미회수액 초과 <span class='rule'>R-EXP-04</span>`]);});
+    if(tot>86400) m.push(["err",`맵핑 합계 ${fmt(tot)} &gt; IRM 잔액 86,400.00`]);
+    m.push(["info",`맵핑 합계 USD ${fmt(tot)} · IRM 잔액 USD ${fmt(86400-tot)} → EDPMS Realization(RLZN) 보고`]);
+    $("#r25").innerHTML=m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join(""); },
+  chk(){ this.calc(); return show($("#r25 .msg.err")?[["err","맵핑 오류"]]:[["ok","EDPMS RLZN 보고 대상 생성"]]); }};
+
+const LODGE = {
+  "1":["FBFP (Foreign Bill Free of Payment)","선수금 수령 후 서류 직송",["Inward Remittance Ref (다건)","Export Agency-Custom","Logistic Name","Invoice Serial No","FOB / Freight / Insurance","Form No","Port Code"]],
+  "2A":["Bill Collection","D/P·D/A 추심 (L/C 방식에도 사용)",["Counter Party Name & Address","LC No (If any)","Dispatch Details (POD No)","Dispatch Date","FOB Currency / Value","Packing List","Country"]],
+  "2B":["Bill Realization","추심대금 회수",["Lodgement Ref No","Deal Type","Exchange Rate","INR Amount","Discrepancy (if any)","Country"]],
+  "3":["Export Lodge and Realize","서류접수·회수 동시",["Remitter Name & Address","Shipping Bill Amount","Freight / Insurance Currency & Value","Form No","Logistic Details","Deal Type / Exchange Rate / INR Amount"]],
+};
+S.xp73 = {id:"XP73", t:"Doc of Export Management", g:"수출입서류", tag:"변경", d:"수출서류 Lodgement. 상단 Lodgement Category(1 / 2A / 2B / 3)에 따라 입력항목이 바뀝니다. Invoice는 RT73 등록분을 돋보기로 불러옵니다.",
+  html:()=>SEC("Lodgement",`<div class="cat" style="grid-column:1/-1">${Object.entries(LODGE).map(([k,v],i)=>`<label><input type="radio" name="lcat" value="${k}" ${k==="2A"?"checked":""}><span><b>${k}</b> ${v[0]}<small>${v[1]}</small></span></label>`).join("")}</div>`+
+      F({l:"Payment Terms",id:"pt",t:"sel",o:["DP","DA","LC","ADV","OA"],v:"DA",rq:1})+F({l:"Lodgement Ref No",id:"lr",v:"XL2610310004",ro:1})+F({l:"DA/DP Ref No (XP11)",id:"xp11",v:"XP2610290012",btn:"xp11"})+F({l:"Form No",id:"fno",v:""})+F({l:"AD Code",id:"ad",v:"02914020000009",ro:1})+F({l:"Tenor (days)",id:"ten",t:"num",v:"90"}))+
+    custBlock("00000052")+SEC("Beneficiary Information",F({l:"Name",id:"bn",v:"DAESUNG FOODS CO LTD",rq:1})+F({l:"Country",id:"bc",v:"KR",rq:1})+F({l:"Phone No",id:"bp",v:"+82-2-555-0142"})+F({l:"Address",id:"ba",v:"21 TEHERAN-RO, GANGNAM-GU",s:3}))+
+    SEC("Shipping Management",F({l:"Invoice No (=SB No)",id:"ino",v:"EXP-26-0311",btn:"rt73"})+F({l:"Issue Date",id:"idt",t:"date",v:"2026-03-18"})+F({l:"Transport Doc No",id:"tdn",v:"MAEU2603201187"})+
+      F({l:"Mode Of Shipment",id:"mos",t:"sel",o:[["1","1 Land"],["2","2 Ship"],["3","3 Airway"],["4","4 Combined"]],v:"2"})+F({l:"Port of Shipment",id:"pos",v:"NHAVA SHEVA"})+F({l:"Port Code",id:"pcd",v:"INNSA1"})+
+      F({l:"Country of Origin",id:"coo",v:"IN"})+F({l:"Country of Consignment",id:"coc",v:""})+F({l:"Place of Destination",id:"pld",v:"BUSAN"}))+
+    SEC("Amount Information",TABLE(["","FOB","Freight","Insurance"],[TR(["Currency","USD","USD","USD"]),TR(["Rate %","-",`<input class="n" id="fr" value="" aria-label="운임 비율" placeholder="% (선택)" style="width:90px">`,`<input class="n" id="ir" value="0.5" aria-label="보험 비율" style="width:90px">`]),TR(["Amount",`<input class="n" id="fob" value="38,500.00" style="width:120px" aria-label="FOB">`,`<input class="n" id="frt" value="1,850.00" style="width:120px" aria-label="Freight">`,`<input class="n" id="ins" readonly style="width:120px" aria-label="Insurance">`])])+
+      `<div class="grid">${F({l:"Amount",id:"am",v:"38,500.00",t:"num"})+F({l:"IGST Rate / Amount",id:"igr",v:"",ph:"선택값"})+F({l:"Total (=SB Amount)",id:"tam",ro:1,v:"38,500.00"})}</div>`,0,"Rate% 입력 시 FOB × % 로 자동계산 (소수 2자리)")+
+    `<section class="sec"><h3>Category Fields <small id="lcs"></small></h3><div id="lcf"></div></section>`+
+    SEC("Additional Information",F({l:"Remarks",id:"rmk",t:"area",s:3})+F({l:"Discrepancy",id:"dis",t:"area",s:3}),3,"각 500자")+dealingBlock(38500,"USD"),
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const k=($("input[name=lcat]:checked")||{}).value, L=LODGE[k];
+    $("#ins").value=fmt(num("fob")*num("ir")/100); if(num("fr")) $("#frt").value=fmt(num("fob")*num("fr")/100);
+    $("#lcs").textContent=`${k} · ${L[0]}`;
+    $("#lcf").innerHTML=`<div class="grid">${L[2].map((n,i)=>F({l:n,id:"lc"+i,rq:i<2})).join("")}</div>`+(k==="1"?`<div class="msg info">Inward Remittance Ref는 GBS 타발 Ref를 조회해 다건 입력·금액 맵핑합니다.</div>`:"")+`<div class="msg info">카테고리별 필수항목 (노이다지점 요청 Sheet7) <span class="rule">R-EXP-01</span></div>`; },
+  chk(){ const lr=diff("2026-03-20",BIZ); return show([lr>P.EXP_DOC?["warn",`LEO 이후 ${lr}일 경과(기준 ${P.EXP_DOC}일): 지연사유 입력 필요 <span class='rule'>R-EXP-02</span>`]:["ok","서류제출기한 내"],["ok","Lodgement 등록 가능"]]); }};
+
+S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국인직접투자 수취 건. 해외은행 KYC·인접국(Press Note 3) 검증, INR 확정 환산, 주식배정(60일)·반환(75일)·FC-GPR(배정+30일) 기한을 관리합니다.",
+  html:()=>custBlock("00000052","Investee Company (CH11)")+SEC("Investment",F({l:"Inward Ref",id:"ir",v:"RT21-2609010031",ro:1})+F({l:"Investor",id:"inv",v:"SEOUL PRECISION CO LTD",rq:1,s:2})+
+      F({l:"Investor Country",id:"ic",t:"sel",o:["KR","JP","US","SG","CN","BD","PK","NP"],v:"KR",rq:1})+F({l:"Route",id:"route",t:"sel",o:["AUTO","GOVT"],v:"AUTO"})+F({l:"Govt Approval Ref",id:"gref"})+
+      F({l:"Instrument",id:"ins",t:"sel",o:[["EQ","Equity"],["CCPS","CCPS"],["CCD","CCD"],["WAR","Warrants"]],v:"EQ"})+F({l:"KYC from Remitting Bank",id:"kyc",t:"sel",o:["Y","N"],v:"Y",rq:1})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-09-01",rq:1}))+
+    SEC("INR Fixed Conversion",F({l:"INR 확정",id:"fix",t:"sel",o:[["Y","Y - 약정 INR 금액 고정"],["N","N - 외화금액 기준"]],v:"Y"})+F({l:"Target INR",id:"tinr",t:"num",v:"250,000,000.00"})+F({l:"Deal Rate (USD/INR)",id:"rate",t:"num",v:"88.4200"})+
+      F({l:"Required USD",id:"rusd",ro:1})+F({l:"Received USD",id:"recv",t:"num",v:"2,827,415.97"})+F({l:"Credited INR",id:"cinr",ro:1}),3,"FCY = ROUNDUP(Target INR / Rate, 2)")+
+    SEC("Allotment",F({l:"Allotment Date",id:"ad",t:"date",v:""})+F({l:"Allotted INR",id:"ainr",t:"num",v:"0.00"})+F({l:"FIRMS SRN",id:"srn"}))+`<section class="sec"><h3>Deadlines <small>TB_FX_OBLIGATION</small></h3><div id="fdtl"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const r=num("rate")||1, req=Math.ceil(num("tinr")/r*100)/100; $("#rusd").value=fmt(req); const cr=num("recv")*r; $("#cinr").value=fmt(cr);
+    const rd=val("rd"), a=addD(rd,P.FDI_ALLOT), rf=addD(rd,P.FDI_ALLOT+P.FDI_REFUND), ad=val("ad"), st=(d,done)=>done?"done":(BIZ>d?"over":diff(BIZ,d)<=15?"due":"");
+    $("#fdtl").innerHTML=`<div class="tl"><div class="done"><b>${rd}</b><span>수취 · FIRC</span></div><div class="${st(a,!!ad)}"><b>${a}</b><span>배정기한 (+60일)${!ad&&BIZ>a?" · 경과":""}</span></div><div class="${st(rf,false)}"><b>${rf}</b><span>미배정분 반환기한 (+75일)</span></div><div class="${ad?st(addD(ad,P.FCGPR),!!val("srn")):""}"><b>${ad?addD(ad,P.FCGPR):"배정 후 산출"}</b><span>FC-GPR 신고 (+30일)</span></div></div>`+
+      `<div class="msg ${cr+0.005>=num("tinr")?"ok":"err"}">입금 INR ${fmt(cr)} ${cr+0.005>=num("tinr")?"≥":"<"} 목표 INR ${fmt(num("tinr"))} <span class="rule">R-FDI-05</span></div>`+
+      (!ad&&BIZ>a?`<div class="msg err">배정기한 경과 · 미배정 INR ${fmt(cr-num("ainr"))} → ${rf}까지 FD12 반환송금 필요</div>`:""); },
+  chk(){ this.calc(); const m=[]; if(["CN","BD","PK","NP"].includes(val("ic")) && (val("route")!=="GOVT"||!val("gref"))) m.push(["err","육상국경 인접국 투자자: Government Route + 승인번호 필수 <span class='rule'>R-FDI-01</span>"]);
+    if(val("kyc")!=="Y") m.push(["err","송금은행 KYC 미수취"]); return show(m.length?m:[["ok","FDI 등록 가능 · 기한 3건 생성"]]); }};
+
+S.fd12 = {id:"FD12", t:"FDI Refund Remittance", g:"FDI", tag:"신규", d:"60일 내 미배정분의 반환송금. 원 송금인·원 통화로 반환하며, 반환기한(수취일+75일) 경과 시 RBI 승인번호 없이는 승인되지 않습니다.",
+  html:()=>SEC("Original FDI",F({l:"FDI Ref",id:"fr",v:"FDI2609010007",ro:1,btn:"fdi"})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-08-10",ro:1})+F({l:"Investor",id:"inv",v:"SEOUL PRECISION CO LTD",ro:1})+
+      F({l:"Original INR",id:"oinr",v:"250,000,000.00",ro:1})+F({l:"Allotted INR",id:"ainr",v:"200,000,000.00",ro:1})+F({l:"Unallotted INR",id:"uinr",v:"50,000,000.00",ro:1}))+
+    SEC("Refund",F({l:"Refund Type",id:"rt",t:"sel",o:[["NONALLOT","미배정분"],["EXCESS","초과입금"],["REJECT","투자불허/KYC"]],v:"NONALLOT"})+F({l:"Refund Date",id:"fd",t:"date",v:BIZ})+F({l:"Refund INR (확정)",id:"rinr",t:"num",v:"50,000,000.00"})+
+      F({l:"CCY",id:"ccy",v:"USD",ro:1})+F({l:"Rate",id:"rate",t:"num",v:"88.4200"})+F({l:"Refund USD",id:"rusd",ro:1})+F({l:"RBI Approval Ref",id:"rbi"})+F({l:"Bene (원 송금인)",id:"bn",v:"SEOUL PRECISION CO LTD",ro:1,s:2}))+`<div id="r12"></div>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const usd=Math.round(num("rinr")/(num("rate")||1)*100)/100; $("#rusd").value=fmt(usd); const due=addD(val("rd"),75), late=val("fd")>due, m=[];
+    if(num("rinr")>50000000) m.push(["err","반환액이 미배정잔액을 초과 <span class='rule'>R-FDI-03</span>"]);
+    m.push(late?[val("rbi")?"warn":"err",`반환기한 ${due} 경과 (${diff(due,val("fd"))}일): RBI 승인번호 ${val("rbi")?"입력됨":"필수"} <span class='rule'>R-FDI-04</span>`]:["ok",`반환기한 ${due} 이내`]);
+    m.push(["info",`INR 확정 반환: USD ${fmt(usd)} = ₹${fmt(num("rinr"))} ÷ ${num("rate")} · 당발 Product 06 송금 생성`]);
+    $("#r12").innerHTML=`<section class="sec"><h3>Result</h3>${m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")}</section>`; },
+  chk(){ this.calc(); return show($("#r12 .msg.err")?[["err","승인 불가 항목이 있습니다"]]:[["ok","반환송금 생성 가능"]]); }};
+
+S.vs11 = {id:"VS11", t:"INR Vostro Account Master", g:"INR Vostro", tag:"신규", d:"해외은행 INR 계좌(일반 / SRVA / RDA)와 명세서 발송 설정을 관리합니다.",
+  html:()=>SEC("Vostro Accounts",TABLE(["Account","Type","Owner BIC","Owner","Ctry",["Balance (INR)","n"],"Stmt","Freq","Nil Stmt","KYC Review","Status"],[
+      TR(["9001000000123","SRVA","NACFKRSE","NONGHYUP BANK SEOUL","KR",["122,500,000.00","n"],"MT950","D","Y","2027-01-15",pill("Active","ok")],"sel"),
+      TR(["9001000000245","NORMAL","SCBLAEAD","STANDARD CHARTERED DUBAI","AE",["48,120,450.25","n"],"MT950","D","N","2026-11-20",pill("KYC D-20","warn")]),
+      TR(["9001000000317","RDA","ALFHAEAD","AL FARDAN EXCHANGE","AE",["9,880,000.00","n"],"MT940","D","N","2026-10-02",pill("KYC overdue","err")])]),0)+
+    SEC("Statement Setting",F({l:"Account",id:"acc",v:"9001000000123",ro:1})+F({l:"Message",id:"msg",t:"sel",o:["MT950","MT940","CAMT053"],v:"MT950"})+F({l:"Frequency",id:"frq",t:"sel",o:[["D","Daily"],["W","Weekly"],["M","Monthly"]],v:"D"})+
+      F({l:"Send when no movement",id:"nil",t:"sel",o:["Y","N"],v:"Y"})+F({l:"Destination BIC",id:"dbic",v:"NACFKRSE"})+F({l:"Last Stmt No",id:"lsn",v:"214",ro:1})+
+      F({l:"Overdraft",id:"od",t:"sel",o:["N","Y"],v:"N"})+F({l:"SRVA Invested (T-bill/G-sec)",id:"inv",t:"num",v:"60,000,000.00"})+F({l:"RBI Ref",id:"rbi",v:"SRVA/2023/NOIDA/0007"}))};
+
+S.vs31 = {id:"VS31", t:"MT950 Statement Monitor", g:"INR Vostro", tag:"신규", d:"EOD 마감 후 Vostro 거래로 MT950을 생성·발송합니다. 페이지당 라인 수를 넘으면 60M/62M 중간잔액으로 분할하고 :28C: 페이지를 증가시킵니다.",
+  tx:[["261031","1031","D",5000000,"NTRF","INV20261031A","NHNOIDA0001","IMPORT SETTLEMENT"],["261031","1031","C",2500000,"NTRF","NONREF","NHNOIDA0002","EXPORT PROCEEDS"],["261031","1031","D",1250.5,"NCHG","NONREF","NHNOIDA0003","CHARGES OCT"],
+      ["261031","1031","C",18000000,"NTRF","SRVA2610-77","NHNOIDA0004","TRADE SETTLEMENT RU"],["261031","1031","D",15000000,"NSEC","TB91D261031","NHNOIDA0005","TBILL 91D INVEST"],["261031","1031","C",745000,"NTRF","RDA88123","NHNOIDA0006","WORKER REMIT"],["261031","1031","D",320000,"NTRF","PO4471","NHNOIDA0007","SUPPLIER PAYMENT"]],
+  html(){ return SEC("Generate",F({l:"Account",id:"acc",t:"sel",o:["9001000000123"],v:"9001000000123"})+F({l:"Statement Date",id:"sd",t:"date",v:BIZ})+F({l:"Lines per page",id:"lpp",t:"num",v:"3"})+
+      F({l:"Opening Balance",id:"ob",t:"num",v:"122,500,000.00"})+F({l:"Stmt No",id:"sn",t:"num",v:"215"})+F({l:"Receiver",id:"rcv",v:"NACFKRSE",ro:1}),3,"운영값 100라인, 시연용 3라인")+
+      SEC("Statement Lines (:61:)",TABLE(["Value","Entry","D/C",["Amount","n"],"Type","Owner Ref","Servicer Ref","Supplementary"],this.tx.map(t=>TR([t[0],t[1],t[2],[fmt(t[3]),"n"],t[4],t[5],t[6],t[7]]))),0)+
+      `<section class="sec"><h3>MT950 Preview <small id="mtsum"></small></h3><div class="mtw" id="mt"></div></section>`+
+      SEC("Send History",TABLE(["Stmt","Date","Pages","Status","Sent","ACK"],[TR(["214","2026-10-30","1",pill("ACK","ok"),"2026-10-30 23:02:11","F21 ACK"]),TR(["213","2026-10-29","2",pill("ACK","ok"),"2026-10-29 23:01:47","F21 ACK"]),TR(["212","2026-10-28","1",pill("NAK → resent","warn"),"2026-10-28 23:15:02","T13 → ACK"])]),0); },
+  init(){ $$("#view input,#view select").forEach(e=>e.addEventListener("input",()=>this.calc())); this.calc(); },
+  calc(){ const lpp=Math.max(1,Math.floor(num("lpp"))), sd=val("sd").replace(/-/g,"").slice(2), amt=n=>n.toFixed(2).replace(".",","), bal=b=>`${b<0?"D":"C"}${sd}INR${amt(Math.abs(b))}`;
+    const pages=[]; for(let i=0;i<Math.max(1,this.tx.length);i+=lpp) pages.push(this.tx.slice(i,i+lpp));
+    let b=num("ob"); const out=pages.map((pg,i)=>{ const first=i===0,last=i===pages.length-1, L=[`:20:VS${sd}${String(num("sn")).padStart(4,"0")}`,`:25:${val("acc")}`,`:28C:${String(num("sn")).padStart(5,"0")}/${i+1}`,`:${first?"60F":"60M"}:${bal(b)}`];
+      pg.forEach(t=>{ b+= t[2]==="C"?t[3]:-t[3]; L.push(`:61:${t[0]}${t[1]}${t[2]}${amt(t[3])}${t[4]}${t[5]}//${t[6]}`,t[7].slice(0,34)); });
+      L.push(`:${last?"62F":"62M"}:${bal(b)}`); if(last) L.push(`:64:${bal(b)}`); return L.join("\n"); });
+    $("#mt").innerHTML=out.map((t,i)=>`<div><h5>Page ${i+1}/${out.length} · {2:I950${val("rcv")}XXXXN}</h5><pre class="mt">${t}</pre></div>`).join("");
+    $("#mtsum").textContent=`${out.length} page(s) · Closing INR ${fmt(b)} · 기초 ± Σ:61: = 기말 검증 OK`; },
+  chk(){ this.calc(); return show([["ok","MT950 정합성 OK (60F/60M·62M/62F, :28C: 연속) <span class='rule'>R-VS-03</span>"]]); }};
+
+S.mn01 = {id:"MN01", t:"Regulatory Deadline Dashboard", g:"규제보고", tag:"신규", d:`모든 규제기한(TB_FX_OBLIGATION)을 기준일 ${BIZ}로 집계합니다. 임박(D-30 이내)·경과 건은 독촉 대상입니다.`,
+  ob:[["IMP_ADV_EVID","00000038","RT13-2604150021","2026-04-15","2026-10-30",250000,0],["IMP_ADV_EVID","00000038","RT13-2607020004","2026-07-02","2027-01-17",80000,30000],["IMP_SETTLE","00000052","BOE 4718263","2026-08-30","2027-02-28",48500,20000],
+      ["EXP_REALIZE","00000052","SB 5521907","2026-02-12","2026-11-12",64000,40000],["EXP_REALIZE","00000052","SB 5630118","2026-03-20","2026-12-20",38500,0],["EXP_ADV_SHIP","00000052","IRM ...000009","2025-11-04","2026-11-04",20000,0],
+      ["FDI_ALLOT","00000052","FDI2609010007","2026-09-01","2026-10-31",250000000,200000000],["FDI_REFUND","00000052","FDI2608100003","2026-08-10","2026-10-24",50000000,0],["FDI_FCGPR","00000052","FDI2609150002","2026-10-10","2026-11-09",1,0],
+      ["LEI_EXPIRY","00000038","5493001KJTIIGC8Y1R12","2025-08-14","2026-08-14",1,0],["INV_VALID","00000038","INV-2026-0912","2026-09-12","2027-03-11",120000,100000],["VOSTRO_KYC","FIN","9001000000317","2025-10-02","2026-10-02",1,0]],
+  html(){ const rows=this.ob.map(o=>{const left=diff(BIZ,o[4]), done=o[6]>=o[5], st=done?["FULFILLED","ok"]:left<0?["OVERDUE","err"]:left<=30?["DUE_SOON","warn"]:["OPEN","info"]; return [...o,left,st];});
+    const cnt=k=>rows.filter(r=>r[8][0]===k).length;
+    return `<section class="sec"><div class="kpis"><div class="kpi"><span>Overdue</span><b style="color:var(--err)">${cnt("OVERDUE")}</b></div><div class="kpi"><span>Due ≤ 30d</span><b style="color:var(--warn)">${cnt("DUE_SOON")}</b></div><div class="kpi"><span>Open</span><b>${cnt("OPEN")}</b></div><div class="kpi"><span>Fulfilled</span><b style="color:var(--ok)">${cnt("FULFILLED")}</b></div></div></section>`+
+      SEC("Obligations",TABLE(["Type","Cust","Source","Base Date","Due","D-day",["Target","n"],["Fulfilled","n"],"Status","Action"],rows.sort((a,b)=>a[7]-b[7]).map(r=>TR([r[0],r[1],r[2],r[3],r[4],[r[7]<0?`+${-r[7]}`:`D-${r[7]}`,"n"],[fmt(r[5],0),"n"],[fmt(r[6],0),"n"],pill(r[8][0],r[8][1]),r[8][0]==="FULFILLED"?"":`<button type="button" data-act="fu">Follow-up</button>`]))),0,"기산일·적용 파라미터는 행 단위 스냅샷"); }};
+
+S.if01 = {id:"IF01", t:"IDPMS / EDPMS / CIMS Monitor", g:"규제보고", tag:"신규", d:"RBI 시스템 송수신 배치 결과와 오류(NAK) 재처리. 어떤 송금이 어느 회차로 보고되었는지 원천키로 역추적합니다.",
+  html:()=>SEC("Batches",TABLE(["IF","System","Dir","Batch","Records","Status","Time","Error"],[
+      TR(["IF-IDP-02","IDPMS","IN","IDPB261031","42",pill("OK","ok"),"07:10","-"]),TR(["IF-EDP-01","EDPMS","IN","EDPB261031","118",pill("OK","ok"),"07:12","-"]),
+      TR(["IF-IDP-01","IDPMS","OUT","ORM261030","17",pill("2 NAK","err"),"23:30","E104 IEC mismatch · E211 Purpose invalid"]),TR(["IF-EDP-02","EDPMS","OUT","IRM261030","23",pill("ACK","ok"),"23:32","-"]),
+      TR(["IF-CIM-01","CIMS","OUT","LRS261030","64",pill("ACK","ok"),"10:05","-"]),TR(["IF-CIM-02","CIMS","OUT","RRET2610H2","—",pill("GEN","info"),"-","제출기한 2026-11-07 (예시)"]),
+      TR(["IF-SWF-03","SWIFT","OUT","MT950-261030","3",pill("ACK","ok"),"23:02","-"])]),0)+
+    SEC("NAK Detail · ORM261030",TABLE(["ORM No","Remit Ref","IEC","Error","Action"],[TR(["0291402ORM2610300011","RT13-2610300011","AAACH4821X","E104 IEC not found in DGFT",`<button type="button" data-act="fix">정정(M) 재송신</button>`]),TR(["0291402ORM2610300014","RT13-2610300014","AABCS7710Q","E211 Purpose code S0199 invalid",`<button type="button" data-act="fix">정정(M) 재송신</button>`])]),0)+
+    `<div class="msg warn">IDPMS·EDPMS·CIMS 파일 레이아웃과 오류코드는 RBI 최신 기술명세로 확정해야 합니다(예시 표기).</div>`};
+
+/* ---------- 공통 검증 ---------- */
+function leiCheck(inr){ const c=CUST[val("cno")]||{}, m=[];
+  if(!c.type || c.type==="IND"||c.type==="NRI") return m;
+  const exp=c.leiExp && c.leiExp<BIZ;
+  if(inr>=P.LEI_INR){ if(!c.lei||exp) m.push(["err",`INR ${fmt(inr,0)} ≥ 50 crore: 유효한 LEI 필수 <span class='rule'>R-CM-03</span>`]); }
+  else if(exp) m.push(["lei",""]);
+  return m; }
+function show(m){
+  if(m.some(x=>x[0]==="lei")){ m=m.filter(x=>x[0]!=="lei");
+    $("#mB").textContent="Warning : LEI No. Expired but Less than INR 50 Crore. Proceed Y / N?"; $("#modal").hidden=false; $("#mY").focus();
+    $("#mY").onclick=()=>{ $("#modal").hidden=true; log(`<span class="pill p-warn">WARN</span> LEI 만료 경고 승인(LEI_WARN_ACK_YN=Y). `+m.map(x=>x[1]).join(" · ")); };
+    $("#mN").onclick=()=>{ $("#modal").hidden=true; log(`<span class="pill p-err">STOP</span> 사용자가 LEI 만료 경고에서 중단했습니다.`); };
+    return; }
+  const k=m.some(x=>x[0]==="err")?"err":m.some(x=>x[0]==="warn")?"warn":"ok";
+  log(`<span class="pill p-${k}">${k.toUpperCase()}</span> `+m.map(x=>x[1]).join(" · "));
+}
+
+/* ---------- 라우팅/메뉴 ---------- */
+const order=["ch11","rt11","rt12","rt13","rt21","rt25","rt73","xp73","fd11","fd12","vs11","vs31","mn01","if01"];
+function buildNav(){ let g="", h=""; order.forEach(k=>{ const s=S[k]; if(s.g!==g){ h+=`<h4>${s.g}</h4>`; g=s.g; } h+=`<a href="#${k}" data-k="${k}"><span>${s.id}</span>${s.t}${s.tag==="신규"?"<em>NEW</em>":""}</a>`; });
+  $("#nav").innerHTML=h; $("#msel").innerHTML=order.map(k=>`<option value="${k}">${S[k].id} · ${S[k].t}</option>`).join(""); }
+function go(k){ if(!S[k]) k="rt13"; const s=S[k]; cur=k;
+  $("#view").innerHTML=`<div class="hdr"><span class="sid">${s.id}</span><h1>${s.t}</h1><span class="tag">${s.tag}</span><p>${s.d}</p></div>`+(typeof s.html==="function"?s.html.call(s):s.html);
+  $("#ttl").textContent=s.t; $("#trx").value=s.id; $("#msel").value=k;
+  $$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.k===k));
+  s.init&&s.init.call(s); log(`${s.id} 화면 로드 · 예시 데이터 (가상 고객)`);
+  try{ localStorage.setItem("gbs.last",k); }catch(e){}
+}
+let cur;
+$("#bizd").textContent=BIZ.replace(/-/g,"/");
+buildNav();
+window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
+$("#msel").addEventListener("change",e=>{ location.hash=e.target.value; });
+$("#trx").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const k=e.target.value.trim().toLowerCase(); if(S[k]) location.hash=k; else log(`<span class="pill p-err">ERR</span> ${e.target.value} 화면이 없습니다.`);} });
+$("#bChk").addEventListener("click",()=>{ const s=S[cur]; s.chk?s.chk.call(s):log(`<span class="pill p-ok">OK</span> 조회 화면입니다.`); });
+$("#bExe").addEventListener("click",()=>{ const s=S[cur]; if(s.chk) s.chk.call(s); if(!$("#log .p-err") && $("#modal").hidden) log($("#log").innerHTML+` · <b>Maker 등록 완료 → Checker 승인 대기</b>`); });
+$("#bClr").addEventListener("click",()=>go(cur));
+document.addEventListener("click",e=>{ const a=e.target.closest("[data-act]"); if(!a) return;
+  const t={cust:"CH11 고객조회 팝업",ref:"송금 Ref 조회",boe:"IDPMS BoE 조회: 4718263 / 2026-09-18 / INNSA1 / USD 48,500.00 / Product 01",idpms:"IDPMS 수신 BoE 목록 조회",rt73:"RT73 Invoice 조회 팝업",xp11:"XP11 DA/DP 조회",fdi:"FDI 조회",fu:"독촉 이력 기록 (FOLLOWUP_CNT+1)",fix:"ORM 정정(M) 큐 등록"}[a.dataset.act];
+  if(a.dataset.act==="boe"){ $("#boe").value="4718263"; $("#boed").value="2026-09-18"; $("#boev").value="USD 48,500.00 · BoE Product 01"; S.rt13.calc(); }
+  log(`<span class="pill p-info">INFO</span> ${t}`); });
+let start=location.hash.slice(1); if(!S[start]){ try{ start=localStorage.getItem("gbs.last")||"rt13"; }catch(e){ start="rt13"; } }
+go(start);
+</script>
