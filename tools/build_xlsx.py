@@ -68,11 +68,14 @@ def main(out):
              ("4.업무규칙", "검증 규칙(ERR/WARN/ALERT/AUTO)과 근거 규정"),
              ("5.기한관리", "BoE·Invoice 유효기간, 선수금 증빙, 수출회수, FDI 등 규제기한 산식"),
              ("6.규정파라미터", "TB_FX_PARAM 초기값 - 규정 개정 시 이력으로 추가"),
-             ("7.기한계산기", "파라미터 기반 기한 계산 예시(노란 칸 입력 → 수식 자동계산)"),
+             ("7.기한계산기", "기한·LRS·LEI·GST 계산 예시(노란 칸 입력 → 수식 자동계산)"),
              ("8.코드정의", "공통코드 / Purpose Code 샘플"),
              ("9.인터페이스", "IDPMS·EDPMS·CIMS·SWIFT·GLEIF 등"),
              ("10.회계분개", "이벤트별 분개 (기존 CM-CMGL GL 코드 기준)"),
-             ("11.요청사항추적", "기존 개발요청서 항목별 반영위치·검토의견")]
+             ("11.요청사항추적", "기존 개발요청서 항목별 반영위치·검토의견"),
+             ("12.서식필드매핑", "고객 서식 4종(FIRC·당발·타발·환전) 항목별 DB 소스"),
+             ("13.FDI화면가이드", "FDI 단계별 사용 화면"),
+             ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -129,6 +132,22 @@ def main(out):
 
     sheet(wb, "11.요청사항추적", ["출처", "기존 요청", "반영 위치", "검토의견"], M.TRACE, [18, 52, 44, 60])
 
+    rows = []
+    for fm in M.FORMS:
+        vnames = dict(fm["variants"])
+        for sec in fm["sections"]:
+            for f in sec["f"]:
+                cond = "전체" if not f[4] else ", ".join(vnames[v] for v in f[4])
+                rows.append((fm["id"], fm["ko"], sec["t"], f[0], f[1], f[2], f[3], cond))
+    sheet(wb, "12.서식필드매핑", ["서식ID", "서식명", "섹션", "필드키", "영문 라벨", "한글 항목", "DB 소스", "표시 조건(변형)"], rows,
+          [11, 26, 26, 12, 30, 18, 52, 40],
+          note="고객 서식(screens/forms.html)의 각 항목이 어느 테이블·컬럼에서 오는지. 발급 시 값 전체를 TB_FX_ADVICE_ISSUE.SNAPSHOT_JSON에 저장")
+    sheet(wb, "13.FDI화면가이드", ["단계", "상황", "사용 화면", "처리 내용", "생성 데이터/서식"], M.FDI_FLOW, [6, 34, 30, 70, 40],
+          note="FDI 유입은 RT21 → FD11 (비계좌는 RT22, 에스크로는 FD13), 반환은 FD12. RT11·RT13은 FDI 유입에 사용하지 않음")
+    sheet(wb, "14.SWIFT카탈로그", ["유형", "표준", "Cat", "명칭", "대응 유형", "현재 송신형식", "방향", "자동생성 원천", "수신 시 연결", "VERIFY"],
+          M.SWIFT_TYPES, [11, 6, 5, 40, 18, 10, 7, 34, 20, 7], verify_col=9,
+          note="CBPR+ 결제·은행이체·입출금통지는 2025.11 이후 MX로 송신(MT는 수신 번역·레거시용). 보고(MT940/950)·Cat3·Cat7은 MT 유지 - SWIFT 최신 일정 확인(VERIFY)")
+
     wb.save(out)
     print("saved", out)
 
@@ -171,6 +190,19 @@ def build_calc(wb):
         ("한도 판정", "=IF(B29>=0,\"가능\",\"한도초과-차단\")", "text"),
         ("기업송금 INR 환산액", 420000000, "input_num"),
         ("LEI 필수 여부", f"=IF(B31>=VALUE({ref('LEI_THRESHOLD_INR')}),\"필수(만료 시 차단)\",\"선택(만료 시 경고)\")", "text"),
+        ("", None, None),
+        ("GST (수수료 + 환전가치, R-GST-01~05)", None, None),
+        ("환전 INR 금액 (무환전=0)", 8842000, "input_num"),
+        ("과세 수수료 합계 (Commission+Cable 등)", 12052.5, "input_num"),
+        ("고객 주코드 (GSTIN 앞 2자리)", "09", "input"),
+        ("GST 수령자 유형", "R_ACCT", "input"),
+        ("환전 과세표준 32(2)(b)", "=IF(B35<=0,0,IF(B35<=100000,MAX(250,ROUND(B35*0.01,2)),IF(B35<=1000000,ROUND(1000+(B35-100000)*0.005,2),MIN(60000,ROUND(5500+(B35-1000000)*0.001,2)))))", "num2"),
+        ("과세표준 합계", "=B36+B39", "num2"),
+        ("공급 구분", f"=IF(B38=\"NR_NONACCT\",\"국외(영세율)\",IF(OR(B38<>\"R_ACCT\",B37={ref('BRANCH_STATE_CODE')}),\"주내\",\"주간\"))", "text"),
+        ("GST 18% 합계", "=IF(B41=\"국외(영세율)\",0,ROUND(B40*0.18,2))", "num2"),
+        ("CGST 9%", "=IF(B41=\"주내\",ROUND(B42/2,2),0)", "num2"),
+        ("SGST 9% (= 합계 - CGST)", "=IF(B41=\"주내\",B42-B43,0)", "num2"),
+        ("IGST 18%", "=IF(B41=\"주간\",B42,0)", "num2"),
     ]
     from datetime import date
     for i, (label, val, kind) in enumerate(rows, 4):
@@ -189,11 +221,18 @@ def build_calc(wb):
             b.number_format = "yyyy-mm-dd"
         if kind in ("num", "input_num"):
             b.number_format = "#,##0;(#,##0);-"
+        if kind == "num2" or (kind == "input_num" and isinstance(val, float)):
+            b.number_format = "#,##0.00;(#,##0.00);-"
     ws.column_dimensions["A"].width = 34; ws.column_dimensions["B"].width = 24
     dv = DataValidation(type="list", formula1='"Y,N"', allow_blank=False)
     ws.add_data_validation(dv)
     for c in ("B6", "B15"):
         dv.add(c)
+    dv2 = DataValidation(type="list", formula1='"R_ACCT,NR_ACCT,R_NONACCT,NR_NONACCT"', allow_blank=False)
+    ws.add_data_validation(dv2)
+    dv2.add("B38")
+    ws["A47"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
+    ws["A47"].font = Font(name=FONT, size=9, italic=True)
 
 
 if __name__ == "__main__":

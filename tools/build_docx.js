@@ -79,6 +79,13 @@ C.push(TBL(["업무", "개인 고객", "기업 고객(개인사업자 포함)", 
   ["수출입 서류/신고", "-(개인사업자는 기업과 동일)", "Invoice, Packing List, BoE, Shipping Bill, Lodgement", "RT73, XP73"],
   ["FDI 외환송금", "-", "FDI 수취, 주식배정 추적, 반환송금, INR 금액 확정송금", "FD11, FD12"],
   ["INR Vostro", "-", "해외은행 INR 계좌(일반/SRVA/RDA), MT950 자동발송", "VS11, VS31"],
+  ["비거주자 송금", "NRI NRE/NRO/FCNR 송금 (NRO USD 1M/FY)", "외국법인·지점 송금, 외국인 급여", "RT14"],
+  ["비계좌 중계", "-", "계좌 없는 수취인: 미지급금 보류 → 부분환전·INR 확정 → NEFT/RTGS", "RT21, RT22"],
+  ["FDI 에스크로", "-", "지분양수도·이연대가·공개매수 에스크로 예치/지급/반환", "FD13"],
+  ["환전", "외화현찰 매입·판매, 계좌간 환전", "EEFC↔INR, 외화간(KRW·USD·EUR·JPY), 지점 자기계정", "FX11, FX21"],
+  ["고객 서식", "당발·타발·환전 확인서", "FIRC(FDI), 당발·타발·환전 확인서, 재발급", "DC01"],
+  ["SWIFT 메시지", "-", "MT1xx·2xx·3xx·7xx·9xx ↔ MX 송수신, 수기작성, MT950 자동/수기", "SW11, SW12"],
+  ["본지점 거래", "-", "RA 대지급(MT740/742), 본지점 미정산·자동정산, 기준환율·금리, 휴일 차이", "RA11, IO11, IO21, CM21"],
   ["규제보고/기한관리", "LRS 일일보고(CIMS)", "IDPMS, EDPMS, R-Return, FC-GPR 기한", "MN01, IF01"],
 ], [1.3, 2, 3, 1.2]));
 C.push(H2("1.3 설계 원칙"));
@@ -167,6 +174,60 @@ C.push(H3("MT950 생성 예시"));
   ":62F:C261031INR122500000,00", ":64:C261031INR122500000,00"].forEach((l) => C.push(new Paragraph({ spacing: { after: 0 }, children: [new TextRun({ text: l, font: "Consolas", size: 18 })] })));
 C.push(P("※ MT950은 MT940과 달리 :86: 필드가 없으므로, 거래 부가정보는 :61: Supplementary Details(34x)에 기재한다. :61: = 결제일(YYMMDD)+기장일(MMDD)+D/C+금액+N+거래유형(TRF 등)+계좌주Ref//당행Ref.", { size: 17, italics: true }));
 
+flow("3.7 비계좌 수취인 중계 (RT21 → RT22)", [
+  ["타발 수신, 수취인이 당행 계좌 없음 → SETTLE_MODE=SUSP, Remittance Payable(미지급금) 보류", "TB_FX_SUSPENSE, R-SUS-01"],
+  ["수취인 식별(PAN/CIN)·이름 확인, 수출·FDI 목적이면 IEC/CIN 확인", "R-SUS-04"],
+  ["RT22: 환전 레그 등록(부분환전 가능, INR 확정 레그는 FCY = ROUNDUP(목표 INR/환율, 2)), 레그별 딜 맵핑", "TB_FX_CONV_LEG, R-SUS-02"],
+  ["NEFT/RTGS 지급(INR 2 lakh 미만은 NEFT), IFSC·계좌 검증, UTR 수신", "TB_DOM_PAYOUT, R-DOM-01~03"],
+  ["잔여 외화: 계속 보류 / 타 AD 외화이체 / 송금인 반환(RT41). 15영업일 경과 시 알림", "R-SUS-03"],
+  ["타발송금 확인서(FM-IN-01 relay) 발급, FDI면 FIRC에 UTR·수취은행 표기", "FM-IN-01, FM-FDI-01"],
+]);
+flow("3.8 FDI 에스크로 (FD13)", [
+  ["약정서·당사자 KYC·대상회사 CIN 확인 후 에스크로 계좌 개설(무이자)", "TB_FDI_ESCROW, R-ESC-01"],
+  ["이연대가: 예치한도 ≤ 총대가 25%, 만기 ≤ 약정일 + 18개월", "R-ESC-02"],
+  ["RT21 SETTLE_MODE=ESCROW로 예치", "TB_FDI_ESCROW_TXN(DEPO)"],
+  ["조건 충족: 공동지시서 등 근거 입력 → 거주자 지급(계좌/NEFT/RTGS), FC-TRS 기한(+60일) 생성", "R-ESC-03"],
+  ["불성립·만기: 비거주자 원통화 반환(당발 Product 07)", "R-ESC-04"],
+]);
+flow("3.9 비거주자 송금 (RT14)", [
+  ["계좌 선택: NRE·FCNR 잔액은 송금 자유, NRO는 자금 성격 구분(경상소득 / 잔액·자산매각)", "R-NR-01"],
+  ["NRO 잔액·자산매각: FY USD 1M 누적 검증(TB_NR_REPAT_SUM), Form 15CA·15CB·원천 증빙", "R-NR-01/02"],
+  ["LRS·TCS 비적용, GST 공급장소 = 공급자 소재지(s.13(8)(a)) → CGST+SGST", "R-NR-04, R-GST-04"],
+  ["타발 NRE 입금은 해외송금·NRE/FCNR 이체만 허용", "R-NR-03"],
+]);
+flow("3.10 환전 (FX11)", [
+  ["유형 선택: 계좌간(EEFC↔INR) / 외화간(KRW·USD·EUR·JPY) / 외화현찰 매입·판매 / 지점 자기계정", "TB_FX_EXCHANGE"],
+  ["EEFC 입금 제한: INR을 매도해 EEFC로 입금 불가. EEFC→INR, EEFC 내 외화간 환전은 허용", "R-FX-02"],
+  ["환율: USD 25,000 이상·지점 자기계정은 자금팀 딜, 미만은 고시환율 회차(FX21)", "R-FX-04"],
+  ["현찰 판매(여행): USD 3,000/건, PAN·Form A2, LRS 합산 / 현찰 매입: CDF(USD 5,000 초과), INR 현금지급 한도", "R-FX-05/06"],
+  ["GST: 환전가치 32(2) 과세표준 × 18%, 외화간은 RBI 기준율 INR 환산액(작은 쪽) 기준", "R-GST-02, R-FX-07"],
+  ["환전 확인서(FM-FX-01) 발급, 현찰 매입은 Encashment Certificate 문구 포함", "FM-FX-01"],
+]);
+
+flow("3.11 SWIFT 메시지 처리 (SW11 / SW12)", [
+  ["업무화면 승인 시 메시지 자동생성(당발 pacs.008, 대지급·정산 pacs.009, MT756, MT950, MT300) → SW11 큐(AUTH 대기)", "TB_SWIFT_MSG, R-SW-01"],
+  ["수기 작성은 SW12 템플릿(MT950·MT202/pacs.009·MT300·MT999 등), 필드 형식 검증 후 VERIFY", "R-SW-02/06"],
+  ["Checker 승인(작성자≠승인자, 수기 MT950·n99는 2인) → RMA·제재 필터 → 송신", "R-SW-03/04"],
+  ["ACK는 완료, NAK는 Repair 큐 → 수정·재검증 → 재발송(PDE)", "R-SW-07"],
+  ["수신 메시지 파싱 후 유형별 연결: pacs.008/MT103→RT21, pacs.009/MT202·MT200→VS21·Nostro 대사, camt.054/MT910→본지점·Nostro 대사, MT740/747/742→RA11, MT300→딜 확인", "R-SW-05"],
+]);
+flow("3.12 RA 대지급과 본지점 정산 (RA11 → IO21)", [
+  ["본점 개설 신용장의 MT740 수신 → RA 등록(잔여 수권액 관리), MT747로 변경", "TB_RA_AUTH, R-RA-01"],
+  ["MT742 청구 접수 → 수권액·유효기일·청구은행 검증, 지급기한 = 다음날부터 인도 영업일 3일", "TB_RA_CLAIM, R-RA-02/03"],
+  ["결제일: USD는 US·IN 모두 영업일, INR은 IN 영업일. 휴일이면 다음 영업일로 이동하고 본점 고객 결제일과의 차이 일수 기록", "R-RA-04, R-HOL-01"],
+  ["지급(pacs.009 또는 RTGS) → 본점 MT756 통보 → Due from HO 미정산(TB_IO_TXN) 생성", "R-RA-05"],
+  ["IO21: 통화별 OPEN 건수 ≥ 30, 순액 ≥ USD 5백만, 또는 주기(W-FRI) 도래 시 정산배치 생성. Cutoff까지의 OPEN 건만 포함", "TB_IO_SETTLE_BATCH, R-IO-01/02"],
+  ["채권-채무 상계 후 순액 청구, 정산통화가 다르면 기준환율 ± 스프레드(IO11) 적용", "R-IO-03/04"],
+  ["본점 입금(pacs.009/camt.054) 대사 → 일치 시 SETTLED, 부족 시 PART·DISPUTE. 2회차 이상 미정산은 보고", "R-IO-05/06"],
+]);
+flow("3.13 휴일 차이 처리 (CM21 → IO21)", [
+  ["IN·US·KR(+TARGET2) 캘린더 관리, 인도 임시휴일은 공표 즉시 등록", "TB_HOLIDAY"],
+  ["등록 시 해당일 결제 예정 RA 청구·당발·정산배치 자동 재계산(지급기한·결제일)", "R-HOL-02"],
+  ["본점 고객 결제일과 지점 결제일 차이 → 이자 = 금액 × (기준금리+스프레드) × 일수 / 일수기준", "TB_IO_FLOAT_ADJ, R-IO-07"],
+  ["건별 USD 300 이하: 자금부담 점이 자체손익으로 흡수(월 합산 내부대체 전표) / 초과: 정산배치에 FLOAT 항목으로 본지점 정산", "R-IO-08"],
+  ["고객에게 개별 청구하지 않고, 영향 건 목록을 본점에 MT999(또는 정산파일)로 한 번에 통보", "R-HOL-03"],
+]);
+
 // ---------------- 4. 화면 ----------------
 C.push(H1("4. 화면 설계"));
 C.push(P("화면 시안은 screens/index.html 에서 확인할 수 있으며(현행 GBS 레이아웃 유지), 주요 검증 로직(LRS 한도·TCS, LEI 판정, Invoice 잔액, BoE 등록일, FDI 기한, MT950 생성)이 동작하도록 구현되어 있다."));
@@ -189,6 +250,13 @@ C.push(H3("XP73 Doc of Export Management"));
 ["상단: Lodgement Category / Lodgement Type / Lodgement Ref No / Form No / DA·DP Ref No(XP11)", "Applicant(IE Name/Address, PAN, LEI+만료일, IEC, 계좌) / Beneficiary / Shipping / Amount(FOB·Freight·Insurance, IGST) / Additional(Remarks·Discrepancy 500자)", "Inward Remittance Ref 다건 그리드(GBS 송금 Ref 조회 → 금액 맵핑)"].forEach((t) => C.push(B(t)));
 C.push(H3("신규 화면"));
 ["RT12 LRS: FY 누적·잔여한도 게이지, TCS 미리보기, Form A2 체크", "FD11/FD12: FDI 기한 타임라인(60/75/30), INR 확정 역산 계산기", "VS31: MT950 미리보기·발송상태, 재발송", "MN01: 기한유형별 OPEN/임박/경과 집계 + 독촉 이력", "IF01: IDPMS/EDPMS/CIMS 배치 송수신 결과·오류 재처리"].forEach((t) => C.push(B(t)));
+
+C.push(H2("4.3 FDI 업무 화면 이용 가이드"));
+C.push(P("FDI 유입은 RT21(타발 등록)에서 시작해 FD11로 자동 이관됩니다. 무역·일반 당발 화면(RT11·RT13)은 FDI 유입에 사용하지 않습니다. 기존 설계서의 'FD13 INR 확정 환산' 표기는 오기였으며, INR 확정 환산은 FD11(당행 계좌)과 RT22(비계좌)에서 처리합니다. FD13은 이번에 FDI 에스크로 화면으로 신설했습니다."));
+C.push(TBL(["단계", "상황", "사용 화면", "처리", "생성 데이터/서식"], M.FDI_FLOW, [0.5, 1.6, 1.5, 3, 1.5], { size: 15 }));
+C.push(H2("4.4 고객 서식"));
+C.push(P("고객 서식 4종의 항목·DB 소스·문구는 별도 문서 '03_고객서식_명세서.docx'와 screens/forms.html(A4 인쇄 시안)에 정리했습니다."));
+C.push(TBL(["서식ID", "서식명", "발급 화면", "발급 시점", "용도"], M.FORMS.map((f) => [f.id, f.ko, f.screen, f.when, f.use]), [0.9, 1.6, 1.3, 2.2, 2]));
 
 // ---------------- 5. 데이터 ----------------
 C.push(H1("5. 데이터 모델 및 관리 규칙"));
@@ -246,32 +314,80 @@ C.push(H2("7.2 EDPMS (Export Data Processing and Monitoring System)"));
 ["BOD: Shipping Bill(LEO 포함) 수신 → TB_TRD_SHIPPING_BILL·회수기한 생성", "수출 관련 타발 전건 IRM 생성 → EDPMS 송신, e-BRC 연계", "IRM↔SB 맵핑 시 Realization 보고, 연장(EXTN)·상각(WOFF)·상계(SETO)·종결(CLSR) 보고"].forEach((t) => C.push(B(t)));
 C.push(H2("7.3 RBI CIMS"));
 ["LRS 일일보고: 익영업일, PAN별 거래 (V_RPT_LRS_DAILY)", "R-Return(FETERS) 외환거래 Purpose별 보고", "SRVA/Vostro 보고", "TB_CIMS_RETURN에 회차·파일·ACK·반려사유 관리, 반려 시 정정 후 재제출(RESB)"].forEach((t) => C.push(B(t)));
+C.push(H2("7.4 SWIFT 메시지 카탈로그"));
+C.push(P("요청하신 MT200·MT300·MT900대를 포함해 Vostro·본지점·RA 업무에 필요한 메시지를 모두 지원합니다. 2025년 11월 CBPR+ MT/MX 공존기간 종료 이후 결제·은행이체·입출금 통지는 MX로 송신하고 MT는 수신 번역·레거시 처리용으로 유지합니다. 명세서(MT940/950), 외환·자금 확인(MT300/320), 무역(MT7xx)은 MT로 송수신합니다."));
+C.push(TBL(["유형", "Cat", "명칭", "대응", "송신", "자동생성", "수신 연결"], M.SWIFT_TYPES.map((r) => [r[0], r[2], r[3], r[4], r[5], r[7], r[8]]), [0.9, 0.4, 2.2, 1.1, 0.5, 1.8, 1.2], { size: 14 }));
+C.push(H2("7.5 Vostro 용도별 처리"));
+C.push(TBL(["용도", "계좌주 / 최종고객", "처리"], [
+  ["HO 본지점", "본점 INR 계좌", "거래마다 본지점 원장(TB_IO_TXN) 동시 생성 → IO21 정산. RA 대지급 INR 지급과 상계 가능"],
+  ["FPI 증권투자", "본국 은행 → 신탁회사·기관투자자", "최종투자자 SEBI FPI 등록번호·커스터디 확인, FPI 지정계좌(SNRR·커스터디)로만 지급 (VERIFY)"],
+  ["CORP 법인 송금", "본국 은행 → 한국계 법인", "Vostro 출금으로 인도 지사·자회사에 입금 = 타발송금. Purpose에 따라 FDI(FD11)·IRM·일반 분기, FIRC 발급"],
+  ["TRADE / EXCH", "SRVA 코레스 / Exchange House", "INR 무역결제·근로자 송금"],
+], [1, 1.8, 4]));
 C.push(NOTE("IDPMS·EDPMS·CIMS 파일 레이아웃(XML 스키마, 필드 길이)은 RBI가 AD 은행에 배포하는 최신 기술명세로 확정해야 한다. 본 설계의 IF 테이블은 업무 필드 기준이며, 레이아웃 확정 시 매핑표(엑셀 '3.컬럼정의'의 외부보고 매핑 열)를 상세화한다."));
 
-// ---------------- 8. 회계 ----------------
-C.push(H1("8. 회계처리"));
+// ---------------- 8. GST ----------------
+C.push(H1("8. GST 처리 기준"));
+C.push(P("기존 설계는 '수수료 × 18%, 고객 GSTIN 주코드에 따라 CGST+SGST 또는 IGST'만 정의했습니다. 이번에 환전가치 과세, 비거주자·비계좌 공급장소, 반올림, INR 확정 환전의 별도징수를 추가했습니다."));
+C.push(H2("8.1 과세표준"));
+C.push(TBL(["항목", "과세 여부", "비고"], [
+  ["Commission, Cable charge, In lieu of Exchange, NEFT/RTGS 수수료", "과세 18%", "SAC 9971xx (세무팀 확정)"],
+  ["환전가치 (CGST Rules 32(2))", "과세 18%", "방식 B slab (FY 단위 선택, 파라미터 GST_FX_METHOD)"],
+  ["TCS, 해외은행 공제수수료, 송금 원금", "비과세", "GST 계산에서 제외"],
+  ["EEFC·FCNR 외화 그대로 송금/입금 (무환전)", "환전가치 없음", "수수료분만 과세"],
+  ["지점 자기계정 환전", "비대상", "대고객 공급 아님"],
+], [3, 1, 2.4]));
+C.push(H2("8.2 환전가치 slab (32(2)(b))"));
+C.push(TBL(["환전 INR 총액", "과세표준", "예시"], [
+  ["≤ INR 1,00,000", "1% (최소 INR 250)", "INR 50,000 → 500"],
+  ["1,00,000 ~ 10,00,000", "1,000 + 0.5% × (금액 - 1,00,000)", "INR 3,61,050 → 2,305.25"],
+  ["> 10,00,000", "5,500 + 0.1% × (금액 - 10,00,000), 최대 60,000", "INR 88,42,000 → 13,342 / 25 crore → 60,000"],
+  ["외화간(INR 미개입)", "두 통화를 RBI 기준율로 INR 환산한 금액 중 작은 금액 기준", "USD 20,000 → KRW: INR 17,68,348 → 6,268.35"],
+], [1.6, 3, 2.4]));
+C.push(H2("8.3 공급장소와 세목"));
+C.push(TBL(["수령자", "공급장소", "세목", "근거"], [
+  ["거주자 계좌고객", "은행 기록상 고객 주 (GSTIN 앞 2자리, 없으면 주소)", "UP(09)면 CGST 9% + SGST 9%, 타주면 IGST 18%", "IGST Act s.12(12)"],
+  ["거주자 비계좌", "공급자(지점) 소재지", "CGST + SGST", "IGST Act s.12(12)"],
+  ["비거주 계좌고객 (NRE/NRO/FCNR, 외국법인)", "공급자(지점) 소재지", "CGST + SGST", "IGST Act s.13(8)(a)"],
+  ["해외 비계좌 수령자 (OUR 수수료 청구 해외은행 등)", "국외", "수출용역 영세율 (LUT)", "IGST Act s.13(2), s.16"],
+], [1.8, 1.8, 2, 1.2], { size: 16 }));
+C.push(H2("8.4 계산 순서와 반올림"));
+["과세표준 = Σ과세 수수료 + 환전가치(32(2))", "GST 합계 = ROUND(과세표준 × 18%, 2)", "주내: CGST = ROUND(GST/2, 2), SGST = GST - CGST (0.01 차이 허용) / 주간: IGST = GST 합계",
+ "INR 확정 환전·FDI: 수수료와 GST는 별도 출금(FEE_COLLECT_MODE=SEPARATE). 원금 INR에서 공제하지 않음",
+ "확인서에 지점 GSTIN·고객 GSTIN·SAC·공급장소를 표기하고, 월별 통합 세금계산서(Rule 54(2)) 대상으로 집계",
+ "계산 예시는 엑셀 '7.기한계산기' GST 섹션(수식)과 각 확인서 시안에서 확인할 수 있음"].forEach((t) => C.push(B(t)));
+C.push(NOTE("비거주자·해외 수령자 공급장소, SAC 코드, 외화간 환전 과세표준 산정(방식 B 적용 시)은 세무팀 확인이 필요합니다(VERIFY)."));
+
+// ---------------- 9. 회계 ----------------
+C.push(H1("9. 회계처리"));
 C.push(TBL(["이벤트", "차변", "대변", "비고"], M.GL, [1.6, 1.8, 2.6, 1.4]));
 
 // ---------------- 9. 요청사항 ----------------
-C.push(H1("9. 기존 요청사항 반영 및 검토의견"));
+C.push(H1("10. 기존 요청사항 반영 및 검토의견"));
 C.push(TBL(["출처", "기존 요청", "반영 위치", "검토의견"], M.TRACE, [1, 2.4, 2, 2.4], { size: 15 }));
-C.push(H2("9.1 확인이 필요한 주요 검토의견"));
+C.push(H2("10.1 확인이 필요한 주요 검토의견"));
 [
   "LEI 기준금액: 요청서 본문 'INR 50,000,000(5 crore)'과 경고문 'INR 50 Crore(500,000,000)'가 불일치. RBI 기준은 INR 50 crore 이므로 파라미터를 500,000,000 으로 설정하였다. 지점 확인 필요.",
   "IEC 자릿수: 요청서 '13 Digits' 표기. DGFT IEC는 PAN 기반 10자리이므로 VARCHAR2(10)으로 설계. 13자리가 다른 코드(예: AD Code 등)를 의미하는지 확인 필요.",
   "TCS: RT13(무역송금)에 TCS Y/N 요청이 있으나 TCS(206C(1G))는 LRS 개인송금 대상이므로 무역송금은 기본 N, 예외 시 수기 Y.",
   "GST: 요청은 IGST(20990016)만 인식이나 현행 CMGL 화면은 CGST/SGST 분개. 고객 GSTIN 주코드 기준 자동판정(R-CM-10)으로 양쪽 모두 지원.",
   "ISO 20022: SWIFT 크로스보더 MT103 공존기간이 2025.11 종료되었으므로 신규 개발은 pacs.008 기준. 2026.11 구조화 주소 의무화 대비 당사자 주소에 Town/Country 필수.",
+  "GST: 기존 설계에 환전가치(32(2)) 과세, 비거주자·비계좌 공급장소, 반올림 규칙이 빠져 있어 R-GST-01~08로 보완. 현행 RT13은 Commission에만 GST를 부과하고 Cable charge는 제외되어 있음 → 과세 대상에 포함.",
+  "EEFC: INR을 매도해 EEFC로 입금하는 환전은 허용되지 않는 것으로 설계(R-FX-02). 지점 운영 관행과 다르면 확인 필요.",
+  "미지급금 보관기한 15영업일(SUSP_MAX_DAYS)은 내부정책 가정값. 지점 기준 확정 필요.",
+  "본지점 정산 기준(주기 W-FRI, 자동정산 30건·USD 5백만, 휴일 차이 흡수한도 건당 USD 300, 기준금리·스프레드)은 본점 자금부와 약정으로 확정 필요. 모두 파라미터로 관리.",
+  "SWIFT: MT940/950·Category 3·7의 MX 전환 일정은 SWIFT 공지로 재확인 필요(VERIFY). 시스템은 카탈로그의 '송신 형식'만 바꾸면 전환되도록 설계.",
+  "RA 휴일 차이: 지점이 늦게 지급한 경우(본점 선수취)와 먼저 지급한 경우(지점 자금부담)를 부호(±)로 구분해 이자 방향을 정함. 고객 청구는 하지 않음(요청하신 방안 반영).",
   "RBI 한시완화(2025.11, 수출 회수 15개월·선수금 선적 3년): 적용 대상기간을 컴플라이언스 확인 후 TB_FX_PARAM 유효기간 행으로 등록.",
 ].forEach((t) => C.push(N(t)));
 
 // ---------------- 10. 이행 ----------------
-C.push(H1("10. 이행 계획(안)"));
+C.push(H1("11. 이행 계획(안)"));
 C.push(TBL(["단계", "범위", "비고"], [
   ["1단계", "CH11 확장, RT13/RT73/XP73 개선(기존 요청 전체), TB_TRD_PAY_ALLOC 잔액엔진, 수수료·GST 체계", "테스트 중인 개선사항 우선 마무리"],
-  ["2단계", "RT12 LRS + TCS + CIMS LRS 일일보고, RT11 일반송금 ISO 20022", "개인 고객 오픈"],
-  ["3단계", "IDPMS/EDPMS 인터페이스, RT25, OBLIGATION 엔진·MN01", "RBI UAT 일정 연계"],
-  ["4단계", "FD11/FD12 FDI, VS11/VS21/VS31 Vostro·MT950", "코레스 약정·RMA 선행"],
+  ["2단계", "RT12 LRS + TCS + CIMS LRS 일일보고, RT11 일반송금 ISO 20022, RT14 비거주자, FX11/FX21 환전, GST 엔진(R-GST)", "개인 고객 오픈"],
+  ["3단계", "IDPMS/EDPMS 인터페이스, RT25, OBLIGATION 엔진·MN01, RT22 미지급금·NEFT/RTGS 연계", "RBI UAT 일정 연계"],
+  ["4단계", "FD11/FD12/FD13 FDI·에스크로, VS11/VS21/VS31 Vostro·MT950, SW11/SW12 SWIFT, RA11·IO11·IO21·CM21 본지점, DC01 서식 발급", "코레스 약정·RMA 선행"],
   ["5단계", "보고서 시스템 연동(V_RPT 뷰), TBML 연계, 이행 데이터 이관·대사", "과거 미결 BoE/SB 이관 포함"],
 ], [0.8, 4, 2]));
 C.push(H2("테스트 시나리오(요약)"));
