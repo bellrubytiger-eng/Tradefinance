@@ -203,6 +203,18 @@ def build_calc(wb):
         ("CGST 9%", "=IF(B41=\"주내\",ROUND(B42/2,2),0)", "num2"),
         ("SGST 9% (= 합계 - CGST)", "=IF(B41=\"주내\",B42-B43,0)", "num2"),
         ("IGST 18%", "=IF(B41=\"주간\",B42,0)", "num2"),
+        ("", None, None),
+        ("본지점 을B 금리 (R-IO-13/14/16)", None, None),
+        ("차입 원금", 5000000, "input_num"),
+        ("기간(일)", 92, "input_num"),
+        ("기준금리 %", 4.30, "input_num"),
+        ("표준 스프레드 (bp, 기간구간)", 75, "input_num"),
+        ("우대 스프레드 (bp, 기간구간)", 45, "input_num"),
+        ("우대조건 충족 (Y/N)", "Y", "input"),
+        ("일수 기준 (360/365)", 360, "input_num"),
+        ("적용금리 %", "=B50+IF(B53=\"Y\",B52,B51)/100", "num4"),
+        ("이자", "=ROUND(B48*B55/100*B49/B54,2)", "num2"),
+        ("기간구간", "=IF(B49<=7,\"T007\",IF(B49<=30,\"T030\",IF(B49<=90,\"T090\",IF(B49<=180,\"T180\",IF(B49<=365,\"T365\",\"T999 (본점 별도승인)\")))))", "text"),
     ]
     from datetime import date
     for i, (label, val, kind) in enumerate(rows, 4):
@@ -221,6 +233,8 @@ def build_calc(wb):
             b.number_format = "yyyy-mm-dd"
         if kind in ("num", "input_num"):
             b.number_format = "#,##0;(#,##0);-"
+        if kind == "num4":
+            b.number_format = "0.0000"
         if kind == "num2" or (kind == "input_num" and isinstance(val, float)):
             b.number_format = "#,##0.00;(#,##0.00);-"
     ws.column_dimensions["A"].width = 34; ws.column_dimensions["B"].width = 24
@@ -231,8 +245,11 @@ def build_calc(wb):
     dv2 = DataValidation(type="list", formula1='"R_ACCT,NR_ACCT,R_NONACCT,NR_NONACCT"', allow_blank=False)
     ws.add_data_validation(dv2)
     dv2.add("B38")
-    ws["A47"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
-    ws["A47"].font = Font(name=FONT, size=9, italic=True)
+    dv.add("B53")
+    ws["A61"] = "갑기금 = 무이자(계산 없음) · 을A = 기준금리+스프레드(휴일차이·정산지연) · 을B = 기간구간 금리, 우대조건: 과거 1년 내 동일통화·금액 이상·30일 이상 조달이력(정기예금·콜머니·콜론 등)"
+    ws["A61"].font = Font(name=FONT, size=9, italic=True)
+    ws["A60"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
+    ws["A60"].font = Font(name=FONT, size=9, italic=True)
 
 
 if __name__ == "__main__":
