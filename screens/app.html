@@ -433,24 +433,63 @@ S.xp73 = {id:"XP73", t:"Doc of Export Management", g:"수출입서류", tag:"변
     $("#lcf").innerHTML=`<div class="grid">${L[2].map((n,i)=>F({l:n,id:"lc"+i,rq:i<2})).join("")}</div>`+(k==="1"?`<div class="msg info">Inward Remittance Ref는 GBS 타발 Ref를 조회해 다건 입력·금액 맵핑합니다.</div>`:"")+`<div class="msg info">카테고리별 필수항목 (노이다지점 요청 Sheet7) <span class="rule">R-EXP-01</span></div>`; },
   chk(){ const lr=diff("2026-03-20",BIZ); return show([lr>P.EXP_DOC?["warn",`LEO 이후 ${lr}일 경과(기준 ${P.EXP_DOC}일): 지연사유 입력 필요 <span class='rule'>R-EXP-02</span>`]:["ok","서류제출기한 내"],["ok","Lodgement 등록 가능"]]); }};
 
-S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국인직접투자 수취 건. 해외은행 KYC·인접국(Press Note 3) 검증, INR 확정 환산, 주식배정(60일)·반환(75일)·FC-GPR(배정+30일) 기한을 관리합니다.",
+S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국인직접투자 수취 건. AD은행의 기본 KYC 의무는 송금인(비거주 투자자)이므로, KYC가 오지 않았으면 송금은행에 MT199로 요청하고 검증합니다. 금액이 크거나 고위험이면 수취인(피투자법인)도 추가 실사합니다. INR 확정 환산과 배정(60일)·반환(75일)·FC-GPR(+30일) 기한도 관리합니다.",
   html:()=>SEC("FDI 업무 화면 안내",TABLE(["단계","상황","사용 화면","처리"],FDI_FLOW.map(r=>TR([r[0],r[1],`<b>${r[2]}</b>`,`<span style="white-space:normal">${r[3]}</span>`]))),0,"RT11·RT13은 FDI 유입에 사용하지 않음")+
     custBlock("00000052","Investee Company (CH11)")+SEC("Investment",F({l:"Inward Ref",id:"ir",v:"RT21-2609010031",ro:1})+F({l:"Investor",id:"inv",v:"SEOUL PRECISION CO LTD",rq:1,s:2})+
       F({l:"Investor Country",id:"ic",t:"sel",o:["KR","JP","US","SG","CN","BD","PK","NP"],v:"KR",rq:1})+F({l:"Route",id:"route",t:"sel",o:["AUTO","GOVT"],v:"AUTO"})+F({l:"Govt Approval Ref",id:"gref"})+
-      F({l:"Instrument",id:"ins",t:"sel",o:[["EQ","Equity"],["CCPS","CCPS"],["CCD","CCD"],["WAR","Warrants"]],v:"EQ"})+F({l:"KYC from Remitting Bank",id:"kyc",t:"sel",o:["Y","N"],v:"Y",rq:1})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-09-01",rq:1}))+
+      F({l:"Instrument",id:"ins",t:"sel",o:[["EQ","Equity"],["CCPS","CCPS"],["CCD","CCD"],["WAR","Warrants"]],v:"EQ"})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-09-01",rq:1}))+
+    SEC("Remitter KYC · AD은행 기본 의무",F({l:"Remitting Bank (DbtrAgt)",id:"rbic",v:"[REMBIC]",ro:1})+F({l:"Remitter (pacs.008 Dbtr)",id:"rnm",v:"SEOUL PRECISION CO LTD",ro:1,s:2})+F({l:"Their Ref",id:"tref",v:"FDI-SPC-20260901",ro:1})+F({l:"UETR",id:"uetr",v:"4b9e3c51-77a2-4f2e-9d0c-3a1f6c2e8b40",ro:1,s:2})+
+      F({l:"KYC Status",id:"kyc",t:"sel",rq:1,o:[["NONE","NONE 미요청"],["ATTACHED","ATTACHED 송금 시 첨부"],["SENT","SENT MT199 송신"],["FOLLOWUP","FOLLOWUP 재요청"],["RECEIVED","RECEIVED 응답 수신"],["INCOMPLETE","INCOMPLETE 보완요청"],["VERIFIED","VERIFIED 검증완료"],["FAILED","FAILED 실패"]],v:"RECEIVED"})+
+      F({l:"KYC Name",id:"knm",v:"SEOUL PRECISION CO LTD"})+F({l:"Incorp. Country",id:"kct",v:"KR",max:2})+F({l:"Reg. No",id:"kreg",v:"110111-[XXXXXXX]"})+F({l:"Account Since",id:"kac",t:"date",v:"2009-03-16"})+
+      F({l:"BO 1 (이름/국적/%)",id:"bo1",v:"KIM D.H. / KR / 62"})+F({l:"BO 2 (이름/국적/%)",id:"bo2",v:"PARK S.Y. / KR / 25"})+F({l:"Source of Funds",id:"sof",v:"Retained earnings"})+
+      F({l:"PEP",id:"pep",t:"sel",o:["N","Y"],v:"N"})+F({l:"Sanctions Screening",id:"scr",t:"sel",o:["CLEAR","REVIEW","HIT"],v:"CLEAR"}),3,"R-KYC-01~08")+
+    `<section class="sec"><h3>KYC Workflow &amp; MT199</h3><div id="kycbox"></div></section>`+
     SEC("INR Fixed Conversion",F({l:"INR 확정",id:"fix",t:"sel",o:[["Y","Y - 약정 INR 금액 고정"],["N","N - 외화금액 기준"]],v:"Y"})+F({l:"Target INR",id:"tinr",t:"num",v:"250,000,000.00"})+F({l:"Deal Rate (USD/INR)",id:"rate",t:"num",v:"88.4200"})+
       F({l:"Required USD",id:"rusd",ro:1})+F({l:"Received USD",id:"recv",t:"num",v:"2,827,414.62"})+F({l:"Credited INR",id:"cinr",ro:1}),3,"FCY = ROUNDUP(Target INR / Rate, 2)")+
     SEC("Investee Settlement",F({l:"Investee Account",id:"iacc",t:"sel",o:[["OWN","당행 계좌 입금"],["OTHER","비계좌 → RT22 경유 RTGS (피투자법인 명의)"]],v:"OWN",s:2})+F({l:"Fee Collection",id:"ffc",v:"SEPARATE (강제)",ro:1}),3,"R-DOM-04 · R-GST-06")+
     SEC("Allotment",F({l:"Allotment Date",id:"ad",t:"date",v:""})+F({l:"Allotted INR",id:"ainr",t:"num",v:"0.00"})+F({l:"FIRMS SRN",id:"srn"}))+
-    `<section class="sec"><h3>Certificate</h3><div class="msg info">KYC 수취 + 입금완료 후 FIRC(FM-FDI-01) 원본 1회 발급, 재발급은 DC01 (DUPLICATE) <span class="rule">R-DOC-01/02</span> · ${formLink("firc-fdi","FIRC 미리보기 (당행 계좌)")} · ${formLink("firc-fdi_rtgs","FIRC 미리보기 (비계좌·RTGS)")}</div></section>`+`<section class="sec"><h3>Deadlines <small>TB_FX_OBLIGATION</small></h3><div id="fdtl"></div></section>`,
+    `<section class="sec"><h3>Certificate</h3><div class="msg info">송금인 KYC VERIFIED + 입금완료 후 FIRC(FM-FDI-01) 원본 1회 발급, 재발급은 DC01 (DUPLICATE) <span class="rule">R-DOC-01/02</span> · ${formLink("firc-fdi","FIRC 미리보기 (당행 계좌)")} · ${formLink("firc-fdi_rtgs","FIRC 미리보기 (비계좌·RTGS)")}</div></section>`+`<section class="sec"><h3>Deadlines <small>TB_FX_OBLIGATION</small></h3><div id="fdtl"></div></section>`,
   init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
   calc(){ const r=num("rate")||1, req=Math.ceil(num("tinr")/r*100)/100; $("#rusd").value=fmt(req); const cr=num("recv")*r; $("#cinr").value=fmt(cr);
     const rd=val("rd"), a=addD(rd,P.FDI_ALLOT), rf=addD(rd,P.FDI_ALLOT+P.FDI_REFUND), ad=val("ad"), st=(d,done)=>done?"done":(BIZ>d?"over":diff(BIZ,d)<=15?"due":"");
     $("#fdtl").innerHTML=`<div class="tl"><div class="done"><b>${rd}</b><span>수취 · FIRC</span></div><div class="${st(a,!!ad)}"><b>${a}</b><span>배정기한 (+60일)${!ad&&BIZ>a?" · 경과":""}</span></div><div class="${st(rf,false)}"><b>${rf}</b><span>미배정분 반환기한 (+75일)</span></div><div class="${ad?st(addD(ad,P.FCGPR),!!val("srn")):""}"><b>${ad?addD(ad,P.FCGPR):"배정 후 산출"}</b><span>FC-GPR 신고 (+30일)</span></div></div>`+
       `<div class="msg ${cr+0.005>=num("tinr")?"ok":"err"}">입금 INR ${fmt(cr)} ${cr+0.005>=num("tinr")?"≥":"<"} 목표 INR ${fmt(num("tinr"))} <span class="rule">R-FDI-05</span></div>`+
-      (!ad&&BIZ>a?`<div class="msg err">배정기한 경과 · 미배정 INR ${fmt(cr-num("ainr"))} → ${rf}까지 FD12 반환송금 필요</div>`:""); },
+      (!ad&&BIZ>a?`<div class="msg err">배정기한 경과 · 미배정 INR ${fmt(cr-num("ainr"))} → ${rf}까지 FD12 반환송금 필요</div>`:"");
+    this.kyc(cr, rd, rf); },
+  kyc(cr, rd, rf){ const st=val("kyc"), m=[], f1=addBiz("IN",rd,3), f2=addBiz("IN",rd,7);
+    const bos=["bo1","bo2"].map(i=>val(i).split("/").map(x=>x.trim())).filter(b=>b[0]);
+    const lb=["CN","BD","PK","NP","MM","BT","AF"], lbBo=bos.filter(b=>lb.includes((b[1]||"").toUpperCase())&&+b[2]>=10);
+    if(["RECEIVED","INCOMPLETE","VERIFIED","ATTACHED"].includes(st)){
+      if(val("knm").toUpperCase()!==val("rnm").toUpperCase()) m.push(["err","KYC 명칭 ≠ 전문 송금인명 → 보완 요청 (INCOMPLETE)"]);
+      if(!val("kreg")||!val("kct")) m.push(["err","설립국·등록번호 누락 → 보완 요청"]);
+      if(!bos.length) m.push(["err","실소유자(지분 10% 이상) 누락 → 보완 요청"]);
+      if(!val("sof")) m.push(["err","자금원천 누락 → 보완 요청"]);
+      if(val("scr")==="HIT") m.push(["err","제재 스크리닝 HIT → FAILED, 반환(FD12 REJECT)·STR 검토 <span class='rule'>R-KYC-08</span>"]);
+      if(val("scr")==="REVIEW") m.push(["warn","제재 스크리닝 REVIEW → 컴플라이언스 확인 후 검증"]);
+      if(lbBo.length){ m.push(["err",`인접국 실소유자 ${lbBo.map(b=>b[0]+"("+b[1]+")").join(", ")} → Government Route·승인번호 필수 <span class='rule'>R-FDI-01</span>`]); $("#route").value="GOVT"; }
+      if(val("pep")==="Y") m.push(["warn","PEP: 고위험 → 수취인 EDD·책임자 승인"]); }
+    const edd = cr>=1e8 || val("pep")==="Y" || lbBo.length>0;
+    const tl=`<div class="tl"><div class="done"><b>${rd}</b><span>수취 · MT199 KYC 요청</span></div><div class="${["SENT","FOLLOWUP"].includes(st)&&BIZ>=f1?"due":["RECEIVED","VERIFIED","INCOMPLETE"].includes(st)?"done":""}"><b>${f1}</b><span>D+3 재요청 (응답 없으면)</span></div><div class="${["SENT","FOLLOWUP"].includes(st)&&BIZ>f2?"over":""}"><b>${f2}</b><span>D+7 책임자 보고</span></div><div class="${st==="VERIFIED"?"done":BIZ>rf?"over":""}"><b>${rf}</b><span>반환기한 내 검증 필수</span></div></div>`;
+    const kind = st==="NONE"?"REQ":st==="SENT"||st==="FOLLOWUP"?"FUP":st==="INCOMPLETE"?"INC":"";
+    const L=[`RE YOUR PAYMENT REF ${val("tref")}`,`UETR ${val("uetr")}`,`USD 2,827,444.62 VALUE ${rd}`,`ORDERING CUSTOMER ${val("rnm")}`,`BENEFICIARY SEOUL PRECISION PARTS INDIA LTD`,`PURPOSE FOREIGN DIRECT INVESTMENT IN INDIA`,
+      ...(kind==="FUP"?[`REMINDER OUR MT199 OF ${rd} UNANSWERED`]:kind==="INC"?[`PLS COMPLETE MISSING KYC ITEMS LISTED BELOW`]:[]),
+      `AS REQUIRED UNDER RBI REGULATIONS PLS PROVIDE`,`KYC REPORT OF THE REMITTER ON YOUR LETTERHEAD`,`SIGNED BY AUTHORISED OFFICIAL INCLUDING`,`FULL NAME AND REGISTERED ADDRESS`,`COUNTRY OF INCORPORATION AND REGISTRATION NO`,`ACCOUNT HELD WITH YOU SINCE`,`BENEFICIAL OWNERS 10PCT OR MORE WITH NATIONALITY`,`SOURCE OF FUNDS`,`PEP AND SANCTIONS SCREENING CONFIRMATION`,`REGARDS NOIDA BRANCH TRADE OPS`];
+    const tooLong=L.filter(l=>l.length>50);
+    const mt = kind?`<div class="mtw"><div><h5>MT199 ${kind==="REQ"?"KYC 요청 (자동 초안)":kind==="FUP"?"재요청":"보완 요청"} → ${val("rbic")}</h5><pre class="mt">{2:I199${val("rbic")}XXXXN}
+{4:
+:20:KYC${kind==="FUP"?"F":kind==="INC"?"C":""}2609010007
+:21:${val("tref")}
+:79:${L.join("\n")}
+-}</pre></div><div>${tooLong.length?`<div class="msg err">:79: 줄당 50자 초과 ${tooLong.length}줄</div>`:`<div class="msg ok">:79: ${L.length}줄 / 최대 35줄 · 줄당 50자 이내</div>`}<div class="msg info">SW11 큐에 AUTH 대기로 등록 → Checker 승인 후 송신 · 응답 MT199의 :21:이 이 :20:과 같으면 FD11에 자동 연결 <span class="rule">R-KYC-02/04</span></div><div class="msg info">MX 대안: camt.110 조사요청 (SWIFT 적용 범위 확인 필요)</div></div></div>`
+      : st==="RECEIVED"?`<div class="msg info">응답 MT199 수신(:21: KYC2609010007 매칭) · 서명 보고서 TB_FX_DOC(KYC) 등록 → 아래 검증 후 VERIFIED</div>`:"";
+    $("#kycbox").innerHTML=tl+mt+m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")+
+      (["RECEIVED","ATTACHED"].includes(st)&&!m.some(x=>x[0]==="err")?`<div class="msg ok">검증 항목 충족 → VERIFIED 처리 가능 <span class="rule">R-KYC-05</span></div>`:"")+
+      `<div class="msg ${edd?"warn":"info"}">수취인(피투자법인) ${edd?`추가 실사(EDD) 대상: INR ${fmt(cr,0)} ≥ 10 crore 또는 고위험 → 실소유자·투자자금 용도·사업 실체 확인`:"EDD 비대상: 당행 고객 CDD로 갈음"} <span class="rule">R-KYC-07</span></div>`+
+      (st!=="VERIFIED"?`<div class="msg warn">KYC 검증 전: FIRC 발급·배정 확인·FC-GPR 지원 불가 <span class="rule">R-KYC-06</span></div>`:""); },
   chk(){ this.calc(); const m=[]; if(["CN","BD","PK","NP"].includes(val("ic")) && (val("route")!=="GOVT"||!val("gref"))) m.push(["err","육상국경 인접국 투자자: Government Route + 승인번호 필수 <span class='rule'>R-FDI-01</span>"]);
-    if(val("kyc")!=="Y") m.push(["err","송금은행 KYC 미수취"]); return show(m.length?m:[["ok","FDI 등록 가능 · 기한 3건 생성"]]); }};
+    if(val("kyc")==="FAILED"||$("#kycbox .msg.err")) m.push(["err","송금인 KYC 검증 오류 · 보완 요청 또는 반환 <span class='rule'>R-KYC-05/08</span>"]);
+    else if(val("kyc")!=="VERIFIED") m.push(["warn",`송금인 KYC ${val("kyc")}: 등록은 가능하나 FIRC·배정 확인은 VERIFIED 후 <span class='rule'>R-KYC-06</span>`]);
+    return show(m.length?m:[["ok","FDI 등록 가능 · KYC 검증 완료 · 기한 생성"]]); }};
 
 S.fd12 = {id:"FD12", t:"FDI Refund Remittance", g:"FDI", tag:"신규", d:"60일 내 미배정분의 반환송금. 원 송금인·원 통화로 반환하며, 반환기한(수취일+75일) 경과 시 RBI 승인번호 없이는 승인되지 않습니다.",
   html:()=>SEC("Original FDI",F({l:"FDI Ref",id:"fr",v:"FDI2609010007",ro:1,btn:"fdi"})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-08-10",ro:1})+F({l:"Investor",id:"inv",v:"SEOUL PRECISION CO LTD",ro:1})+
@@ -686,7 +725,9 @@ S.sw11 = {id:"SW11", t:"SWIFT Message Center", g:"SWIFT", tag:"신규", d:"모�
      ["SW2610310107","I","camt.054","MT910","[HOBIC]","[OURBIC]","HO-STL-2610-W43","USD","1,212,330.18","2026-10-30","ROUTED","IO21 IOB2610300002 PAID"],
      ["SW2610310108","O","pacs.009","MT202","[OURBIC]","SCBLINBB","VSO2610310011","INR","4,500,000.00","2026-10-31","NAK","Repair: T27 BIC 오류"],
      ["SW2610310109","O","MT999","-","[OURBIC]","[HOBIC]","HOL2611090001","-","-","2026-11-06","DRAFT","CM21 휴일 영향 일괄 통보"],
-     ["SW2610310110","I","MT740","-","[HOBIC]","[OURBIC]","LC26KR004417","USD","500,000.00","2026-10-28","ROUTED","RA11 RA2610280002"]],
+     ["SW2610310110","I","MT740","-","[HOBIC]","[OURBIC]","LC26KR004417","USD","500,000.00","2026-10-28","ROUTED","RA11 RA2610280002"],
+     ["SW2610310111","O","MT199","camt.110","[OURBIC]","[REMBIC]","KYC2610300012","-","-","2026-10-30","AUTH","FD11 FDI2610300004 송금인 KYC 요청 (자동)"],
+     ["SW2610310112","I","MT199","camt.111","[REMBIC]","[OURBIC]","KR26KYC0917","-","-","2026-10-31","ROUTED","FD11 KYC 응답 (:21: KYC2610280009 매칭)"]],
   html(){ return `<section class="sec"><div class="kpis">${["DRAFT","VERIFY","AUTH","ACK","NAK","ROUTED"].map(k=>`<div class="kpi"><span>${k}</span><b style="${k==="NAK"?"color:var(--err)":""}">${this.q.filter(r=>r[10]===k).length}</b></div>`).join("")}</div></section>`+
     SEC("Queue",TABLE(["Msg ID","Dir","Type","MT/MX 대응","Sender","Receiver","Reference","CCY",["Amount","n"],"Value","Status","Linked / Note"],this.q.map((r,i)=>TR([`<a href="#sw11" data-m="${i}">${r[0]}</a>`,r[1],`<b>${r[2]}</b>`,r[3],r[4],r[5],r[6],r[7],[r[8],"n"],r[9],pill(r[10],{ACK:"ok",ROUTED:"ok",NAK:"err",DRAFT:"info",VERIFY:"warn",AUTH:"warn"}[r[10]]),r[11]]))),0,"R-SW-03~05, 07")+
     `<section class="sec"><h3>Message Detail</h3><div id="swd"></div></section>`+
@@ -697,18 +738,20 @@ S.sw11 = {id:"SW11", t:"SWIFT Message Center", g:"SWIFT", tag:"신규", d:"모�
       "pacs.009":`<FICdtTrf>\n  <GrpHdr><MsgId>RA2610300003P</MsgId><NbOfTxs>1</NbOfTxs><SttlmInf><SttlmMtd>INDA</SttlmMtd></SttlmInf></GrpHdr>\n  <CdtTrfTxInf>\n    <PmtId><InstrId>RA2610300003P</InstrId><EndToEndId>HDF742/26/0911</EndToEndId><UETR>…</UETR></PmtId>\n    <IntrBkSttlmAmt Ccy="USD">248500.00</IntrBkSttlmAmt><IntrBkSttlmDt>2026-11-03</IntrBkSttlmDt>\n    <Dbtr><FinInstnId><BICFI>[OURBIC]</BICFI></FinInstnId></Dbtr>\n    <Cdtr><FinInstnId><BICFI>HDFCINBB</BICFI></FinInstnId></Cdtr>\n  </CdtTrfTxInf>\n</FICdtTrf>`,
       "MT756":`{2:I756[HOBIC]XXXXN}\n{4:\n:20:RA2610300003A\n:21:LC26KR004417\n:32B:USD248500,00\n:33A:261103USD248500,00\n:72Z:/REIMBURSED/ CLAIM HDF742/26/0911\n-}`,
       "MT300":`{2:I300[HOBIC]XXXXN}\n{4:\n:15A:\n:20:FX2610310090\n:22A:NEWT\n:22C:[OURB]8842[HOBI]\n:82A:[OURBIC]\n:87A:[HOBIC]\n:15B:\n:30T:20261031\n:30V:20261103\n:36:88,42\n:32B:USD1000000,00\n:57A:[HO NOSTRO]\n:33B:INR88420000,00\n:57A:[OURBIC]\n-}`,
+      "MT199":r[1]==="O"?`{2:I199[REMBIC]XXXXN}\n{4:\n:20:KYC2610300012\n:21:GM-FDI-2610-30\n:79:RE YOUR PMT UETR ...\nORDERING CUSTOMER GANGNAM MOBILITY CO LTD\nPURPOSE FOREIGN DIRECT INVESTMENT IN INDIA\nAS REQUIRED UNDER RBI REGULATIONS PLS PROVIDE\nKYC REPORT OF THE REMITTER ...\n-}`:`{1:F01[OURBIC]...}{2:O199[REMBIC]...}\n{4:\n:20:KR26KYC0917\n:21:KYC2610280009\n:79:KYC OF REMITTER HANA CAPITAL PARTNERS\nINCORPORATED KOREA REG NO 110111-XXXXXXX\nCUSTOMER SINCE 2014 BO LEE J.H. KR 70PCT\nSOURCE OF FUNDS FUND CAPITAL NOT PEP\nSIGNED REPORT FOLLOWS BY COURIER\n-}`,
       "MT999":`{2:I999[HOBIC]XXXXN}\n{4:\n:20:HOL2611090001\n:79:INDIA BANK HOLIDAY 09NOV26 (TEMPORARY)\nAFFECTED: 3 RA CLAIMS / 1 SETTLEMENT BATCH\nVALUE DATES MOVED TO 10NOV26\nFLOAT INTEREST PER IO SETTLEMENT RULE\n-}`}[r[2]] || `(원문 예시) ${r[2]} ${r[6]} ${r[7]} ${r[8]}`;
     $("#swd").innerHTML=`<div class="mtw"><div><h5>${r[0]} · ${r[2]} ${r[3]!=="-"?"(≈ "+r[3]+")":""} · ${r[10]}</h5><pre class="mt">${txt.replace(/</g,"&lt;")}</pre></div><div><h5>처리</h5>${r[10]==="NAK"?`<div class="msg err">NAK T27: 수신 BIC 오류 → Repair 큐. 수정 후 재검증·재송신(PDE) <span class="rule">R-SW-07</span></div>`:r[10]==="VERIFY"||r[10]==="AUTH"?`<div class="msg warn">Checker 승인 대기 (작성자≠승인자) <span class="rule">R-SW-03</span></div>`:r[10]==="DRAFT"?`<div class="msg info">CM21 임시휴일 영향 일괄 통보 초안 → <a href="#sw12">SW12</a>에서 편집</div>`:`<div class="msg ok">${r[1]==="I"?"수신 → "+r[11]:"송신 완료 "+r[10]}</div>`}<div class="msg info">원천: ${r[11]}</div></div></div>`;
     log(`${r[0]} 선택`); }};
 
 S.sw12 = {id:"SW12", t:"SWIFT Compose", g:"SWIFT", tag:"신규", d:"메시지 유형별 템플릿으로 수기 작성합니다. MT950은 VS31 자동생성 외에 여기서 수기로 작성·재발송할 수 있으며, 원장 잔액과 대사한 뒤 2인 승인으로 송신합니다.",
-  html:()=>SEC("Header",F({l:"Message Type",id:"mt",t:"sel",rq:1,o:[["MT950","MT950 Statement (수기)"],["MT202","MT202 → pacs.009 FI Transfer"],["MT300","MT300 FX Confirmation"],["MT999","MT999 Free Format"]],v:"MT950"})+
+  html:()=>SEC("Header",F({l:"Message Type",id:"mt",t:"sel",rq:1,o:[["MT950","MT950 Statement (수기)"],["MT199","MT199 Free Format (KYC 요청 등)"],["MT202","MT202 → pacs.009 FI Transfer"],["MT300","MT300 FX Confirmation"],["MT999","MT999 Free Format"]],v:"MT950"})+
       F({l:"Receiver BIC",id:"rcv",v:"NACFKRSE",rq:1,max:11})+F({l:"Reason (수기 사유)",id:"rsn",v:"",ph:"자동발송 NAK 후 수기 재작성 등"}))+
     `<section class="sec"><h3>Fields <small id="mthint"></small></h3><div id="mtf"></div></section><section class="sec"><h3>Preview &amp; Check</h3><div id="mtp"></div></section>`,
   F:{MT950:[["20","Transaction Ref","VS2610310216"],["25","Account","9001000000123"],["28C","Stmt/Page","00216/1"],["60F","Opening (C/D YYMMDD CCY Amt)","C261031INR122500000,00"],["61a","Line 1","2610311031D5000000,00NTRFINV20261031A//NHNOIDA0001"],["61b","Line 2","2610311031C2500000,00NTRFNONREF//NHNOIDA0002"]],
      MT202:[["20","Transaction Ref","IOB2610310003"],["21","Related Ref","IOB2610310003"],["32A","Value/CCY/Amt","261103USD1212330,18"],["58A","Beneficiary Institution","[HOBIC]"],["72","Sender to Receiver","/BNF/IO SETTLEMENT W44"]],
      MT300:[["20","Ref","FX2610310091"],["22A","Type","NEWT"],["30T","Trade Date","20261031"],["30V","Value Date","20261103"],["36","Rate","88,42"],["32B","Bought","USD500000,00"],["33B","Sold","INR44210000,00"]],
-     MT999:[["20","Ref","HOL2611090001"],["79","Narrative","INDIA BANK HOLIDAY 09NOV26 (TEMPORARY)"]]},
+     MT999:[["20","Ref","HOL2611090001"],["79","Narrative","INDIA BANK HOLIDAY 09NOV26 (TEMPORARY)"]],
+     MT199:[["20","Ref","KYC2610310015"],["21","Related Ref (상대 Ref)","SGX2610310044"],["79","Narrative","PLS PROVIDE KYC REPORT OF THE REMITTER FOR FDI"]]},
   init(){ $("#mt").addEventListener("change",()=>this.build()); ["rcv","rsn"].forEach(i=>$("#"+i).addEventListener("input",()=>this.calc())); this.build(); },
   build(){ const t=val("mt"); $("#mthint").textContent=t==="MT202"?"CBPR+ 이후 pacs.009로 송신 (MT 미리보기는 참고용)":t==="MT950"?"MT 유지 (camt.053 대응)":"MT 유지";
     $("#mtf").innerHTML=`<div class="grid" style="--c:2">${this.F[t].map(([tag,l,v])=>F({l:`:${tag.replace(/[ab]$/,"")}: ${l}`,id:"f_"+tag,v,s:1})).join("")}</div>`;
@@ -721,6 +764,7 @@ S.sw12 = {id:"SW12", t:"SWIFT Compose", g:"SWIFT", tag:"신규", d:"메시지 �
         const cl=`${bal<0?"D":"C"}${mm[2]}${mm[3]}${Math.abs(bal).toFixed(2).replace(".",",")}`; body+=`\n:62F:${cl}\n:64:${cl}`;
         m.push(["info",`기말잔액 자동계산 ${cl} · 원장(VS) 잔액과 대사 후 승인 <span class='rule'>R-SW-06</span>`]); }
       if(!val("rsn")) m.push(["err","수기 MT950은 사유 입력 필수 <span class='rule'>R-SW-06</span>"]); }
+    if(t==="MT199"||t==="MT999"){ const ls=val("f_79").split(/\n/); if(ls.some(l=>l.length>50)) m.push(["err",":79: 줄당 50자 초과"]); if(ls.length>35) m.push(["err",":79: 35줄 초과"]); if(t==="MT199"&&!val("f_21")) m.push(["err","MT199은 :21: 관련참조 필수"]); }
     if(t==="MT202") m.push(["info","송신은 pacs.009 (SttlmMtd INDA, IntrBkSttlmDt = :32A: 일자). US 휴일이면 결제일 오류 <span class='rule'>R-SW-01 · R-HOL-01</span>"]);
     if(t==="MT202"){ const d=val("f_32A").slice(0,6); const iso=`20${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4,6)}`; if(!isBiz("US",iso)) m.push(["err",`결제일 ${iso}은 US 휴일/주말 → ${nextBiz("US",iso)}`]); }
     if(!/^[A-Z0-9\[\]]{8,11}$/.test(val("rcv"))) m.push(["err","수신 BIC 형식 오류"]);

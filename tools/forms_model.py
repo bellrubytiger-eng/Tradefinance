@@ -63,7 +63,7 @@ FORMS = [
                 ("purpose", "Purpose Code", "Purpose Code", f"{MST}.PURPOSE_CODE + TB_CD_PURPOSE.DESC_EN", None),
                 ("instr", "Instrument", "투자수단", f"{FDI}.INSTRUMENT", None),
                 ("route", "Route", "투자경로 / 승인번호", f"{FDI}.ROUTE, GOVT_APPROVAL_REF", None),
-                ("kyc", "KYC of Investor", "투자자 KYC", f"{FDI}.KYC_RCV_YN, KYC_BANK_BIC", None),
+                ("kyc", "KYC of Remitter (Investor)", "송금인 KYC", "TB_FDI_KYC.KYC_STS, REQ_SENT_DT, RESP_RCV_DT", None),
                 ("allot_due", "Allotment Due By", "배정기한", f"{FDI}.ALLOT_DUE_DT", None),
                 ("refund_due", "Refund Due By (if not allotted)", "반환기한", f"{FDI}.REFUND_DUE_DT", None),
             ]},
@@ -353,7 +353,7 @@ SAMPLES = {
             "inr_fixed": "Yes - target INR 25,00,00,000.00 agreed; required USD 2,827,414.62 at 88.4200 (rounded up)",
             "charges": charges_text(_FDI_FEES_IG, "debited separately on 2026-09-01; customer GSTIN 06AABCS7710Q1ZT, inter-state"),
             "purpose": "P0006 - Foreign direct investment in India (equity)", "instr": "Equity Shares", "route": "Automatic Route",
-            "kyc": "Received from remitting bank on 2026-09-02", "allot_due": "2026-10-31", "refund_due": "2026-11-15",
+            "kyc": "Requested by MT199 on 2026-09-01; report from remitting bank received 2026-09-02, verified", "allot_due": "2026-10-31", "refund_due": "2026-11-15",
             "copy": "ORIGINAL", "verify": "7F3A-91C2-0D5E-B844"},
         "fdi_rtgs": {
             "cert_no": "FIRC/NOI/2026-27/000047", "issue_dt": "2026-10-09", "fdi_ref": "FDI2610050002", "our_ref": "NOI035RI2610000009",
@@ -369,7 +369,7 @@ SAMPLES = {
             "payout": f"RTGS · UTR [UTR] · IFSC [XXXX0XXXXXX] · A/c XXXXXXXX7731 in the name of GANGNAM MOBILITY INDIA PVT LTD · INR {fin(_L1_INR + _L2_INR)} on 2026-10-08",
             "charges": charges_text(_FDI_FEES_CS, "paid separately by the investee by NEFT on 2026-10-08; non-account holder, place of supply UP"),
             "purpose": "P0006 - Foreign direct investment in India (equity)", "instr": "Equity Shares", "route": "Automatic Route",
-            "kyc": "Received from remitting bank on 2026-10-06", "allot_due": "2026-12-04", "refund_due": "2026-12-19",
+            "kyc": "Requested by MT199 on 2026-10-05; report from remitting bank received 2026-10-06, verified", "allot_due": "2026-12-04", "refund_due": "2026-12-19",
             "copy": "ORIGINAL", "verify": "3E7B-08D1-C64A-29F5"},
     },
     "out": {

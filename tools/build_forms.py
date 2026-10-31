@@ -81,7 +81,7 @@ table.legs td:last-child,table.legs th:last-child{padding-left:12px}
 table.legs .n{text-align:right}
 table.fees td:last-child{text-align:right;font-family:var(--mono)}
 ol.st{margin:0;padding-left:16px;display:grid;gap:2px;font:9.7px/1.35 var(--serif);color:#26303c}
-.sign{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;margin-top:auto;padding-top:10px}
+.sign{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:18px;margin-top:auto;padding-top:4px}
 .sign div{border-top:1px solid var(--ink);padding-top:3px;font-size:10px;color:var(--sub)}
 .sign .seal{border:1px dashed var(--rule);height:40px;border-top-style:dashed;display:flex;align-items:center;justify-content:center}
 .foot{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border-top:1px solid var(--rule);padding-top:6px;font-size:9.5px;color:var(--sub)}
