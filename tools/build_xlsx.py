@@ -76,7 +76,8 @@ def main(out):
              ("12.서식필드매핑", "고객 서식 4종(FIRC·당발·타발·환전) 항목별 DB 소스"),
              ("13.FDI화면가이드", "FDI 단계별 사용 화면"),
              ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면"),
-             ("15.RBI기준검토", "업로드 무역금융 자료·기존 설계의 RBI 최신 기준 대조 결과")]
+             ("15.RBI기준검토", "업로드 무역금융 자료·기존 설계의 RBI 최신 기준 대조 결과"),
+             ("16.규정근거색인", "규정별 번호·고시일·시행일·관련 파라미터·규칙·출처")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -153,6 +154,9 @@ def main(out):
           note="CBPR+ 결제·은행이체·입출금통지는 2025.11 이후 MX로 송신(MT는 수신 번역·레거시용). 보고(MT940/950)·Cat3·Cat7은 MT 유지 - SWIFT 최신 일정 확인(VERIFY)")
 
     wb.move_sheet("15.RBI기준검토", offset=1)
+    sheet(wb, "16.규정근거색인", ["규정", "번호", "고시일", "시행일", "적용 업무", "관련 파라미터", "관련 규칙", "확인 상태", "출처"], M.REG_INDEX,
+          [52, 22, 14, 22, 40, 34, 30, 20, 60],
+          note="설계에 쓰인 모든 규정·국제규칙의 번호·일자·적용 범위와, 해당 규정을 근거로 하는 파라미터(6번 시트)·업무규칙(4번 시트) 색인")
     wb.save(out)
     print("saved", out)
 
@@ -220,6 +224,16 @@ def build_calc(wb):
         ("적용금리 %", "=B50+IF(B53=\"Y\",B52,B51)/100", "num4"),
         ("이자", "=ROUND(B48*B55/100*B49/B54,2)", "num2"),
         ("기간구간", "=IF(B49<=7,\"T007\",IF(B49<=30,\"T030\",IF(B49<=90,\"T090\",IF(B49<=180,\"T180\",IF(B49<=365,\"T365\",\"T999 (본점 별도승인)\")))))", "text"),
+        ("", None, None),
+        ("FDI 약정금액·초과입금 (R-FDI-06~08)", None, None),
+        ("약정 INR (발행가 × 주식수)", 250000000, "input_num"),
+        ("딜 환율 (INR per USD)", 88.42, "input_num"),
+        ("수취 외화 (USD)", 2850000, "input_num"),
+        ("환전 대상 외화 = ROUNDUP(약정/환율, 2)", "=ROUNDUP(B60/B61,2)", "num2"),
+        ("초과 외화 (환전 없이 원통화 반환)", "=ROUND(MAX(0,B62-B63),2)", "num2"),
+        ("부족 외화 (환전 보류)", "=ROUND(MAX(0,B63-B62),2)", "num2"),
+        ("입금 INR", "=IF(B65>0,0,ROUND(B63*B61,2))", "num2"),
+        ("처리", "=IF(B65>0,\"부족 → 환전 보류·부족분 요청\",IF(B64>0,\"약정분만 환전, 초과분 원통화 반환\",\"전액 환전\"))", "text"),
     ]
     from datetime import date
     for i, (label, val, kind) in enumerate(rows, 4):
@@ -251,10 +265,10 @@ def build_calc(wb):
     ws.add_data_validation(dv2)
     dv2.add("B38")
     dv.add("B53")
-    ws["A61"] = "갑기금 = 무이자(계산 없음) · 을A = 기준금리+스프레드(휴일차이·정산지연) · 을B = 기간구간 금리, 우대조건: 과거 1년 내 동일통화·금액 이상·30일 이상 조달이력(정기예금·콜머니·콜론 등)"
-    ws["A61"].font = Font(name=FONT, size=9, italic=True)
-    ws["A60"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
-    ws["A60"].font = Font(name=FONT, size=9, italic=True)
+    ws["A71"] = "갑기금 = 무이자(계산 없음) · 을A = 기준금리+스프레드(휴일차이·정산지연) · 을B = 기간구간 금리, 우대조건: 과거 1년 내 동일통화·금액 이상·30일 이상 조달이력(정기예금·콜머니·콜론 등)"
+    ws["A71"].font = Font(name=FONT, size=9, italic=True)
+    ws["A70"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
+    ws["A70"].font = Font(name=FONT, size=9, italic=True)
 
 
 if __name__ == "__main__":

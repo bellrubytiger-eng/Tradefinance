@@ -64,6 +64,10 @@ PARAMS = [
     ("FDI_BENE_EDD_INR", "FDI 수취인 추가실사(EDD) 기준금액", "100000000", "INR", "FDI", "지점 확정(2026-11) / RBI (Commercial Banks – KYC) Directions, 2025 (위험기반)", "N", "INR 10 crore 이상 또는 고위험 → 피투자법인 EDD (지점 확정값)"),
     ("FDI_HOLD_UNTIL_KYC", "KYC 확인 전 입금 보류", "N", "Y/N", "FDI", "은행 내부정책", "N", "N: 입금하되 FIRC·배정확인 차단 / Y: 미지급금(RT22) 보류. 고위험국은 Y 강제"),
     ("KYC_BO_THRESHOLD_PCT", "실소유자 확인 지분 기준", "10", "%", "KYC", "PML (Maintenance of Records) Rules", "Y", "법인 실소유자 판정"),
+    ("FDI_EXCESS_RETURN_DAYS", "FDI 초과입금 반환 기한", "5", "영업일(수취일 후)", "FDI", "지점 정책 (투자자 지시·FEMA: 투자 목적 외 자금 미보유)", "N", "초과분은 환전 없이 원통화·원송금인 앞 반환"),
+    ("FDI_EXCESS_RETURN_CHG", "FDI 초과입금 반환 수수료 부담", "BEN", "-", "FDI", "지점 정책", "N", "반환액에서 공제(BEN). 투자 원금(약정분)에서는 공제 금지"),
+    ("FDI_SHORTFALL_ACTION", "FDI 부족입금 처리", "HOLD", "-", "FDI", "지점 정책", "N", "환전 보류·미지급금(외화) 보관 → 부족분 요청 또는 약정 변경 확인 후 환전"),
+    ("SIM_QUOTE_VALID_MIN", "환율 시뮬레이션 견적 유효시간", "15", "분", "시뮬레이션", "지점 정책 (고시환율 회차 내)", "N", "회차 변경 시 즉시 만료. 딜 환율은 자금팀 딜 유효시간"),
     ("FDI_FCTRS_DAYS", "FC-TRS 신고기한(대금 수취/지급일 기준)", "60", "일", "FDI", "FEMA (Mode of Payment and Reporting of NDI) Regulations 2019", "N", ""),
     ("DIRECT_IMP_FLAT_COMM_INR", "Direct Import Bill 송금수수료(정액)", "750", "INR", "수입", "노이다지점 요청(RT13 수수료체계)", "N", "Product Type 03"),
     ("GST_RATE", "금융서비스 GST 세율", "18", "%", "공통", "CGST/SGST/IGST Act", "N", "동일주 CGST9+SGST9 / 타주 IGST18"),
@@ -313,7 +317,9 @@ CODES = [
     ("KYC_STS", "VERIFIED", "검증 완료", "FIRC·배정확인 허용", "N"),
     ("KYC_STS", "FAILED", "검증 실패(제재·불일치)", "반환(FD12 REJECT)·STR 검토", "N"),
     ("FDI_REFUND_TYPE", "NONALLOT", "60일 내 미배정분 반환", "", "N"),
-    ("FDI_REFUND_TYPE", "EXCESS", "초과입금분 반환", "", "N"),
+    ("FDI_REFUND_TYPE", "EXCESS", "초과입금분 반환 (환전 없이 원통화)", "약정 투자금액 초과분 - 수취 즉시 분리, INR 미전환", "N"),
+    ("FDI_AGREED_BASIS", "INR", "INR 확정 (주식 발행가 × 주식수)", "필요 외화 = ROUNDUP(약정 INR / 환율, 2)", "N"),
+    ("FDI_AGREED_BASIS", "FCY", "외화 확정 (투자계약 외화금액)", "약정 외화만 환전", "N"),
     ("FDI_REFUND_TYPE", "REJECT", "투자불허/KYC 실패 반환", "", "N"),
     # 인터페이스 상태
     ("IF_STATUS", "NEW", "생성", "", "N"),
@@ -719,6 +725,14 @@ table("TB_FDI_INFLOW", "FDI 유입", "FDI(FD11)", "외국인직접투자 수취�
     ("INR_AMT", "INR 환산(입금)", "NUMBER(18,2)", "NN", "", "FIRMS"),
     ("INR_FIXED_YN", "INR 확정여부", "VARCHAR2(1)", "", "", ""),
     ("TARGET_INR_AMT", "목표 INR 금액", "NUMBER(18,2)", "", "INR 확정송금 시 투자약정 금액", ""),
+    ("AGREED_BASIS", "약정 기준", "VARCHAR2(3)", "NN", "INR(주식 발행가 기준) / FCY(외화 약정)", ""),
+    ("AGREED_FCY_AMT", "약정 외화금액", "NUMBER(18,2)", "", "AGREED_BASIS=FCY", ""),
+    ("REQ_FCY_AMT", "환전 대상 외화", "NUMBER(18,2)", "NN", "INR: ROUNDUP(TARGET_INR/환율,2) / FCY: AGREED_FCY_AMT", ""),
+    ("CONV_FCY_AMT", "실제 환전 외화", "NUMBER(18,2)", "NN", "= MIN(수취 외화, REQ_FCY_AMT). 약정분만 환전", "FIRC"),
+    ("EXCESS_FCY_AMT", "초과입금 외화", "NUMBER(18,2)", "NN", "= 수취 - REQ (>0). 환전 금지, 원통화 반환", "FIRC"),
+    ("EXCESS_REFUND_REF", "초과분 반환 Ref", "VARCHAR2(16)", "", "TB_FDI_REFUND(REFUND_TYPE=EXCESS)", ""),
+    ("SHORTFALL_FCY_AMT", "부족 외화", "NUMBER(18,2)", "NN", "= REQ - 수취 (>0). 환전 보류", ""),
+    ("SPLIT_STS", "약정·초과 분리 상태", "VARCHAR2(6)", "NN", "EXACT/EXCESS/SHORT/RTND(초과 반환완료)", ""),
     ("KYC_RCV_YN", "해외은행 KYC 수취", "VARCHAR2(1)", "NN", "= (TB_FDI_KYC.KYC_STS = VERIFIED). 송금인 KYC가 AD은행 기본 의무", "FIRMS"),
     ("KYC_BANK_BIC", "KYC 발급은행", "VARCHAR2(11)", "", "송금은행(Ordering Institution)", ""),
     ("BENE_EDD_YN", "수취인 추가실사 대상", "VARCHAR2(1)", "NN", "INR ≥ FDI_BENE_EDD_INR 또는 고위험 → Y", ""),
@@ -772,7 +786,8 @@ table("TB_FDI_REFUND", "FDI 반환송금", "FDI(FD12)", "미배정/초과분 반
     ("ORIG_INR_AMT", "원 입금 INR", "NUMBER(18,2)", "NN", "", ""),
     ("REFUND_INR_AMT", "반환 INR", "NUMBER(18,2)", "NN", "≤ 미배정잔액", ""),
     ("REFUND_CCY", "반환통화", "VARCHAR2(3)", "NN", "원 송금통화 원칙", ""),
-    ("REFUND_FCY_AMT", "반환 FCY", "NUMBER(18,2)", "NN", "INR 확정 시 역산", ""),
+    ("REFUND_FCY_AMT", "반환 FCY", "NUMBER(18,2)", "NN", "NONALLOT: INR 확정 역산 / EXCESS: 수취 외화 그대로(환전 없음)", ""),
+    ("CONVERTED_YN", "환전 여부", "VARCHAR2(1)", "NN", "EXCESS는 항상 N (외화 그대로 반환, 환차·환전 GST 없음)", ""),
     ("FX_DIFF_INR", "환차손익", "NUMBER(18,2)", "", "", ""),
     ("LATE_YN", "기한경과여부", "VARCHAR2(1)", "NN", "Y면 RBI 승인/LSF 검토", ""),
     ("RBI_APPROVAL_REF", "RBI 승인번호", "VARCHAR2(30)", "", "", ""),
@@ -1322,6 +1337,30 @@ table("TB_IO_FLOAT_ADJ", "휴일 차이 조정", "본지점(IO21/CM21)", "본점
     ("CUST_CLAIM_YN", "고객 청구", "VARCHAR2(1)", "NN", "기본 N (휴일 차이는 고객에게 청구하지 않음)", ""),
 ] + AUD)
 
+table("TB_FX_SIMULATION", "송금·환전 시뮬레이션(견적)", "공통(SM11)", "송금·환전 전 예상 환율·환전액·수수료·GST·TCS를 계산한 견적. 실거래 전환 시 원거래와 연결.", [
+    ("QUOTE_ID", "견적번호", "VARCHAR2(16)", "PK", "Q+YYMMDD+일련", ""),
+    ("SIM_TYPE", "유형", "VARCHAR2(8)", "NN", "OUT_GEN/OUT_LRS/OUT_TRD/OUT_NR/IN_GEN/IN_FDI/FX_ACCT/FX_CASH", ""),
+    ("CUST_NO", "고객번호", "VARCHAR2(8)", "FK", "비계좌 견적은 NULL", ""),
+    ("CCY", "통화", "VARCHAR2(3)", "NN", "", ""),
+    ("INPUT_BASIS", "입력 기준", "VARCHAR2(3)", "NN", "FCY 금액 / INR 금액(INR 확정)", ""),
+    ("INPUT_AMT", "입력 금액", "NUMBER(18,2)", "NN", "", ""),
+    ("RATE_SRC", "환율 출처", "VARCHAR2(4)", "NN", "CARD(회차) / DEAL(자금팀 견적)", ""),
+    ("RATE_CARD_SEQ", "고시 회차", "NUMBER(3)", "", "", ""),
+    ("APPLIED_RATE", "적용 환율", "NUMBER(15,6)", "NN", "", ""),
+    ("FCY_AMT", "외화 금액", "NUMBER(18,2)", "NN", "", ""),
+    ("INR_AMT", "INR 금액", "NUMBER(18,2)", "NN", "", ""),
+    ("FEE_AMT", "수수료 합계", "NUMBER(18,2)", "NN", "", ""),
+    ("GST_FX_VALUE", "환전 과세표준", "NUMBER(18,2)", "", "32(2)(b)", "GST"),
+    ("GST_AMT", "GST 합계", "NUMBER(18,2)", "NN", "CGST/SGST 또는 IGST, R-GST", "GST"),
+    ("TCS_AMT", "TCS", "NUMBER(18,2)", "", "LRS", ""),
+    ("TOTAL_DEBIT", "총 출금(당발)", "NUMBER(18,2)", "", "", ""),
+    ("NET_CREDIT", "순 입금(타발)", "NUMBER(18,2)", "", "", ""),
+    ("EXCESS_FCY", "FDI 초과(반환 예정)", "NUMBER(18,2)", "", "IN_FDI", ""),
+    ("VALID_UNTIL", "유효시각", "TIMESTAMP", "NN", "생성 + SIM_QUOTE_VALID_MIN, 회차 변경 시 만료", ""),
+    ("CONVERTED_REF", "전환 거래", "VARCHAR2(16)", "", "실거래 송금·환전 Ref", ""),
+    ("QUOTE_STS", "상태", "VARCHAR2(5)", "NN", "OPEN/USED/EXPD", ""),
+] + AUD)
+
 table("TB_FX_ADVICE_ISSUE", "확인서·증명서 발급이력", "서식(DC01)",
       "FIRC(FM-FDI-01)·당발확인서(FM-OUT-01)·타발확인서(FM-IN-01) 발급/재발급/정정 이력. 원본은 원천 1건당 1회.", [
     ("ISSUE_NO", "발급번호", "VARCHAR2(30)", "PK", "서식약어/지점/FY/일련 (예: FIRC/NOI/2026-27/000041)", "서식"),
@@ -1397,6 +1436,13 @@ RULES = [
     ("R-EXP-05", "수출", "배치", "회수기한 산출", "REALIZE_DUE_DT = 선적(LEO)일 + 선적일에 유효한 EXP_REALIZE_MONTHS (2026.10.1~ 9개월, INR 인보이스·결제 12개월, 서비스는 인보이스일 기산)", "AUTO", "FEM EXIM Regs 2026 (FEMA 23(R)/(1)/2026-RB)", "EXP_REALIZE_MONTHS", "Y"),
     ("R-EXP-06", "수출", "배치", "선수금 선적이행", "IRM ADV_YN=Y & 잔액>0 & 오늘 > SHIP_DUE_DT → OVERDUE, 반환송금/연장 처리 대상", "ALERT", "FEM EXIM 2026", "EXP_ADV_SHIP_MONTHS", "Y"),
     ("R-FDI-01", "FDI", "FD11", "KYC/인접국", "송금인 KYC 검증(R-KYC-01~08) 필수, 투자자 국가 또는 실소유자가 인접국이면 ROUTE=GOVT + 승인번호 필수", "ERR", "NDI Rules / Press Note 3(2020)", "", "N"),
+    ("R-FDI-06", "FDI", "FD11", "약정금액만 환전", "투자금액이 확정된 FDI는 약정분(INR 확정: ROUNDUP(약정 INR/환율,2) 외화 / 외화 확정: 약정 외화)만 환전·입금. 수취액이 더 많아도 초과분은 환전하지 않음", "ERR", "FEMA (NDI) Rules - 투자 목적 자금 / 지점 정책", "", "N"),
+    ("R-FDI-07", "FDI", "FD11/FD12", "초과분 원통화 반환", "초과 외화는 수취 즉시 외화 미지급금(A/P)으로 분리 → 환전 없이 원송금인·원통화로 반환(FD12 EXCESS, 수취 후 5영업일 내). 반환 수수료는 반환액에서 공제(BEN), 환전 GST 없음, FIRC·FC-GPR에는 약정 환전분만 표기", "ERR", "지점 정책", "FDI_EXCESS_RETURN_DAYS", "N"),
+    ("R-FDI-08", "FDI", "FD11", "부족입금", "수취액 < 약정분이면 환전하지 않고 외화 미지급금 보류 → 송금인에게 부족분 요청(camt.110) 또는 투자자·피투자법인의 약정 변경 확인 후 환전", "ERR", "지점 정책", "FDI_SHORTFALL_ACTION", "N"),
+    ("R-SIM-01", "시뮬레이션", "SM11", "예상치 표시", "견적은 예상치임을 화면·출력물에 명시. 고시환율 회차 또는 딜 견적 환율, 수수료·환전 GST·TCS를 실거래와 같은 엔진(R-GST·R-LRS)으로 계산", "AUTO", "지점 정책", "", "N"),
+    ("R-SIM-02", "시뮬레이션", "SM11", "유효시간", "생성 후 15분 또는 고시환율 회차 변경 시 만료. 만료 견적으로 실거래 전환 불가", "ERR", "지점 정책", "SIM_QUOTE_VALID_MIN", "N"),
+    ("R-SIM-03", "시뮬레이션", "SM11", "실거래 전환", "견적 전환 시 금액·통화·유형 동일 여부 검증, 딜 환율은 자금팀 딜 Ref 연결, 원거래에 QUOTE_ID 기록", "AUTO", "지점 정책", "", "N"),
+    ("R-SIM-04", "시뮬레이션", "SM11", "민감도", "환율 ±0.10/0.25/0.50 INR 변동 시 총 출금·순 입금 변화를 함께 표시", "AUTO", "지점 정책", "", "N"),
     ("R-KYC-01", "FDI KYC", "FD11", "기본 의무 = 송금인", "모든 FDI 유입은 비거주 투자자(송금인) KYC를 송금은행으로부터 확보·검증해야 함. 수취인(피투자법인)은 당행 고객 CDD로 갈음하고 기준 이상만 EDD", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025 / FEMA NDI 보고(FC-GPR 첨부)", "", "N"),
     ("R-KYC-02", "FDI KYC", "FD11/SW11", "KYC 자동요청", "RT21→FD11 이관 시 KYC 미첨부(KYC_STS=NONE)면 송금은행(DbtrAgt, 없으면 송신은행) 앞 요청 초안 자동 생성. 기본 camt.110(원거래 UETR·금액·송금인 참조, 요청항목 서술), KYC_REQ_FORMAT=MT면 MT199(:20: KYC+FDI Ref, :21: 상대 Ref, :79: 35줄×50자)", "AUTO", "SWIFT ISO 20022 / 업무요건", "KYC_REQ_FORMAT", "N"),
     ("R-KYC-03", "FDI KYC", "FD11", "독촉", "응답 없으면 D+3 영업일 재요청 MT199(FOLLOWUP), D+7 책임자 보고·MN01 경보", "ALERT", "내부정책", "FDI_KYC_FOLLOWUP_DAYS", "N"),
@@ -1497,6 +1543,7 @@ DEADLINES = [
     ("EXP_REALIZE", "수출", "LEO(수출일)", "선적(LEO) + 9개월 (INR 인보이스·결제 12개월, 서비스 인보이스일 기산, 해외창고 별도 확인)", "D-30/15/7/0", "SB OUTSTANDING=0 (회수/상각/상계)", "AD 정책에 따른 연장·감액·상계(₹10 lakh 이하 신고 종결), Caution list 검토", "EDPMS", "EXP_REALIZE_MONTHS", "Y"),
     ("EXP_ADV_SHIP", "수출", "선수금 수취일", "수취일 + 3년", "D-30", "IRM 잔액=0 (SB 맵핑)", "반환송금 또는 연장", "EDPMS", "EXP_ADV_SHIP_MONTHS", "Y"),
     ("FDI_KYC", "FDI", "FDI 수취일(KYC 요청일)", "요청 D+3 재요청, D+7 보고, 반환기한(+75일) 내 검증", "D+3/D+7", "KYC_STS=VERIFIED", "재요청·책임자 보고 → 미검증 시 반환", "FIRMS", "FDI_KYC_FOLLOWUP_DAYS", "N"),
+    ("FDI_EXCESS", "FDI", "FDI 수취일", "수취 + 5영업일", "D-2/D-day", "초과 외화 반환 완료(RTND)", "책임자 보고 · 투자자 통지", "-", "FDI_EXCESS_RETURN_DAYS", "N"),
     ("FDI_ALLOT", "FDI", "FDI 수취일", "수취일 + 60일", "D-15/7/0", "UNALLOC_INR_AMT=0", "반환송금 의무 발생", "FIRMS", "FDI_ALLOT_DAYS", "N"),
     ("FDI_REFUND", "FDI", "FDI 수취일", "수취일 + 75일", "D-7/0", "미배정분 반환완료", "RBI 승인/LSF, 컴플라이언스 보고", "FIRMS", "FDI_REFUND_DAYS", "N"),
     ("FDI_FCGPR", "FDI", "배정일", "배정일 + 30일", "D-7", "FIRMS SRN 등록", "고객 통지(LSF 대상)", "FIRMS", "FDI_FCGPR_DAYS", "N"),
@@ -1576,6 +1623,7 @@ SCREENS = [
     ("IO31", "Interoffice Funding (을B)", "본지점", "신규", "본점 차입·예치, 기간구간 금리, 우대조건 자동판정(조달이력), MT320, 만기·이자", "TB_IO_FUNDING, TB_MM_DEAL_REF", "io31"),
     ("IO21", "Interoffice Settlement", "본지점", "신규", "미정산 원장, 자동정산 트리거(건수·금액·주기), 정산배치·순액·환산, 휴일차이 이자 흡수/정산", "TB_IO_TXN, TB_IO_SETTLE_*", "io21"),
     ("CM21", "Holiday Calendar (IN/US/KR)", "내부", "신규", "국가별 휴일, 인도 임시휴일 등록·영향 거래 재계산·본점 일괄 통보", "TB_HOLIDAY, TB_IO_FLOAT_ADJ", "cm21"),
+    ("SM11", "FX & Remittance Simulator", "개인/기업/비거주자", "신규", "송금·환전 전 예상 환율·환전액·수수료·환전 GST·TCS·총 출금/순 입금, FDI 약정·초과 분리, 환율 민감도, 견적 저장", "TB_FX_SIMULATION", "sm11"),
     ("DC01", "Advice & Certificate Issue", "개인/기업", "신규", "FIRC·당발/타발 확인서 발급·재발급(DUPLICATE)·정정·진위확인", "TB_FX_ADVICE_ISSUE", "dc01"),
     ("VS11", "INR Vostro Account Master", "금융기관/본점", "신규", "Vostro/SRVA/RDA 계좌·용도(본지점·FPI·한국계 법인·무역)·명세서 발송설정", "TB_VOSTRO_ACCT", "vs11"),
     ("VS31", "MT950 Statement Monitor", "금융기관", "신규", "MT950 생성·미리보기·발송/재발송·ACK 모니터", "TB_VOSTRO_STMT", "vs31"),
@@ -1595,7 +1643,9 @@ GL = [
     ("EEFC 출금 송금", "EEFC 계좌(FCY)", "Nostro(FCY) + In lieu of Exchange 수익", "환전 없음"),
     ("타발 입금", "Nostro(FCY)", "고객 계좌(INR/EEFC)", "IRM 생성"),
     ("FDI 수취", "Nostro(FCY)", "피투자법인 Share Application Money 계좌", "배정 전 별도 관리"),
-    ("FDI 반환", "피투자법인 계좌(INR)", "Nostro(FCY)", "환차손익 별도"),
+    ("FDI 반환(미배정분)", "피투자법인 계좌(INR)", "Nostro(FCY)", "환차손익 별도"),
+    ("FDI 초과입금 분리", "Nostro(FCY)", "21100000 미지급금(A/P, FCY) - 환전 없음", "R-FDI-07"),
+    ("FDI 초과입금 반환", "21100000 미지급금(FCY)", "Nostro(FCY) (반환 수수료 공제분 → 수수료수익)", "환차·환전 GST 없음"),
     ("타발 보류(비계좌)", "Nostro(FCY)", "21100000 미지급금(A/P, FCY 하위원장)", "RT21 SETTLE_MODE=SUSP"),
     ("부분환전(레그)", "21100000 미지급금(FCY)", "21100000 미지급금(INR) 또는 지급계정", "레그별 환율·딜"),
     ("NEFT/RTGS 지급", "21100000 미지급금(INR)", "10211000 RBI 당좌예금 (RTGS Settlement)", "SFMS UTR"),
@@ -1674,6 +1724,10 @@ TRACE = [
     ("2026.10 추가요청", "인도·미국·한국 휴일 차이 처리", "CM21, TB_HOLIDAY, TB_IO_FLOAT_ADJ, R-HOL-*, R-IO-07/08", "제안대로 고객 개별청구 없이 소액 자체흡수 / 초과분 본지점 이자정산"),
     ("2026.10 추가요청", "본지점 금리 목적별 구분 (갑기금 무이자 / 을A 거래성 / 을B 여신성)", "IO_FUND 코드, TB_IO_RATE(기금·기간구간·우대 스프레드), TB_IO_FUNDING, IO31, R-IO-10~16", "을B 우대: 과거 1년 내 동일통화·금액 이상·30일 이상 조달이력(정기예금·콜머니·콜론 등)"),
     ("2026.10 추가요청", "FDI KYC 의무 = 송금인, MT199 KYC 요청", "TB_FDI_KYC, R-KYC-01~08, FD11 Remitter KYC, MT199 자동요청·독촉·응답매칭", "수취인은 INR 10 crore(지점 확정) 이상·고위험 시 EDD. MX 전환 완료로 기본 camt.110/111, MT199 병행"),
+    ("2026.11 추가요청", "송금 전 환율 시뮬레이션 (예상 GST·환전 후 금액)", "SM11, TB_FX_SIMULATION, R-SIM-01~04", "실거래와 같은 GST·TCS 엔진 사용"),
+    ("2026.11 추가요청", "FDI는 투자금액만 환전, 초과분은 환전 없이 반환", "R-FDI-06~08, TB_FDI_INFLOW(REQ/CONV/EXCESS/SHORTFALL), FD12 EXCESS", "FIRC·FC-GPR은 약정 환전분만"),
+    ("2026.11 추가요청", "기준을 엑셀·워드에 상세 반영", "규정 근거 색인(엑셀 16번 시트, 워드 2.4절), RBI 검토표에 근거 열 추가", ""),
+    ("2026.11 추가요청", "화면 연결 다이어그램", "docs/04_화면흐름도.pptx", ""),
     ("2026.10 추가요청", "FDI 송금 시 사용 화면", "FDI_FLOW 가이드 (RT21→FD11→FD12, ODI는 RT13-05)", "기존 설계의 'FD13' 표기 오류 정정 → FD11/FD12"),
 ]
 
@@ -1687,6 +1741,8 @@ FDI_FLOW = [
      "Purpose Code P0006(FDI) 선택, 피투자법인 계좌 지정 후 저장 → FD11로 자동 이관(FDI_REF_NO 생성). RT11·RT13은 사용하지 않음", "TB_FX_REMIT_MST(I), TB_FDI_INFLOW"),
     ("3", "송금인 KYC (AD은행 기본 의무)", "FD11 > Remitter KYC → SW11",
      "KYC 미첨부면 송금은행 앞 MT199 KYC 요청 자동 작성·승인·송신 → D+3 재요청 → 응답(:21: 매칭) 검증(명칭·주소·실소유자·자금원천·PEP·제재). 큰 금액·고위험은 수취인 EDD 추가", "TB_FDI_KYC, TB_SWIFT_MSG(MT199)"),
+    ("3-A", "약정금액과 수취액이 다를 때", "FD11 > Agreed vs Received",
+     "약정분만 환전·입금. 초과분은 환전 없이 외화 미지급금 분리 → FD12(EXCESS)로 원송금인·원통화 반환(5영업일 내, 수수료 반환액 공제). 부족하면 환전 보류 후 부족분 요청 또는 약정 변경 확인", "TB_FDI_INFLOW.CONV/EXCESS/SHORTFALL, TB_FDI_REFUND"),
     ("3-B", "환전·입금 및 인접국 검증", "FD11 FDI Inflow Registry",
      "1단계 딜과 매칭해 환전, 인접국(Press Note 3: 투자자·실소유자)·정부승인 검증. 기한 생성(배정 +60일, 반환 +75일). KYC 검증 전에는 FIRC 발급 불가", "TB_FX_OBLIGATION"),
     ("4", "고객이 환전증명서 요청", "FD11 [Issue FIRC] (재발급은 DC01)",
@@ -1739,6 +1795,35 @@ SWIFT_TYPES = [
     ("MT999", "MT", "9", "Free Format", "-", "MT", "BOTH", "본점 일괄 통보(휴일 영향)", "SW11", "Y"),
 ]
 
+# ---------------------------------------------------------------------------
+# 12. 규정 근거 색인 (규정, 번호, 고시일, 시행일, 적용 업무, 관련 파라미터, 관련 규칙, 확인상태, 출처)
+# ---------------------------------------------------------------------------
+REG_INDEX = [
+    ("FEM (Export and Import of Goods and Services) Regulations, 2026", "FEMA 23(R)/2026-RB", "2026-01-13", "2026-10-01", "수출입 전반 (2015 규정·MD 대체)", "EXP_*, IMP_*", "R-EXP-*, R-IMP-*, R-TF-06~08,16", "2차출처", "https://www.scconline.com/blog/post/2026/09/29/rbi-amends-fema-export-import-goods-services-regulations-2026/"),
+    ("FEM (Export and Import) (Amendment) Regulations, 2026", "FEMA 23(R)/(1)/2026-RB", "2026-09-22", "2026-10-01", "회수기한 9개월, INR 12개월", "EXP_REALIZE_MONTHS, EXP_REALIZE_MONTHS_INR", "R-TF-07, R-EXP-05", "2차출처", "https://ksandk.com/newsletter/rbi-amends-fema-export-and-import-regulations-2026-export-proceeds-realisation-period-reduced-to-nine-months/"),
+    ("RBI Directions on Export and Import of Goods and Services", "-", "2026-01-16", "2026-10-01", "AD 재량·SOP, 선수금 진정성, ₹10 lakh 신고 종결, EDF, FETERS", "IMP_ADV_BG_THRESHOLD_USD, EXP_DECL_CLOSE_INR, EXP_SVC_EDF_DAYS", "R-IMP-05/06, R-TF-16", "2차출처", "https://www.rbi.org.in/scripts/FS_Notification.aspx?Id=13277"),
+    ("RBI (Non-Fund Based Credit Facilities) Directions, 2025", "RBI/2025-26/140", "2025-08-06", "2026-04-01", "LC·보증·공동인수·부분신용보강", "PCE_MAX_PCT", "R-LC-02, R-BG-01, R-BG-05", "2차출처", "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12889"),
+    ("FEM (Guarantees) Regulations, 2026", "FEMA 8(R)/2026-RB", "2026-01-06", "2026-01-10", "비거주자 관련 보증, 분기 보고", "BG_FEMA_RPT_DAYS", "R-BG-04", "2차출처", "https://www.taxscan.in/top-stories/rbi-notifies-new-fema-regulations-for-cross-border-guarantees-makes-quarterly-reporting-mandatory-1441755"),
+    ("RBI (Commercial Banks – Credit Facilities) Directions, 2025", "RBI/DOR/2025-26/154", "2025-11-28", "2025-11-28 (2026.4·7 개정)", "수출신용(Ch.XV): 선적 전·후, PCFC, EBR", "TF_EXP_CREDIT_MAX_DAYS", "R-TF-*", "2차출처", "https://rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13156"),
+    ("RBI (Commercial Banks – Interest Rates on Advances) Directions, 2025", "-", "2025-11-28", "2025-11-28", "MCLR·EBLR, 금리 정책", "TF_TENOR_SPREAD", "R-TF-02, R-TF-12", "2차출처(내용 미확인)", "-"),
+    ("RBI (Commercial Banks – IRACP) Directions, 2025", "RBI/DOR/2025-26/164", "2025-11-28", "2025-11-28", "SMA·NPA·충당금, 자동 판정", "-", "R-TF-10", "2차출처(CRILC 기준 미확인)", "https://www.jurishour.in/notification/rbi-comprehensive-iracp-directions-2025/"),
+    ("RBI (Commercial Banks – KYC) Directions, 2025", "RBI/DOR/2025-26/169", "2025-11-28", "2025-11-28 (2025.12.29 개정)", "고객확인·CKYCR", "KYC_BO_THRESHOLD_PCT", "R-CM-01, R-KYC-*, R-SUS-04", "2차출처", "https://website.rbi.org.in/web/rbi/-/notifications/reserve-bank-of-india-commercial-banks-know-your-customer-amendment-directions-2025"),
+    ("RBI (Trade Receivables Discounting System) Directions, 2026", "RBI/DPSS/2026-27/406", "2026-06-23", "2026-06-23", "TReDS 보험·재양도·무소구", "-", "R-TF-14", "2차출처", "https://vinodkothari.com/2026/06/treds-master-directions-issued-by-rbi/"),
+    ("Interest subvention under EPM - Niryat Protsahan", "RBI/2025-26/195", "2026-01-19", "2026-01 (2026.4.1~ EXIM Bank)", "MSME 수출신용 이자보전", "TF_EPM_SUBV_CAP_INR", "R-TF-13", "2차출처", "https://website.rbi.org.in/web/rbi/-/notifications/interest-subvention-for-pre-and-post-shipment-export-credit-under-export-promotion-mission-epm-niryat-prothsahan"),
+    ("FEM (Borrowing and Lending) Regs 개정 / MD - Trade Credit", "-", "2026-02", "2026-02", "무역신용 금액·기간·비용", "TC_MAX_USD, TC_TENOR", "R-TF-06", "2차출처", "https://lexcounsel.in/newsletters/rbi-notifies-ecb-framework-revamp/"),
+    ("RBI (Trade Relief Measures) Directions, 2025 / 2026", "-", "2025-11-14 / 2026-03-31", "2026-06-30 실행분까지", "수출신용 450일·유예", "TF_EXP_CREDIT_MAX_DAYS", "-", "미확인(이후 연장)", "https://www.scconline.com/blog/post/2025/11/18/rbi-trade-relief-measures-directions-2025/"),
+    ("FEMA (Non-Debt Instruments) Rules, 2019 / Mode of Payment & Reporting Regs / MD Foreign Investment", "-", "2019", "-", "FDI 배정 60일·반환 75일·FC-GPR 30일·송금인 KYC", "FDI_*", "R-FDI-*, R-KYC-*", "기존 규정 유지", "-"),
+    ("Press Note 3 (2020)", "DPIIT", "2020-04-17", "2020-04-22", "육상국경 인접국 투자·실소유자", "-", "R-FDI-01", "기존 규정 유지", "-"),
+    ("RBI Master Direction - Liberalised Remittance Scheme / Income-tax Act s.206C(1G)", "-", "-", "-", "LRS 한도·TCS", "LRS_*", "R-LRS-*", "VERIFY (2026.4 Income-tax Act 2025 조항)", "-"),
+    ("CGST Rules 32(2) / IGST Act s.12(12)·13(8)(a)·13(2)", "-", "-", "-", "환전 GST·공급장소", "GST_*", "R-GST-*, R-FX-07", "VERIFY (세무팀)", "-"),
+    ("SWIFT ISO 20022 CBPR+ / Exceptions & Investigations", "-", "-", "2025-11-22 (MT9xx 2028.11, camt.110 2027.11)", "MX 송신, MT950, KYC 요청", "SWIFT_MX_CUTOVER, KYC_REQ_FORMAT", "R-SW-*, R-KYC-02", "지점 확인 + 2차출처", "https://www.wellsfargo.com/assets/pdf/commercial/focus/iso20022-faq-for-financial-institutions.pdf"),
+    ("ICC UCP 600 / ISBP / URC 522 / URDG 758 / ISP98 / URR 725", "ICC", "-", "-", "LC·추심·보증·상환", "LC_EXAM_DAYS, URDG_EXAM_DAYS, RA_PAY_BANKING_DAYS", "R-LC-03, R-BG-05, R-RA-*", "국제규칙", "-"),
+    ("FEDAI Rules", "FEDAI", "-", "-", "외화 결정(만기+30일)·환율", "TF_CRYSTAL_DAYS", "R-TF-11", "업계 규칙", "-"),
+    ("Indian Contract Act s.28 (은행보증 청구기간 예외)", "-", "-", "-", "보증 청구만료", "BG_CLAIM_MIN_MONTHS", "R-BG-02", "VERIFY", "-"),
+    ("RBI RTGS / NEFT", "-", "-", "-", "₹2 lakh 최소, 24x7", "RTGS_MIN_INR", "R-RTE-002, R-DOM-01", "기존 규정 유지", "-"),
+    ("PML (Maintenance of Records) Rules - 실소유자", "-", "-", "-", "법인 실소유자 10%", "KYC_BO_THRESHOLD_PCT", "R-KYC-05", "VERIFY", "-"),
+]
+
 from forms_model import FORMS, SAMPLES, BRANCH  # noqa: E402  고객 서식 정의
 import tf_model as TF  # noqa: E402  무역금융(여신) 모듈
 
@@ -1766,7 +1851,7 @@ def as_dict():
             "TABLES": T, "RULES": RULES, "DEADLINES": DEADLINES, "INTERFACES": INTERFACES,
             "SCREENS": SCREENS, "GL": GL, "TRACE": TRACE, "FDI_FLOW": FDI_FLOW,
             "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES,
-            "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW}
+            "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX}
 
 
 if __name__ == "__main__":

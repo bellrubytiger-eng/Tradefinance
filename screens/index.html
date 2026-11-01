@@ -451,16 +451,23 @@ S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국�
       F({l:"BO 1 (이름/국적/%)",id:"bo1",v:"KIM D.H. / KR / 62"})+F({l:"BO 2 (이름/국적/%)",id:"bo2",v:"PARK S.Y. / KR / 25"})+F({l:"Source of Funds",id:"sof",v:"Retained earnings"})+
       F({l:"PEP",id:"pep",t:"sel",o:["N","Y"],v:"N"})+F({l:"Sanctions Screening",id:"scr",t:"sel",o:["CLEAR","REVIEW","HIT"],v:"CLEAR"}),3,"R-KYC-01~08")+
     `<section class="sec"><h3>KYC Workflow &amp; MT199</h3><div id="kycbox"></div></section>`+
-    SEC("INR Fixed Conversion",F({l:"INR 확정",id:"fix",t:"sel",o:[["Y","Y - 약정 INR 금액 고정"],["N","N - 외화금액 기준"]],v:"Y"})+F({l:"Target INR",id:"tinr",t:"num",v:"250,000,000.00"})+F({l:"Deal Rate (USD/INR)",id:"rate",t:"num",v:"88.4200"})+
-      F({l:"Required USD",id:"rusd",ro:1})+F({l:"Received USD",id:"recv",t:"num",v:"2,827,414.62"})+F({l:"Credited INR",id:"cinr",ro:1}),3,"FCY = ROUNDUP(Target INR / Rate, 2)")+
+    SEC("Agreed vs Received · 약정금액만 환전",F({l:"약정 기준",id:"fix",t:"sel",o:[["Y","INR 확정 (발행가 × 주식수)"],["N","외화 확정 (투자계약 외화)"]],v:"Y"})+F({l:"Agreed INR",id:"tinr",t:"num",v:"250,000,000.00"})+F({l:"Agreed USD (외화 확정)",id:"agf",t:"num",v:"2,800,000.00"})+
+      F({l:"Deal Rate (USD/INR)",id:"rate",t:"num",v:"88.4200"})+F({l:"Received USD",id:"recv",t:"num",v:"2,850,000.00"})+F({l:"To Convert USD",id:"rusd",ro:1})+
+      F({l:"Excess USD (환전 없음)",id:"exc",ro:1})+F({l:"Shortfall USD",id:"sht",ro:1})+F({l:"Credited INR",id:"cinr",ro:1}),3,"R-FDI-06~08 · INR 확정: ROUNDUP(약정 INR / 환율, 2)")+`<div id="split"></div>`+
     SEC("Investee Settlement",F({l:"Investee Account",id:"iacc",t:"sel",o:[["OWN","당행 계좌 입금"],["OTHER","비계좌 → RT22 경유 RTGS (피투자법인 명의)"]],v:"OWN",s:2})+F({l:"Fee Collection",id:"ffc",v:"SEPARATE (강제)",ro:1}),3,"R-DOM-04 · R-GST-06")+
     SEC("Allotment",F({l:"Allotment Date",id:"ad",t:"date",v:""})+F({l:"Allotted INR",id:"ainr",t:"num",v:"0.00"})+F({l:"FIRMS SRN",id:"srn"}))+
     `<section class="sec"><h3>Certificate</h3><div class="msg info">송금인 KYC VERIFIED + 입금완료 후 FIRC(FM-FDI-01) 원본 1회 발급, 재발급은 DC01 (DUPLICATE) <span class="rule">R-DOC-01/02</span> · ${formLink("firc-fdi","FIRC 미리보기 (당행 계좌)")} · ${formLink("firc-fdi_rtgs","FIRC 미리보기 (비계좌·RTGS)")}</div></section>`+`<section class="sec"><h3>Deadlines <small>TB_FX_OBLIGATION</small></h3><div id="fdtl"></div></section>`,
   init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
-  calc(){ const r=num("rate")||1, req=Math.ceil(num("tinr")/r*100)/100; $("#rusd").value=fmt(req); const cr=num("recv")*r; $("#cinr").value=fmt(cr);
+  calc(){ const r=num("rate")||1, inrBasis=val("fix")==="Y", req=inrBasis?Math.ceil(num("tinr")/r*100)/100:num("agf"), recv=num("recv");
+    const short=r2(Math.max(0,req-recv)), exc=r2(Math.max(0,recv-req)), conv=short>0?0:req, cr=r2(conv*r);
+    $("#rusd").value=fmtC("USD",req); $("#exc").value=fmtC("USD",exc); $("#sht").value=fmtC("USD",short); $("#cinr").value=short>0?"환전 보류":fmt(cr);
+    const exDue=addBiz("IN",val("rd"),5);
+    $("#split").innerHTML = short>0 ? `<div class="msg err">수취 USD ${fmtC("USD",recv)} &lt; 약정분 USD ${fmtC("USD",req)} (부족 ${fmtC("USD",short)}) → 환전 보류·외화 미지급금 보관, 부족분 요청(camt.110) 또는 약정 변경 확인 후 환전 <span class="rule">R-FDI-08</span></div>`
+      : exc>0 ? `<div class="msg warn">약정분 USD ${fmtC("USD",conv)}만 환전 → INR ${fmt(cr)} 입금. 초과 USD ${fmtC("USD",exc)}는 <b>환전 없이</b> 외화 미지급금(21100000)으로 분리 → <a href="#fd12">FD12</a> EXCESS로 원송금인·원통화 반환 (기한 ${exDue}, 수수료 반환액 공제) <span class="rule">R-FDI-06/07</span></div><div class="msg info">FIRC·FC-GPR에는 약정 환전분(USD ${fmtC("USD",conv)} / INR ${fmt(cr)})만 표기, 초과 반환 사실은 비고 기재</div>`
+      : `<div class="msg ok">수취액 = 약정분 · 전액 환전</div>`;
     const rd=val("rd"), a=addD(rd,P.FDI_ALLOT), rf=addD(rd,P.FDI_ALLOT+P.FDI_REFUND), ad=val("ad"), st=(d,done)=>done?"done":(BIZ>d?"over":diff(BIZ,d)<=15?"due":"");
     $("#fdtl").innerHTML=`<div class="tl"><div class="done"><b>${rd}</b><span>수취 · FIRC</span></div><div class="${st(a,!!ad)}"><b>${a}</b><span>배정기한 (+60일)${!ad&&BIZ>a?" · 경과":""}</span></div><div class="${st(rf,false)}"><b>${rf}</b><span>미배정분 반환기한 (+75일)</span></div><div class="${ad?st(addD(ad,P.FCGPR),!!val("srn")):""}"><b>${ad?addD(ad,P.FCGPR):"배정 후 산출"}</b><span>FC-GPR 신고 (+30일)</span></div></div>`+
-      `<div class="msg ${cr+0.005>=num("tinr")?"ok":"err"}">입금 INR ${fmt(cr)} ${cr+0.005>=num("tinr")?"≥":"<"} 목표 INR ${fmt(num("tinr"))} <span class="rule">R-FDI-05</span></div>`+
+      (inrBasis&&short===0?`<div class="msg ${cr+0.005>=num("tinr")?"ok":"err"}">입금 INR ${fmt(cr)} ${cr+0.005>=num("tinr")?"≥":"<"} 약정 INR ${fmt(num("tinr"))} (끝전 ${fmt(cr-num("tinr"))}) <span class="rule">R-FDI-05</span></div>`:"")+
       (!ad&&BIZ>a?`<div class="msg err">배정기한 경과 · 미배정 INR ${fmt(cr-num("ainr"))} → ${rf}까지 FD12 반환송금 필요</div>`:"");
     this.kyc(cr, rd, rf); },
   kyc(cr, rd, rf){ const st=val("kyc"), m=[], f1=addBiz("IN",rd,3), f2=addBiz("IN",rd,7);
@@ -501,10 +508,18 @@ S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국�
 S.fd12 = {id:"FD12", t:"FDI Refund Remittance", g:"FDI", tag:"신규", d:"60일 내 미배정분의 반환송금. 원 송금인·원 통화로 반환하며, 반환기한(수취일+75일) 경과 시 RBI 승인번호 없이는 승인되지 않습니다.",
   html:()=>SEC("Original FDI",F({l:"FDI Ref",id:"fr",v:"FDI2609010007",ro:1,btn:"fdi"})+F({l:"Receipt Date",id:"rd",t:"date",v:"2026-08-10",ro:1})+F({l:"Investor",id:"inv",v:"SEOUL PRECISION CO LTD",ro:1})+
       F({l:"Original INR",id:"oinr",v:"250,000,000.00",ro:1})+F({l:"Allotted INR",id:"ainr",v:"200,000,000.00",ro:1})+F({l:"Unallotted INR",id:"uinr",v:"50,000,000.00",ro:1}))+
-    SEC("Refund",F({l:"Refund Type",id:"rt",t:"sel",o:[["NONALLOT","미배정분"],["EXCESS","초과입금"],["REJECT","투자불허/KYC"]],v:"NONALLOT"})+F({l:"Refund Date",id:"fd",t:"date",v:BIZ})+F({l:"Refund INR (확정)",id:"rinr",t:"num",v:"50,000,000.00"})+
+    SEC("Refund",F({l:"Refund Type",id:"rt",t:"sel",o:[["NONALLOT","미배정분 (INR → 외화 환전 반환)"],["EXCESS","초과입금 (환전 없이 원통화 반환)"],["REJECT","투자불허/KYC"]],v:"NONALLOT"})+F({l:"Excess USD (외화 미지급금)",id:"exf",t:"num",v:"22,585.38"})+F({l:"Return Charge USD (BEN)",id:"rch",t:"num",v:"25.00"})+F({l:"Refund Date",id:"fd",t:"date",v:BIZ})+F({l:"Refund INR (확정)",id:"rinr",t:"num",v:"50,000,000.00"})+
       F({l:"CCY",id:"ccy",v:"USD",ro:1})+F({l:"Rate",id:"rate",t:"num",v:"88.4200"})+F({l:"Refund USD",id:"rusd",ro:1})+F({l:"RBI Approval Ref",id:"rbi"})+F({l:"Bene (원 송금인)",id:"bn",v:"SEOUL PRECISION CO LTD",ro:1,s:2}))+`<div id="r12"></div>`,
   init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
-  calc(){ const usd=Math.round(num("rinr")/(num("rate")||1)*100)/100; $("#rusd").value=fmt(usd); const due=addD(val("rd"),75), late=val("fd")>due, m=[];
+  calc(){ if(val("rt")==="EXCESS"){ const net=r2(num("exf")-num("rch")), due=addBiz("IN",val("rd"),5), late=val("fd")>due;
+      $("#rusd").value=fmtC("USD",net); $("#rinr").value="환전 없음"; $("#rate").value="-";
+      const m=[["ok",`초과입금 USD ${fmtC("USD",num("exf"))} → 수수료 USD ${fmtC("USD",num("rch"))}(BEN) 공제 후 USD ${fmtC("USD",net)}을 <b>환전 없이</b> 원송금인에게 반환 (pacs.008, Product 06) <span class='rule'>R-FDI-07</span>`],
+        ["info","환전이 없으므로 환차손익·환전 GST 없음. 반환 수수료는 해외 비계좌 수령자 부담 → GST 영세율 (R-GST-04)"],
+        late?["warn",`반환기한 ${due}(수취+5영업일) 경과 → 책임자 보고`]:["info",`반환기한 ${due} (수취 후 5영업일)`],
+        ["info","원 FDI 건(FD11) 초과분 상태 RTND로 변경 · 당발송금 확인서(FM-OUT-01) 발급"]];
+      $("#r12").innerHTML=`<section class="sec"><h3>Result</h3>${m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")}</section>`; return; }
+    if($("#rate").value==="-"){ $("#rate").value="88.4200"; $("#rinr").value="50,000,000.00"; }
+    const usd=Math.round(num("rinr")/(num("rate")||1)*100)/100; $("#rusd").value=fmt(usd); const due=addD(val("rd"),75), late=val("fd")>due, m=[];
     if(num("rinr")>50000000) m.push(["err","반환액이 미배정잔액을 초과 <span class='rule'>R-FDI-03</span>"]);
     m.push(late?[val("rbi")?"warn":"err",`반환기한 ${due} 경과 (${diff(due,val("fd"))}일): RBI 승인번호 ${val("rbi")?"입력됨":"필수"} <span class='rule'>R-FDI-04</span>`]:["ok",`반환기한 ${due} 이내`]);
     m.push(["info",`INR 확정 반환: USD ${fmt(usd)} = ₹${fmt(num("rinr"))} ÷ ${num("rate")} · 당발 Product 06 송금 생성`]);
@@ -1028,6 +1043,58 @@ S.sf11 = {id:"SF11", t:"SFMS Message Execution", g:"무역금융", tag:"신규",
     $("#sfx").textContent=`<AppHdr><Fr>[Branch IFSC]</Fr><To>${ch==="RTGS"?"RBIN0RTGS00":"(NEFT 값 - 벤더 확인)"}</To><MsgDefIdr>(설정테이블 버전)</MsgDefIdr></AppHdr>\n<FIToFICstmrCdtTrf>\n  <CdtTrfTxInf>\n    <PmtId><EndToEndId>${val("e2e")}</EndToEndId><TxId>(UTR)</TxId></PmtId>\n    <IntrBkSttlmAmt Ccy="INR">${a.toFixed(2)}</IntrBkSttlmAmt>\n    <IntrBkSttlmDt>${BIZ}</IntrBkSttlmDt>\n    <Dbtr><Nm>[BANK NAME]</Nm></Dbtr>\n    <CdtrAgt><FinInstnId><ClrSysMmbId><MmbId>${ifsc}</MmbId></ClrSysMmbId></FinInstnId></CdtrAgt>\n    <Cdtr><Nm>${val("bn")}</Nm></Cdtr><CdtrAcct><Id>${val("acc")}</Id></CdtrAcct>\n    <RmtInf><Ustrd>${r[1]} proceeds ${val("e2e")}</Ustrd></RmtInf>\n  </CdtTrfTxInf>\n</FIToFICstmrCdtTrf>`; },
   chk(){ this.calc(); return show($("#sfr .p-err")?[["err","규칙 오류 → 송신 차단"]]:[["ok","PENDING_APPROVAL 등록 · Checker 승인 후 미들웨어 송신 (Maker≠Checker)"]]); }};
 
+
+const SIM_PRESETS = {
+  OUT_GEN:["당발 · 기업 일반 (RT11)","USD","FCY",50000,"R_ACCT","09",500,1000],
+  OUT_LRS:["당발 · 개인 LRS (RT12)","USD","FCY",45000,"R_ACCT","09",500,1000],
+  OUT_TRD:["당발 · 수입대금 (RT13)","USD","FCY",100000,"R_ACCT","09",0,1000],
+  OUT_NR:["당발 · 비거주자 NRO (RT14)","USD","FCY",120000,"NR_ACCT","",2500,1000],
+  IN_GEN:["타발 · 수출대금 (RT21)","USD","FCY",86400,"R_ACCT","06",250,0],
+  IN_FDI:["타발 · FDI (FD11, 약정 INR 확정)","USD","FCY",2850000,"R_ACCT","06",7500,0],
+  FX_ACCT:["환전 · EEFC USD → INR (FX11)","USD","FCY",50000,"R_ACCT","09",0,0],
+  OUT_INR:["당발 · INR 금액 확정 송금","USD","INR",4000000,"R_ACCT","09",500,1000]};
+S.sm11 = {id:"SM11", t:"FX & Remittance Simulator", g:"환전", tag:"신규", d:"송금·환전 전에 예상 환율, 환전 후 금액, 수수료, 환전 GST, TCS, 총 출금액 또는 순 입금액을 계산합니다. 실거래와 같은 GST·TCS 규칙을 쓰며, 결과는 예상치입니다. 견적은 15분 또는 고시환율 회차가 바뀔 때까지 유효합니다.",
+  html:()=>SEC("Scenario",F({l:"Type",id:"st",t:"sel",o:Object.entries(SIM_PRESETS).map(([k,v])=>[k,v[0]]),v:"OUT_LRS",s:2})+F({l:"Quote No",id:"qid",v:"Q2610310014",ro:1})+
+      F({l:"Currency",id:"ccy",t:"sel",o:["USD","EUR","GBP","JPY","AED","KRW"],v:"USD"})+F({l:"Amount Basis",id:"bas",t:"sel",o:[["FCY","외화 금액"],["INR","INR 금액 (INR 확정)"]],v:"FCY"})+F({l:"Amount",id:"amt",t:"num",v:"45,000.00"})+
+      F({l:"Rate Source",id:"rs",t:"sel",o:[["CARD","고시환율 회차 2 (TT)"],["DEAL","자금팀 딜 견적"]],v:"CARD"})+F({l:"Deal Rate",id:"drt",t:"num",v:""})+F({l:"GST Recipient / State",id:"gr",t:"sel",o:[["R_ACCT","거주자 계좌고객"],["NR_ACCT","비거주 계좌고객"],["R_NONACCT","비계좌"]],v:"R_ACCT",suf:`<input id="gs" value="09" maxlength="2" style="max-width:48px" aria-label="주코드">`})+
+      F({l:"Commission (INR)",id:"com",t:"num",v:"500"})+F({l:"Cable (INR)",id:"cab",t:"num",v:"1000"})+F({l:"From EEFC (무환전)",id:"eefc",t:"sel",o:["N","Y"],v:"N"}))+
+    SEC("LRS / FDI",F({l:"LRS Category",id:"lc",t:"sel",o:[["EDU","교육(자기자금) 5%"],["LOAN","교육(대출) 0%"],["MED","의료 5%"],["OTH","기타 20%"]],v:"EDU"})+F({l:"FY LRS INR (기송금)",id:"fyi",t:"num",v:"16,050,000.00"})+
+      F({l:"FDI Agreed INR",id:"fai",t:"num",v:"250,000,000.00"}),3,"해당 유형에서만 사용")+
+    `<section class="sec"><h3>Result <small>예상치 · R-SIM-01</small></h3><div id="simr"></div></section><section class="sec"><h3>Rate Sensitivity <small>R-SIM-04</small></h3><div id="sims"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); $("#st").addEventListener("change",()=>this.preset());
+    let pre=null; try{ pre=sessionStorage.getItem("simPreset"); sessionStorage.removeItem("simPreset"); }catch(e){} if(pre&&SIM_PRESETS[pre]) $("#st").value=pre; this.preset(); },
+  preset(){ const v=SIM_PRESETS[val("st")]; $("#ccy").value=v[1]; $("#bas").value=v[2]; $("#amt").value=fmt(v[3]); $("#gr").value=v[4]; $("#gs").value=v[5]; $("#com").value=String(v[6]); $("#cab").value=String(v[7]); $("#eefc").value="N"; this.calc(); },
+  core(dRate){ const t=val("st"), ccy=val("ccy"), c=CARD[ccy], inward=/^IN_|^FX_ACCT/.test(t), card=inward?c[1]:c[2];
+    const rate=r2((val("rs")==="DEAL"&&num("drt")?num("drt"):card)+dRate) || card;
+    const eefc=val("eefc")==="Y"; let fcy, inr;
+    if(val("bas")==="INR"){ inr=num("amt"); fcy=r2(inr/rate); } else { fcy=num("amt"); inr=r2(fcy*rate); }
+    let charges=[], exc=0, conv=fcy, req=0;
+    if(t==="IN_FDI"){ req=Math.ceil(num("fai")/rate*100)/100; exc=r2(Math.max(0,fcy-req)); conv=fcy>=req?req:0; inr=r2(conv*rate); }
+    const comm = t==="OUT_TRD" ? r2(Math.max(500,Math.min(inr*0.00125,15000))) : num("com");
+    if(comm) charges.push(["42020601","Commission",comm]); if(num("cab")) charges.push(["42020603","Cable charge",num("cab")]);
+    const g=gstCalc(charges, eefc?0:inr, val("gr"), val("gs"));
+    let tcs=0; if(t==="OUT_LRS"){ const fy=num("fyi"), base=Math.max(0,fy+inr-Math.max(P.TCS_TH,fy)), rt={EDU:5,LOAN:0,MED:5,OTH:20}[val("lc")]; tcs=r2(base*rt/100); }
+    const out=/^OUT_/.test(t);
+    return {t,ccy,rate,fcy,inr,g,tcs,exc,conv,req,out,
+      total: out ? r2(inr+g.total+tcs) : null,
+      net: !out ? (t==="IN_FDI" ? inr : r2(inr-g.total)) : null}; },
+  calc(){ const R=this.core(0), cy=R.ccy, rows=[];
+    rows.push(["적용 환율",`${R.rate.toFixed(4)} INR per ${cy} (${val("rs")==="DEAL"?"딜 견적":R.out?"TT 매도율":"TT 매입율"})`]);
+    rows.push([R.out?"송금 외화":"수취 외화",`${cy} ${fmtC(cy,R.fcy)}`]);
+    if(R.t==="IN_FDI") rows.push(["약정분 환전 / 초과 반환",`${cy} ${fmtC(cy,R.conv)} 환전 · ${cy} ${fmtC(cy,R.exc)} 환전 없이 반환 (R-FDI-06/07)`]);
+    rows.push([R.out?"INR 환산 (원금)":"환전 후 INR",`INR ${fmt(R.inr)}`]);
+    R.g.rows.forEach(r=>rows.push(["  "+r[1], r[2]===null?"(과세표준)":`INR ${fmt(r[2])}`]));
+    if(R.tcs) rows.push(["  TCS (LRS)",`INR ${fmt(R.tcs)}`]);
+    rows.push(["수수료·GST 합계",`INR ${fmt(R.g.total)}${R.t==="IN_FDI"?" (별도 출금 - 원금 미공제)":""}`]);
+    rows.push([R.out?"<b>예상 총 출금액</b>":"<b>예상 입금액</b>",`<b>INR ${fmt(R.out?R.total:R.net)}</b>`]);
+    $("#simr").innerHTML=TABLE(["항목",["금액","n"]],rows.map(r=>TR([r[0],[r[1],"n"]])))+
+      `<div class="msg info">공급장소 ${R.g.pos} · ${R.g.why} · 견적 ${val("qid")} 유효 15분 또는 고시 회차 변경 시까지 <span class="rule">R-SIM-02</span></div>`+
+      (R.t==="IN_FDI"&&R.exc>0?`<div class="msg warn">FDI 초과 ${cy} ${fmtC(cy,R.exc)}: 환전 금지, 원송금인 반환 예정 (수수료 반환액 공제)</div>`:"")+
+      `<div class="msg warn">예상치입니다. 실제 환율·수수료는 거래 시점 기준으로 확정됩니다.</div>`;
+    const ds=[-0.50,-0.25,-0.10,0,0.10,0.25,0.50];
+    $("#sims").innerHTML=TABLE(["환율 변동",["적용 환율","n"],[R.out?"총 출금 (INR)":"입금 (INR)","n"],["차이","n"]],ds.map(d=>{ const X=this.core(d), v=R.out?X.total:X.net, b=R.out?R.total:R.net; return TR([d===0?"<b>현재</b>":(d>0?"+":"")+d.toFixed(2),[X.rate.toFixed(4),"n"],[fmt(v),"n"],[(v-b>=0?"+":"")+fmt(v-b),"n"]],d===0?"sel":""); })); },
+  chk(){ this.calc(); return show([["ok",`견적 ${val("qid")} 저장 (TB_FX_SIMULATION) · 실거래 전환 시 금액·통화 동일 검증 <span class='rule'>R-SIM-03</span>`]]); }};
+
 /* ---------- 공통 검증 ---------- */
 function leiCheck(inr){ const c=CUST[val("cno")]||{}, m=[];
   if(!c.type || c.type==="IND"||c.type==="NRI") return m;
@@ -1046,12 +1113,13 @@ function show(m){
 }
 
 /* ---------- 라우팅/메뉴 ---------- */
-const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","fx21","rt73","xp73","tf11","tf31","tf41","lc11","bg11","tf81","sf11","fd11","fd12","fd13","vs11","vs31","sw11","sw12","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
+const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","sm11","fx21","rt73","xp73","tf11","tf31","tf41","lc11","bg11","tf81","sf11","fd11","fd12","fd13","vs11","vs31","sw11","sw12","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
 function buildNav(){ let g="", h=""; order.forEach(k=>{ const s=S[k]; if(s.g!==g){ h+=`<h4>${s.g}</h4>`; g=s.g; } h+=`<a href="#${k}" data-k="${k}"><span>${s.id}</span>${s.t}${s.tag==="신규"?"<em>NEW</em>":""}</a>`; });
   h+=`<h4>서식</h4><a href="forms.html" target="_blank" rel="noopener"><span>FORM</span>Customer Forms ↗</a>`;
   $("#nav").innerHTML=h; $("#msel").innerHTML=order.map(k=>`<option value="${k}">${S[k].id} · ${S[k].t}</option>`).join(""); }
 function go(k){ if(!S[k]) k="rt13"; const s=S[k]; cur=k;
-  $("#view").innerHTML=`<div class="hdr"><span class="sid">${s.id}</span><h1>${s.t}</h1><span class="tag">${s.tag}</span><p>${s.d}</p></div>`+(typeof s.html==="function"?s.html.call(s):s.html);
+  const SIMK={rt11:"OUT_GEN",rt12:"OUT_LRS",rt13:"OUT_TRD",rt14:"OUT_NR",rt21:"IN_GEN",fd11:"IN_FDI",fx11:"FX_ACCT"}[k];
+  $("#view").innerHTML=`<div class="hdr"><span class="sid">${s.id}</span><h1>${s.t}</h1><span class="tag">${s.tag}</span>${SIMK?`<a href="#sm11" class="flink" data-sim="${SIMK}">환율 시뮬레이션 →</a>`:""}<p>${s.d}</p></div>`+(typeof s.html==="function"?s.html.call(s):s.html);
   $("#ttl").textContent=s.t; $("#trx").value=s.id; $("#msel").value=k;
   $$("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.k===k));
   s.init&&s.init.call(s); log(`${s.id} 화면 로드 · 예시 데이터 (가상 고객)`);
@@ -1066,7 +1134,8 @@ $("#trx").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const k=e.target.
 $("#bChk").addEventListener("click",()=>{ const s=S[cur]; s.chk?s.chk.call(s):log(`<span class="pill p-ok">OK</span> 조회 화면입니다.`); });
 $("#bExe").addEventListener("click",()=>{ const s=S[cur]; if(s.chk) s.chk.call(s); if(!$("#log .p-err") && $("#modal").hidden) log($("#log").innerHTML+` · <b>Maker 등록 완료 → Checker 승인 대기</b>`); });
 $("#bClr").addEventListener("click",()=>go(cur));
-document.addEventListener("click",e=>{ const a=e.target.closest("[data-act]"); if(!a) return;
+document.addEventListener("click",e=>{ const sm=e.target.closest("[data-sim]"); if(sm){ try{ sessionStorage.setItem("simPreset",sm.dataset.sim); }catch(x){} }
+  const a=e.target.closest("[data-act]"); if(!a) return;
   const t={cust:"CH11 고객조회 팝업",ref:"송금 Ref 조회",boe:"IDPMS BoE 조회: 4718263 / 2026-09-18 / INNSA1 / USD 48,500.00 / Product 01",idpms:"IDPMS 수신 BoE 목록 조회",rt73:"RT73 Invoice 조회 팝업",xp11:"XP11 DA/DP 조회",fdi:"FDI 조회",fu:"독촉 이력 기록 (FOLLOWUP_CNT+1)",fix:"ORM 정정(M) 큐 등록"}[a.dataset.act];
   if(a.dataset.act==="boe"){ $("#boe").value="4718263"; $("#boed").value="2026-09-18"; $("#boev").value="USD 48,500.00 · BoE Product 01"; S.rt13.calc(); }
   log(`<span class="pill p-info">INFO</span> ${t}`); });
