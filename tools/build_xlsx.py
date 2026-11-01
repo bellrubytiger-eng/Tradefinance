@@ -5,6 +5,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
+from openpyxl.comments import Comment
 import model as M
 
 FONT = "Arial"
@@ -12,6 +13,10 @@ HDR_FILL = PatternFill("solid", fgColor="1F4E79")
 SUB_FILL = PatternFill("solid", fgColor="DDEBF7")
 VERIFY_FILL = PatternFill("solid", fgColor="FFF2CC")
 INPUT_FILL = PatternFill("solid", fgColor="FFFF00")
+NEW_FILL = PatternFill("solid", fgColor="F4B084")    # 주황: 인도지점 신규 계정
+MOD_FILL = PatternFill("solid", fgColor="FCE4D6")    # 연주황: 인도지점 적용 변경
+INACT_FILL = PatternFill("solid", fgColor="D9D9D9")  # 회색: 인도지점 비활성
+FIX_FILL = PatternFill("solid", fgColor="FFF2CC")    # 노랑: 통합 CoA 정정 권고
 thin = Side(style="thin", color="BFBFBF")
 BORDER = Border(left=thin, right=thin, top=thin, bottom=thin)
 WRAP = Alignment(wrap_text=True, vertical="top")
@@ -71,13 +76,15 @@ def main(out):
              ("7.기한계산기", "기한·LRS·LEI·GST 계산 예시(노란 칸 입력 → 수식 자동계산)"),
              ("8.코드정의", "공통코드 / Purpose Code 샘플"),
              ("9.인터페이스", "IDPMS·EDPMS·CIMS·SWIFT·GLEIF 등"),
-             ("10.회계분개", "이벤트별 분개 (기존 CM-CMGL GL 코드 기준)"),
+             ("10.회계분개", "이벤트별 분개 요약 (통합 표준 CoA 계정 기준, 18번 시트 요약)"),
              ("11.요청사항추적", "기존 개발요청서 항목별 반영위치·검토의견"),
              ("12.서식필드매핑", "고객 서식 4종(FIRC·당발·타발·환전) 항목별 DB 소스"),
              ("13.FDI화면가이드", "FDI 단계별 사용 화면"),
              ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면"),
              ("15.RBI기준검토", "업로드 무역금융 자료·기존 설계의 RBI 최신 기준 대조 결과"),
-             ("16.규정근거색인", "규정별 번호·고시일·시행일·관련 파라미터·규칙·출처")]
+             ("16.규정근거색인", "규정별 번호·고시일·시행일·관련 파라미터·규칙·출처"),
+             ("17.CoA(인도지점)", "차세대 GBS 통합 표준 CoA + 인도지점 신규(주황)·변경(연주황)·비활성(회색)·정정권고(노랑), 메모"),
+             ("18.업무별분개", "업무별 예시 분개(통화별 대차 검증 수식 포함). 금액은 고객 서식 샘플과 일치")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -85,7 +92,13 @@ def main(out):
     ws.cell(r, 2, "").fill = VERIFY_FILL
     ws.cell(r, 3, "VERIFY=Y : 규정 개정 가능성이 높은 수치/코드. 운영 반영 전 컴플라이언스 확인 필수").font = f(); r += 1
     ws.cell(r, 2, "").fill = INPUT_FILL
-    ws.cell(r, 3, "입력 셀 (7.기한계산기)").font = f(); r += 2
+    ws.cell(r, 3, "입력 셀 (7.기한계산기)").font = f(); r += 1
+    for fill, txt in [(NEW_FILL, "17·18번 시트: 인도지점 신규 계정 (본점 채번 전 임시코드, 메모 참조)"),
+                      (MOD_FILL, "17번 시트: 인도지점 적용 변경 (표시명·직접기장 금지 등)"),
+                      (INACT_FILL, "17번 시트: 인도지점 비활성 (통합 CoA에서 삭제하지 않음)"),
+                      (FIX_FILL, "17번 시트 '통합 CoA 정정 권고' 열: 본점 CoA 담당 전달 사항")]:
+        ws.cell(r, 2, "").fill = fill; ws.cell(r, 3, txt).font = f(); r += 1
+    r += 1
     ws.cell(r, 2, "기반 자료").font = f(bold=True, size=12); r += 1
     for d in M.META["base_docs"]:
         ws.cell(r, 3, d).font = f(size=9); r += 1
@@ -157,6 +170,8 @@ def main(out):
     sheet(wb, "16.규정근거색인", ["규정", "번호", "고시일", "시행일", "적용 업무", "관련 파라미터", "관련 규칙", "확인 상태", "출처"], M.REG_INDEX,
           [52, 22, 14, 22, 40, 34, 30, 20, 60],
           note="설계에 쓰인 모든 규정·국제규칙의 번호·일자·적용 범위와, 해당 규정을 근거로 하는 파라미터(6번 시트)·업무규칙(4번 시트) 색인")
+    build_coa(wb)
+    build_journal(wb)
     wb.save(out)
     print("saved", out)
 
@@ -270,6 +285,108 @@ def build_calc(wb):
     ws["A70"] = "R_ACCT 거주자 계좌고객(고객 주 기준) · NR_ACCT 비거주 계좌고객 · R_NONACCT 비계좌 · NR_NONACCT 해외 비계좌(영세율). 근거: IGST Act s.12(12), s.13(8)(a), s.13(2)"
     ws["A70"].font = Font(name=FONT, size=9, italic=True)
 
+
+
+
+def build_coa(wb):
+    ws = wb.create_sheet("17.CoA(인도지점)")
+    rows = M.as_dict()["COA"]
+    n = {k: sum(1 for r in rows if r["status"] == k) for k in ("신규", "변경", "비활성")}
+    nf = sum(1 for r in rows if r.get("fix"))
+    ws.cell(1, 1, f"차세대 GBS 통합 표준 CoA(0930) · 인도(Noida) 지점 적용본 — 전체 {len(rows)}개 / 신규 {n['신규']} (주황) · "
+                  f"변경 {n['변경']} (연주황) · 비활성 {n['비활성']} (회색) · 정정권고 {nf} (노랑)").font = Font(name=FONT, bold=True, size=11, color="1F4E79")
+    ws.cell(2, 1, "신규 계정 코드는 통합 CoA 번호체계(L1 1 + L2~L6 각 2자리)를 따른 임시코드이며 본점 채번 후 교체(R-ACC-08). "
+                  "본점 매핑 '(안)'은 상위·유사 계정 기준 제안값. 계정코드 셀의 메모(코멘트)에 사유 기재.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    hdr = ["계정코드", "Lv", "구분", "업무영역", "계정과목(영문)", "인도지점 표시명 / 한글명", "본점 통합계정", "본점 통합계정명",
+           "비화폐성", "현행 GBS코드", "인도지점 상태", "메모", "통합 CoA 정정 권고"]
+    for c, h in enumerate(hdr, 1):
+        x = ws.cell(4, c, h); x.font = Font(name=FONT, bold=True, color="FFFFFF", size=10); x.fill = HDR_FILL
+        x.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True); x.border = BORDER
+    for i, a in enumerate(rows, 5):
+        disp = a.get("br_name") or (a["krw"] if a["status"] == "신규" else "")
+        vals = [a["code"], a["lv"], a["grp"], a["area"], "  " * (a["lv"] - 1) + a["name"], disp, a["ho"], a["ho_name"],
+                a["nonmon"], a["gbs"], a["status"], a["memo"], a.get("fix", "")]
+        fill = {"신규": NEW_FILL, "변경": MOD_FILL, "비활성": INACT_FILL}.get(a["status"])
+        for c, v in enumerate(vals, 1):
+            x = ws.cell(i, c, v); x.border = BORDER
+            x.font = Font(name=FONT, size=9, bold=(a["lv"] <= 2 or a["status"] == "신규"),
+                          color="7F7F7F" if a["status"] == "비활성" else "000000")
+            x.alignment = Alignment(vertical="top", wrap_text=c in (5, 6, 8, 12, 13))
+            if fill:
+                x.fill = fill
+        if a.get("fix"):
+            ws.cell(i, 13).fill = FIX_FILL
+        if a["status"] in ("신규", "변경", "비활성"):
+            cm = Comment(f"[인도지점 {a['status']}] {a['memo']}", "CBS 설계")
+            cm.width, cm.height = 320, 110
+            ws.cell(i, 1).comment = cm
+    for c, w in enumerate([13, 4, 9, 14, 50, 34, 15, 22, 7, 11, 9, 52, 44], 1):
+        ws.column_dimensions[get_column_letter(c)].width = w
+    ws.freeze_panes = "B5"
+    ws.auto_filter.ref = f"A4:M{4 + len(rows)}"
+
+
+def build_journal(wb):
+    ws = wb.create_sheet("18.업무별분개")
+    d = M.as_dict()
+    status = {r["code"]: r["status"] for r in d["COA"]}
+    ws.cell(1, 1, "업무별 예시 분개 (통합 표준 CoA 기준)").font = Font(name=FONT, bold=True, size=13, color="1F4E79")
+    ws.cell(2, 1, "환전 거래는 통화별로 대차를 맞추고 11200000000(통화별 포지션)으로 연결. 난외(OB)는 대차검증 제외. "
+                  "주황 계정 = 인도지점 신규(임시코드). 각 단계 아래 '검증' 행은 SUMIFS 수식으로 통화별 차변=대변 확인.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    hdr = ["업무", "시나리오", "내용", "화면", "단계", "일자", "차/대", "계정코드", "계정명", "통화", "차변", "대변", "적요", "근거", "단계키"]
+    R0 = 4
+    for c, h in enumerate(hdr, 1):
+        x = ws.cell(R0, c, h); x.font = Font(name=FONT, bold=True, color="FFFFFF", size=10); x.fill = HDR_FILL
+        x.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True); x.border = BORDER
+    rows = d["JOURNAL"]
+    total = R0 + len(rows) + 200
+    rng = lambda col: f"${col}${R0 + 1}:${col}${total}"
+    r = R0 + 1
+    prev_biz, prev_key = None, None
+    groups = []
+    for row in rows:
+        key = f"{row[1]}|{row[4]}"
+        groups.append((key, row))
+    i = 0
+    while i < len(groups):
+        key, row = groups[i]
+        if row[0] != prev_biz:
+            x = ws.cell(r, 1, f"■ {row[0]}"); x.font = Font(name=FONT, bold=True, size=11, color="FFFFFF")
+            for c in range(1, 16):
+                ws.cell(r, c).fill = PatternFill("solid", fgColor="2E75B6")
+            r += 1; prev_biz = row[0]
+        block = []
+        while i < len(groups) and groups[i][0] == key:
+            block.append(groups[i][1]); i += 1
+        for b in block:
+            vals = list(b[:13]) + [b[13], key]
+            for c, v in enumerate(vals, 1):
+                x = ws.cell(r, c, v); x.font = Font(name=FONT, size=9); x.border = BORDER
+                x.alignment = Alignment(vertical="top", wrap_text=c in (3, 9, 13, 14))
+                if c in (11, 12):
+                    x.number_format = "#,##0.00"
+            if b[7] and status.get(b[7]) == "신규":
+                ws.cell(r, 8).fill = NEW_FILL; ws.cell(r, 9).fill = NEW_FILL
+            if b[6] in ("난외+", "난외-"):
+                for c in (7, 8, 9, 10, 11, 12):
+                    ws.cell(r, c).font = Font(name=FONT, size=9, italic=True, color="7F7F7F")
+            r += 1
+        for ccy in dict.fromkeys(b[9] for b in block if b[6] in ("차변", "대변")):
+            ws.cell(r, 7, "검증").font = Font(name=FONT, size=9, bold=True)
+            ws.cell(r, 10, ccy).font = Font(name=FONT, size=9, bold=True)
+            ws.cell(r, 11, f'=SUMIFS({rng("K")},{rng("O")},"{key}",{rng("J")},"{ccy}",{rng("G")},"차변")')
+            ws.cell(r, 12, f'=SUMIFS({rng("L")},{rng("O")},"{key}",{rng("J")},"{ccy}",{rng("G")},"대변")')
+            ws.cell(r, 13, f'=IF(ROUND(K{r}-L{r},2)=0,"OK","불일치")')
+            for c in range(7, 14):
+                x = ws.cell(r, c); x.fill = SUB_FILL; x.border = BORDER
+                if c in (11, 12):
+                    x.number_format = "#,##0.00"; x.font = Font(name=FONT, size=9, bold=True)
+            ws.cell(r, 13).font = Font(name=FONT, size=9, bold=True, color="006100")
+            r += 1
+    for c, w in enumerate([10, 9, 34, 12, 26, 11, 7, 13, 36, 6, 16, 16, 46, 22, 18], 1):
+        ws.column_dimensions[get_column_letter(c)].width = w
+    ws.column_dimensions["O"].hidden = True
+    ws.freeze_panes = f"A{R0 + 1}"
 
 if __name__ == "__main__":
     main(sys.argv[1])

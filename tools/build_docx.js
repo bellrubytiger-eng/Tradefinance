@@ -293,7 +293,7 @@ C.push(H2("4.1 공통 컴포넌트"));
 C.push(H2("4.2 화면별 핵심 변경"));
 C.push(H3("RT13 Remittance (Trade Finance)"));
 ["탭 구성: Default / Product Type / Amount Limit / Dealing Information", "Amount Limit: Total Remittance(Fiscal Year) + Invoice별 Total/Consumed/Balance + Bill of Entry(Ref No, Registration Date, Value)",
-  "BoE Product Code ≠ Product Type 오류(현행 rto1300 Line 992) 제거, 정보표시로 변경", "수수료 그리드: Commission(42020601) + GST, TCS Y/N, Commission 수기입력(CCY/Amount) 허용", "Reim Bank(Nostro) 통화별 자동세팅, 명칭 'Receiver's Correspondent' / 'Reimbursement Bank(Nostro)'"].forEach((t) => C.push(B(t)));
+  "BoE Product Code ≠ Product Type 오류(현행 rto1300 Line 992) 제거, 정보표시로 변경", "수수료 그리드: Commission(현행 42020601 → 통합 CoA 40570010000) + GST, TCS Y/N, Commission 수기입력(CCY/Amount) 허용", "Reim Bank(Nostro) 통화별 자동세팅, 명칭 'Receiver's Correspondent' / 'Reimbursement Bank(Nostro)'"].forEach((t) => C.push(B(t)));
 C.push(H3("RT73 Invoice / Bill of Entry Mgmt"));
 ["Invoice Category, Amount/IGST Rate/IGST Amount/Total Amount, Total/Consumed/Balance", "Shipping Date 미래일자 → Packing List 생략 허용(현행 rto7300 Line 989 오류 원인 해소)", "Vessel Name(Flight No)/Voyage No 20자, Port of Shipment/Country of Origin/Consignment/Port of Discharge/Port Code/Place of Destination", "BoE 탭: Home Consumption/Warehousing/Ex-bond, Invoice 값 자동복사, IDPMS 수신 BoE 조회·매칭"].forEach((t) => C.push(B(t)));
 C.push(H3("XP73 Doc of Export Management"));
@@ -413,7 +413,27 @@ C.push(NOTE("비거주자·해외 수령자 공급장소, SAC 코드, 외화간 
 
 // ---------------- 9. 회계 ----------------
 C.push(H1("9. 회계처리"));
-C.push(TBL(["이벤트", "차변", "대변", "비고"], M.GL, [1.6, 1.8, 2.6, 1.4]));
+C.push(P("회계 계정은 차세대 GBS 통합 표준 CoA(0930 기준, 11자리 L1~L6)를 따릅니다. 인도지점에 필요한 계정은 같은 번호체계로 임시코드를 부여해 추가했고(본점 채번 후 교체), 엑셀 '17.CoA(인도지점)'에 주황색과 메모로 표시했습니다. 업무별 예시 분개는 엑셀 '18.업무별분개'에 있으며, 금액은 고객 서식 샘플과 같습니다."));
+C.push(H2("9.1 분개 원칙"));
+["통화별 대차: 전표마다 통화별로 차변합 = 대변합. 환전은 11200000000(통화별 포지션)을 거쳐 외화 레그와 INR 레그를 각각 맞춤(R-ACC-03)",
+ "포지션 손익: 일말에 통화별 포지션 잔액을 대체해 외환매매손익(40760100000 / 51010040100) 인식. 월말 외화 평가는 40760200000 / 51010040200",
+ "직접 기장 금지: 하위 L5가 있는 계정(예금 L4, VAT, TDS/TCS, 송금 미지급, 보증 난외)에는 기장하지 않음(R-ACC-01)",
+ "비활성: NAPAS·AOB·TOKEN·갑기금 이자 계정은 인도지점 기장 차단(R-ACC-02)",
+ "예금 L5: 계좌 상품에 따라 거주자·EEFC·SNRR(사업/FPI)·NRE·NRO·RFC·FCNR(B)·SRVA 계정을 자동 결정(R-ACC-04)",
+ "본점 INR Vostro: 21040000000 본지점 부채로만 기장. 예금 계정 사용 금지, 을A 정산배치·이자·수수료 대상 아님(R-ACC-05)",
+ "미지급: 비계좌 타발 20181100100, FDI 초과 20181100200, 반송 20181100300, 무역금융 순지급 20440800000(R-ACC-06)",
+ "세금: CGST/SGST/IGST 20510500100~300, TCS 20510400200, TDS 20510400100(R-ACC-07)",
+ "분개 생성: 각 화면은 TB_ACCT_RULE(이벤트·순번·차대·계정·금액기준)로 분개를 만들어 CM-CMGL로 전송"].forEach((t) => C.push(B(t)));
+C.push(H2("9.2 통합 CoA 검토 결과"));
+C.push(H3("인도지점 신규 계정 (주황, 임시코드)"));
+C.push(TBL(["코드", "Lv", "계정명", "한글명", "사유"], M.COA_ADD.map((a) => [a[0], String(a[1]), a[2], a[3], a[5]]), [1.2, 0.3, 2.3, 1.6, 2.6], { size: 14 }));
+C.push(H3("인도지점 비활성 (삭제 아님)"));
+C.push(TBL(["코드", "사유"], M.COA_DEACT, [1.4, 5.6], { size: 15 }));
+C.push(H3("통합 CoA 정정 권고 (본점 CoA 담당 전달)"));
+C.push(TBL(["코드", "내용"], M.COA_FIX, [1.4, 5.6], { size: 15 }));
+C.push(H2("9.3 업무별 분개 요약"));
+C.push(TBL(["업무·단계", "차변", "대변", "비고"], M.GL, [2.2, 1.9, 2.2, 0.9], { size: 13 }));
+C.push(NOTE("신규 계정의 본점 통합계정 매핑은 상위·유사 계정을 기준으로 한 제안값입니다. 본점 채번 시 TB_COA_ACCT·TB_ACCT_RULE을 일괄 교체합니다(R-ACC-08)."));
 
 // ---------------- 9. 요청사항 ----------------
 C.push(H1("10. 기존 요청사항 반영 및 검토의견"));
@@ -423,7 +443,7 @@ C.push(H2("10.1 확인이 필요한 주요 검토의견"));
   "LEI 기준금액: 요청서 본문 'INR 50,000,000(5 crore)'과 경고문 'INR 50 Crore(500,000,000)'가 불일치. RBI 기준은 INR 50 crore 이므로 파라미터를 500,000,000 으로 설정하였다. 지점 확인 필요.",
   "IEC 자릿수: 요청서 '13 Digits' 표기. DGFT IEC는 PAN 기반 10자리이므로 VARCHAR2(10)으로 설계. 13자리가 다른 코드(예: AD Code 등)를 의미하는지 확인 필요.",
   "TCS: RT13(무역송금)에 TCS Y/N 요청이 있으나 TCS(206C(1G))는 LRS 개인송금 대상이므로 무역송금은 기본 N, 예외 시 수기 Y.",
-  "GST: 요청은 IGST(20990016)만 인식이나 현행 CMGL 화면은 CGST/SGST 분개. 고객 GSTIN 주코드 기준 자동판정(R-CM-10)으로 양쪽 모두 지원.",
+  "GST: 요청은 IGST(현행 20990016)만 인식이나 현행 CMGL 화면은 CGST/SGST 분개. 고객 GSTIN 주코드 기준 자동판정(R-CM-10)으로 양쪽 모두 지원하고, 통합 CoA에 세목별 L5(20510500100~300)를 신설.",
   "ISO 20022: SWIFT 크로스보더 MT103 공존기간이 2025.11 종료되었으므로 신규 개발은 pacs.008 기준. 2026.11 구조화 주소 의무화 대비 당사자 주소에 Town/Country 필수.",
   "GST: 기존 설계에 환전가치(32(2)) 과세, 비거주자·비계좌 공급장소, 반올림 규칙이 빠져 있어 R-GST-01~08로 보완. 현행 RT13은 Commission에만 GST를 부과하고 Cable charge는 제외되어 있음 → 과세 대상에 포함.",
   "EEFC: INR을 매도해 EEFC로 입금하는 환전은 허용되지 않는 것으로 설계(R-FX-02). 지점 운영 관행과 다르면 확인 필요.",
@@ -443,7 +463,7 @@ C.push(H2("11.1 처리 흐름"));
 C.push(TBL(["단계", "처리", "데이터"], M.TF_FLOW, [1.4, 4, 1.6], { size: 16 }));
 C.push(H2("11.2 기존 설계와의 통합 지점"));
 [
-  "A/P 단일화: 할인 순지급액과 비계좌 타발 보류를 모두 GL 21100000 미지급금(TB_AP_ITEM)으로 관리. 기존 'Remittance Payable 신규 GL'은 폐지",
+  "미지급 하위원장 공용·계정 분리: 원장 테이블(TB_AP_ITEM)은 하나로 두고, 계정은 통합 CoA대로 무역금융 순지급 20440800000, 비계좌 타발 20181100100, FDI 초과 20181100200, 반송 20181100300으로 분리(R-ACC-06)",
   "SFMS 단일 경로: 무역금융 A/P 지급, RT22 타발 중계, FDI·에스크로 지급 모두 Velocis 미들웨어 → SFMS(TB_SFMS_MSG). 규칙 ID는 지점 SFMS 요건서(R-VAL·RTE·CTL·EXC·MCH·IFN)를 그대로 사용",
   "EDPMS·IDPMS: 무역금융 거래(TB_TF_BILL)는 기존 Shipping Bill·BoE·IRM 원장과 연결해 같은 보고 경로 사용",
   "RA·본지점: 본점 개설 LC의 상환(RA11)은 기존 본지점 정산(IO21)으로, 지점 개설 LC의 상환은 LC11에서 MT740 발행",

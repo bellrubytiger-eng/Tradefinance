@@ -385,7 +385,7 @@ SAMPLES = {
                 "rem_iec": "AAACH4821K", "rem_lei": "5493001KJTIIGC8Y1R12",
                 "ben_name": "HANBIT SEED CO LTD", "ben_acct": "301-0221-7781-21", "ben_addr": "45 Seed Valley-ro, Anseong, KR", "ben_bank": "[Beneficiary bank], Seoul · [BIC]",
                 "intm": "[Intermediary bank], New York · [BIC]", "ccy": "USD", "amt": 100000.00, "rate": 88.4200, "inr": 8842000.00, "chg_type": "OUR",
-                "fees": fee_lines([("Commission (GL 42020601)", 11052.50), ("Cable charge (GL 42020603)", 1000.00)], 8842000.00, "CS"),
+                "fees": fee_lines([("Commission (GL 40570010000)", 11052.50), ("Cable charge (GL 40570030000)", 1000.00)], 8842000.00, "CS"),
                 "gst_info": f"Bank GSTIN 09[XXXXXXXXXX]1Z[X] · Customer GSTIN 09AAACH4821K1Z5 · {GST_UP} · {SAC}",
                 "purpose": "S0101 - Advance payment against imports", "rmt_info": "ADVANCE PAYMENT PI INV-2026-0912",
                 "form_a2": "Received", "inv_ref": "INV-2026-0912 dated 2026-09-12 (Proforma)", "orm": "0291402ORM2610310184",

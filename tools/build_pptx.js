@@ -215,14 +215,14 @@ arrow(s, exc, "r", ret, "l", "5영업일");
 note(s, "예: 약정 INR 25 crore, 환율 88.42 → 환전 대상 USD 2,827,414.62. 수취 USD 2,850,000이면 초과 USD 22,585.38은 외화 미지급금으로 분리 후 반환(수수료 USD 25 공제). 배정 60일·미배정 반환 75일·FC-GPR 30일 기한은 FD11에서 함께 관리.", 0.4, 5.75, 12.4, 0.8);
 
 // 7. 무역금융
-s = addContent("무역금융: 등록 → 승인 → A/P → SFMS 지급", "상세 프로세스", "할인·매입·LC매입·추심·OA·TReDS는 TF11 한 화면에서 등록하고, 순지급액은 미지급금(21100000)을 거쳐 SF11에서 지급합니다.");
+s = addContent("무역금융: 등록 → 승인 → A/P → SFMS 지급", "상세 프로세스", "할인·매입·LC매입·추심·OA·TReDS는 TF11 한 화면에서 등록하고, 순지급액은 미지급금(20440800000)을 거쳐 SF11에서 지급합니다.");
 let t31 = node(s, "tf31", 0.4, 1.3), t41 = node(s, "tf41", 0.4, 2.45);
 let docs = node(s, "xp73", 0.4, 3.6, 1.75, 0.72, { label: "수출서류 Lodgement" });
 let t11 = node(s, "tf11", 3.0, 2.45, 1.9, 0.9);
 arrow(s, t31, "r", t11, "t", "5층 한도", { dash: true, dx: -0.3 }); arrow(s, t41, "r", t11, "l", "개설은행 등급", { dash: true }); arrow(s, docs, "r", t11, "b", "서류·S/B", { dash: true, dx: -0.3 });
 let chk = ext(s, "Checker / Authorizer\n정책 프리미엄 결재선", 5.55, 2.5, 2.0, 0.8);
 arrow(s, t11, "r", chk, "l");
-let ap = ext(s, "A/P 21100000\n순지급액 계상", 8.15, 2.5, 1.9, 0.8);
+let ap = ext(s, "A/P 20440800000\n순지급액 계상", 8.15, 2.5, 1.9, 0.8);
 arrow(s, chk, "r", ap, "l", "승인");
 let s11 = node(s, "sf11", 10.7, 2.5, 1.9, 0.8);
 arrow(s, ap, "r", s11, "l");

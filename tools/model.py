@@ -218,12 +218,14 @@ CODES = [
     ("SRC_ACCT_TYPE", "NRO", "NRO Account", "USD 1M/FY 송금한도·15CA/CB", "Y"),
     ("SRC_ACCT_TYPE", "VOSTRO", "Vostro Account", "", "N"),
     ("SRC_ACCT_TYPE", "CASH", "현금", "LRS 현금 지급한도 확인", "Y"),
-    ("FEE_TYPE", "COMM", "Remittance Commission (GL 42020601)", "", "N"),
-    ("FEE_TYPE", "CABLE", "Cable Charge (GL 42020603)", "", "N"),
-    ("FEE_TYPE", "CGST", "CGST 9% (GL 20990017)", "", "N"),
-    ("FEE_TYPE", "SGST", "SGST 9% (GL 20990018)", "", "N"),
-    ("FEE_TYPE", "IGST", "IGST 18% (GL 20990016)", "", "N"),
-    ("FEE_TYPE", "TCS", "TCS (GL 신규채번)", "LRS", "N"),
+    ("FEE_TYPE", "COMM", "Remittance Commission (40570010000 당발 / 40570020000 타발)", "", "N"),
+    ("FEE_TYPE", "CABLE", "Cable Charge (40570030000)", "", "N"),
+    ("FEE_TYPE", "CGST", "CGST 9% (20510500100)", "", "N"),
+    ("FEE_TYPE", "SGST", "SGST 9% (20510500200)", "", "N"),
+    ("FEE_TYPE", "IGST", "IGST 18% (20510500300)", "", "N"),
+    ("FEE_TYPE", "TCS", "TCS (20510400200)", "LRS", "N"),
+    ("FEE_TYPE", "INLIEU", "In lieu of exchange (40570100000)", "무환전 송금", "N"),
+    ("FEE_TYPE", "RTGS", "NEFT/RTGS charge (40570070000)", "", "N"),
     ("FEE_TYPE", "ILOE", "In lieu of Exchange", "EEFC/외화계좌 출금 시", "N"),
     ("FEE_TYPE", "GST_FX", "GST on Currency Conversion(Rule 32(2)(b))", "환전가액 slab 기준 과세표준", "Y"),
     # 기한관리
@@ -457,11 +459,11 @@ table("TB_FX_REMIT_PARTY", "송금 당사자", "송금공통", "송금인/수취
 ] + AUD)
 
 table("TB_FX_REMIT_FEE", "송금 수수료/세금", "송금공통",
-      "수수료 체계: Commission(42020601)+GST 18%만 인식(기존 요청). Direct Import 정액 INR 750. 수기입력 시 MANUAL_YN=Y.", [
+      "수수료 체계: 통합 CoA 수수료 계정(40570010000 등) + GST 세목별(20510500100/200/300). Direct Import 정액 INR 750. 수기입력 시 MANUAL_YN=Y.", [
     ("REMIT_REF_NO", "송금참조번호", "VARCHAR2(16)", "PK,FK", "", ""),
     ("FEE_SEQ", "순번", "NUMBER(3)", "PK", "", ""),
     ("FEE_TYPE", "수수료유형", "VARCHAR2(6)", "NN", "CODE:FEE_TYPE", ""),
-    ("GL_CODE", "계정과목", "VARCHAR2(8)", "NN", "", "GL"),
+    ("GL_CODE", "계정과목", "VARCHAR2(11)", "NN", "TB_COA_ACCT (통합 CoA 11자리)", "GL"),
     ("CCY", "통화", "VARCHAR2(3)", "NN", "", ""),
     ("AMT", "금액", "NUMBER(18,2)", "NN", "", ""),
     ("BASE_AMT", "과세표준", "NUMBER(18,2)", "", "GST/TCS 기준금액", ""),
@@ -1023,7 +1025,7 @@ table("TB_FX_SUSPENSE", "미지급금(타발 보류) 원장", "타발중계(RT22
       "비계좌 수취인·지시대기·KYC대기 타발을 Remittance Payable(미지급금) GL에 보류. 통화별 잔액 관리.", [
     ("SUSP_NO", "보류번호", "VARCHAR2(16)", "PK", "", ""),
     ("REMIT_REF_NO", "송금참조번호", "VARCHAR2(16)", "FK,NN", "", ""),
-    ("GL_CODE", "미지급금 계정", "VARCHAR2(8)", "NN", "21100000 미지급금(A/P) - 무역금융 A/P와 공용, TB_AP_ITEM(INW_RELAY) 동시 생성", "GL"),
+    ("GL_CODE", "미지급금 계정", "VARCHAR2(11)", "NN", "20181100100 타발 미지급(비계좌·지시대기) / 20181100200 FDI 초과 / 20181100300 반송. TB_AP_ITEM(INW_RELAY) 동시 생성", "GL"),
     ("CCY", "통화", "VARCHAR2(3)", "NN", "외화 보류 또는 INR(환전 후 지급대기)", ""),
     ("PARK_AMT", "보류금액", "NUMBER(18,2)", "NN", "", ""),
     ("BALANCE_AMT", "잔액", "NUMBER(18,2)", "NN", "= PARK - Σ환전/지급/반환", ""),
@@ -1333,8 +1335,36 @@ table("TB_IO_FLOAT_ADJ", "휴일 차이 조정", "본지점(IO21/CM21)", "본점
     ("RATE_PCT", "적용금리", "NUMBER(9,6)", "NN", "TB_IO_RATE(INT) all-in", ""),
     ("INT_AMT", "이자", "NUMBER(18,2)", "NN", "AMT × RATE × DAYS / 일수기준", ""),
     ("TREAT", "처리", "VARCHAR2(6)", "NN", "ABSORB/SETTLE (IO_FLOAT_ABSORB_USD)", ""),
-    ("GL_CODE", "계정", "VARCHAR2(8)", "NN", "내부대체 손익 / 본지점 이자", "GL"),
+    ("GL_CODE", "계정", "VARCHAR2(11)", "", "SETTLE: 11010000000/40620000000, ABSORB: 분개 없음", "GL"),
     ("CUST_CLAIM_YN", "고객 청구", "VARCHAR2(1)", "NN", "기본 N (휴일 차이는 고객에게 청구하지 않음)", ""),
+] + AUD)
+
+table("TB_COA_ACCT", "계정과목(통합 표준 CoA)", "회계공통", "차세대 GBS 통합 표준 CoA(0930) + 인도지점 적용 상태. 모든 GL_CODE의 참조 마스터. 신규 계정은 본점 채번 전 임시코드.", [
+    ("ACCT_CD", "계정코드", "VARCHAR2(11)", "PK", "11자리 Level1~6", ""),
+    ("ACCT_LVL", "레벨", "NUMBER(1)", "NN", "1~6", ""),
+    ("PARENT_CD", "상위계정", "VARCHAR2(11)", "", "", ""),
+    ("ACCT_NM_EN", "계정명(영문)", "VARCHAR2(100)", "NN", "", ""),
+    ("ACCT_NM_BR", "인도지점 표시명", "VARCHAR2(100)", "", "예: STATE BANK → RESERVE BANK OF INDIA", ""),
+    ("BS_PL", "구분", "VARCHAR2(10)", "NN", "자산/부채/자본/수익/비용/각주(난외)", ""),
+    ("HO_ACCT_CD", "본점 통합계정", "VARCHAR2(13)", "", "", ""),
+    ("GBS_CD", "현행 GBS 코드", "VARCHAR2(8)", "", "이행 매핑", ""),
+    ("NONMON_YN", "비화폐성", "VARCHAR2(1)", "", "외화환산 제외", ""),
+    ("POSTABLE_YN", "기장 가능", "VARCHAR2(1)", "NN", "하위 L5가 있는 계정은 N(직접 기장 금지)", ""),
+    ("BR_STATUS", "인도지점 상태", "VARCHAR2(6)", "", "NEW(신규·임시코드)/MOD(변경)/INACT(비활성)", ""),
+    ("TEMP_CD_YN", "임시코드", "VARCHAR2(1)", "", "본점 채번 후 ACCT_CD 교체, 이력은 TB_ACCT_RULE 동시 갱신", ""),
+    ("BR_MEMO", "메모", "VARCHAR2(400)", "", "", ""),
+] + AUD)
+
+table("TB_ACCT_RULE", "업무별 분개 규칙", "회계공통", "업무 이벤트별 차대 계정과 금액기준. 송금·환전·FDI·Vostro·본지점·무역금융 화면은 이 규칙으로 분개를 생성(CM-CMGL 연동).", [
+    ("EVENT_CD", "이벤트", "VARCHAR2(12)", "PK", "예: OUT-01-①", ""),
+    ("LEG_SEQ", "순번", "NUMBER(3)", "PK", "", ""),
+    ("DC", "차대", "VARCHAR2(3)", "NN", "D/C/OB+/OB-", ""),
+    ("ACCT_CD", "계정", "VARCHAR2(11)", "NN,FK", "TB_COA_ACCT, POSTABLE_YN=Y·비활성 아님", "GL"),
+    ("CCY_BASIS", "통화기준", "VARCHAR2(3)", "NN", "INR / FCY(거래통화)", ""),
+    ("AMT_BASIS", "금액기준", "VARCHAR2(12)", "NN", "FCY_AMT/INR_AMT/COMM/CABLE/CGST/SGST/IGST/TCS/NET_CR/TOTAL_DR/DISC_INT/FACE/...", ""),
+    ("SCREEN_ID", "화면", "VARCHAR2(20)", "", "", ""),
+    ("EVENT_DESC", "설명", "VARCHAR2(200)", "", "", ""),
+    ("EFF_FROM_DT", "적용시작", "DATE", "NN", "", ""),
 ] + AUD)
 
 table("TB_FX_SIMULATION", "송금·환전 시뮬레이션(견적)", "공통(SM11)", "송금·환전 전 예상 환율·환전액·수수료·GST·TCS를 계산한 견적. 실거래 전환 시 원거래와 연결.", [
@@ -1443,6 +1473,14 @@ RULES = [
     ("R-SIM-02", "시뮬레이션", "SM11", "유효시간", "생성 후 15분 또는 고시환율 회차 변경 시 만료. 만료 견적으로 실거래 전환 불가", "ERR", "지점 정책", "SIM_QUOTE_VALID_MIN", "N"),
     ("R-SIM-03", "시뮬레이션", "SM11", "실거래 전환", "견적 전환 시 금액·통화·유형 동일 여부 검증, 딜 환율은 자금팀 딜 Ref 연결, 원거래에 QUOTE_ID 기록", "AUTO", "지점 정책", "", "N"),
     ("R-SIM-04", "시뮬레이션", "SM11", "민감도", "환율 ±0.10/0.25/0.50 INR 변동 시 총 출금·순 입금 변화를 함께 표시", "AUTO", "지점 정책", "", "N"),
+    ("R-ACC-01", "회계", "공통", "CoA 참조", "모든 분개 계정은 TB_COA_ACCT에 존재하고 POSTABLE_YN=Y. 상위(L4)에 L5가 있으면 직접 기장 금지(예: 20150100000, 20510500000)", "ERR", "통합 CoA", "", "N"),
+    ("R-ACC-02", "회계", "공통", "비활성 계정", "BR_STATUS=INACT 계정(NAPAS·AOB·TOKEN·갑기금 이자) 기장 차단", "ERR", "통합 CoA", "", "N"),
+    ("R-ACC-03", "회계", "공통", "통화별 대차", "전표 단위로 통화별 차변합 = 대변합. 환전은 11200000000 포지션으로 통화 간 연결(난외 OB+/OB- 제외)", "ERR", "회계원칙", "", "N"),
+    ("R-ACC-04", "회계", "공통", "예금 규제구분", "예금 계정은 계좌 상품(거주자·EEFC·SNRR·NRE·NRO·RFC·FCNR(B)·SRVA)에 맞는 L5로 자동 결정, 상품-계정 불일치 시 오류", "ERR", "FEM(Deposit) Regs", "", "N"),
+    ("R-ACC-05", "회계", "공통", "본점 Vostro 분리", "본점 명의 INR 계좌는 21040000000(본지점)으로만 기장. 예금(201502xxxxx) 기장 금지, 을A 정산배치·이자 제외, 수수료 미부과", "ERR", "지점 정책", "", "N"),
+    ("R-ACC-06", "회계", "공통", "미지급 분리", "비계좌 타발 20181100100, FDI 초과 20181100200, 반송 20181100300, 무역금융 순지급 20440800000. 하위원장 TB_AP_ITEM과 일별 잔액 대사", "ERR", "통합 CoA", "", "N"),
+    ("R-ACC-07", "회계", "공통", "GST 세목", "GST는 세목별 계정(CGST/SGST/IGST 20510500100~300), TCS 20510400200, TDS 20510400100. VAT 상위계정 직접 기장 금지", "ERR", "CGST Act", "", "N"),
+    ("R-ACC-08", "회계", "공통", "임시코드 교체", "TEMP_CD_YN=Y 계정은 본점 채번 시 코드 일괄 교체(TB_COA_ACCT·TB_ACCT_RULE·잔액 이관), 교체 전 결산 보고는 본점 매핑(안) 사용", "WARN", "지점 정책", "", "N"),
     ("R-KYC-01", "FDI KYC", "FD11", "기본 의무 = 송금인", "모든 FDI 유입은 비거주 투자자(송금인) KYC를 송금은행으로부터 확보·검증해야 함. 수취인(피투자법인)은 당행 고객 CDD로 갈음하고 기준 이상만 EDD", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025 / FEMA NDI 보고(FC-GPR 첨부)", "", "N"),
     ("R-KYC-02", "FDI KYC", "FD11/SW11", "KYC 자동요청", "RT21→FD11 이관 시 KYC 미첨부(KYC_STS=NONE)면 송금은행(DbtrAgt, 없으면 송신은행) 앞 요청 초안 자동 생성. 기본 camt.110(원거래 UETR·금액·송금인 참조, 요청항목 서술), KYC_REQ_FORMAT=MT면 MT199(:20: KYC+FDI Ref, :21: 상대 Ref, :79: 35줄×50자)", "AUTO", "SWIFT ISO 20022 / 업무요건", "KYC_REQ_FORMAT", "N"),
     ("R-KYC-03", "FDI KYC", "FD11", "독촉", "응답 없으면 D+3 영업일 재요청 MT199(FOLLOWUP), D+7 책임자 보고·MN01 경보", "ALERT", "내부정책", "FDI_KYC_FOLLOWUP_DAYS", "N"),
@@ -1459,7 +1497,7 @@ RULES = [
     ("R-VS-02", "Vostro", "VS21", "계좌상태", "ACCT_STS≠A 또는 KYC 재심사 경과 시 거래 차단(입금은 Hold)", "ERR", "KYC Directions 2025", "", "N"),
     ("R-VS-03", "Vostro", "VS31", "MT950 정합성", "OPEN_BAL ± Σ:61: = CLOSE_BAL, 첫 페이지 60F/마지막 62F, 중간 60M/62M, :28C: 연속", "ERR", "SWIFT MT950 Standard", "MT950_MAX_LINES", "N"),
     ("R-VS-04", "Vostro", "VS31", "자동발송", "EOD 마감 후 STMT_FREQ 대상 계좌 자동생성·발송, NAK 시 재발송 큐", "AUTO", "코레스 약정", "MT950_CUTOFF", "N"),
-    ("R-SUS-01", "타발중계", "RT21", "미지급금 보류", "수취인 당행 계좌 없음·지시대기·KYC대기 → SETTLE_MODE=SUSP, Remittance Payable GL 입금, TB_FX_SUSPENSE 생성", "AUTO", "업무요건", "", "N"),
+    ("R-SUS-01", "타발중계", "RT21", "미지급금 보류", "수취인 당행 계좌 없음·지시대기·KYC대기 → SETTLE_MODE=SUSP, 20181100100 타발 미지급 입금, TB_FX_SUSPENSE 생성", "AUTO", "업무요건", "", "N"),
     ("R-SUS-02", "타발중계", "RT22", "부분환전", "Σ레그 FCY ≤ 보류 FCY 잔액. 레그별 환율·딜 Ref 필수. 잔여 외화는 계속 보류 또는 외화이체", "ERR", "업무요건", "", "N"),
     ("R-SUS-03", "타발중계", "RT22", "보관기한", "DUE_DT 경과 시 OVERDUE 알림, 책임자 연장 또는 송금인 반환(RT41). 장기 보류는 AML 검토", "ALERT", "내부정책", "SUSP_MAX_DAYS", "N"),
     ("R-SUS-04", "타발중계", "RT22", "비계좌 KYC", "비계좌 수취인 지급 전 수취인 식별(PAN/CIN)·이름 일치 확인, 수출·FDI 목적이면 IEC/CIN 필수", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025", "", "N"),
@@ -1634,39 +1672,7 @@ SCREENS = [
 # ---------------------------------------------------------------------------
 # 8. 회계 분개 (event, 차변, 대변, 비고)
 # ---------------------------------------------------------------------------
-GL = [
-    ("당발송금(INR 계좌 출금)", "고객 CA/SA (INR)", "10212002 Due from Overseas Banks (FCY) / 25100002 Interoffice", "환율 = 딜링/TTS"),
-    ("당발 수수료", "고객 CA/SA", "42020601 Commission-Remittance", "Direct Import: INR 750 정액"),
-    ("GST", "고객 CA/SA", "20990017 CGST / 20990018 SGST 또는 20990016 IGST", "18%"),
-    ("Cable Charge", "고객 CA/SA", "42020603 Commission-Cable", "OUR/SHA 정책"),
-    ("TCS(LRS)", "고객 CA/SA", "TCS Payable (신규 GL 채번 필요)", "분기 27EQ 신고"),
-    ("EEFC 출금 송금", "EEFC 계좌(FCY)", "Nostro(FCY) + In lieu of Exchange 수익", "환전 없음"),
-    ("타발 입금", "Nostro(FCY)", "고객 계좌(INR/EEFC)", "IRM 생성"),
-    ("FDI 수취", "Nostro(FCY)", "피투자법인 Share Application Money 계좌", "배정 전 별도 관리"),
-    ("FDI 반환(미배정분)", "피투자법인 계좌(INR)", "Nostro(FCY)", "환차손익 별도"),
-    ("FDI 초과입금 분리", "Nostro(FCY)", "21100000 미지급금(A/P, FCY) - 환전 없음", "R-FDI-07"),
-    ("FDI 초과입금 반환", "21100000 미지급금(FCY)", "Nostro(FCY) (반환 수수료 공제분 → 수수료수익)", "환차·환전 GST 없음"),
-    ("타발 보류(비계좌)", "Nostro(FCY)", "21100000 미지급금(A/P, FCY 하위원장)", "RT21 SETTLE_MODE=SUSP"),
-    ("부분환전(레그)", "21100000 미지급금(FCY)", "21100000 미지급금(INR) 또는 지급계정", "레그별 환율·딜"),
-    ("NEFT/RTGS 지급", "21100000 미지급금(INR)", "10211000 RBI 당좌예금 (RTGS Settlement)", "SFMS UTR"),
-    ("NEFT/RTGS 반송", "10211000 RBI 당좌예금", "21100000 미지급금(INR, RTN)", "pacs.004 → A/P 복원"),
-    ("환전 GST", "고객 계좌(별도징수)", "20990017/18 또는 20990016", "32(2)(b) 과세표준×18%"),
-    ("FDI 에스크로 예치/지급", "Nostro 또는 Escrow(부채)", "Escrow(부채) 또는 수취인 계좌/RTGS", "무이자"),
-    ("환전(계좌 EEFC→INR)", "EEFC 계좌(FCY)", "고객 INR 계좌 + 환전이익(포지션)", "Rate Card/딜"),
-    ("외화현찰 매입", "외화현찰(시재)", "고객 계좌/현금(INR)", "Encashment Certificate"),
-    ("외화현찰 판매", "고객 계좌/현금(INR)", "외화현찰(시재)", "LRS 합산"),
-    ("갑기금 수령", "Nostro", "갑기금 (본점 영업기금, 자본계정)", "무이자 · 정산 제외"),
-    ("을B 본점 차입", "Nostro", "본점차입금 (을B, 신규 GL)", "MT320"),
-    ("을B 차입 이자", "본점차입금 이자비용", "미지급이자 → 만기 본점 지급", "기간구간 금리"),
-    ("을B 본점 예치", "본점예치금 (을B, 신규 GL)", "Nostro", "이자수익"),
-    ("RA 대지급", "25100002 Due from HO (을A 본지점 채권)", "Nostro(USD) / RBI 결제계정(INR)", "MT742 지급, 본점 정산 대상"),
-    ("본지점 정산 입금", "Nostro", "25100002 Due from HO", "정산배치 PAID"),
-    ("휴일차이 이자 - 정산", "Due from HO", "본지점 이자수익 (신규 GL)", "SETTLE"),
-    ("휴일차이 이자 - 흡수", "내부대체 손익 (신규 GL)", "본지점 이자 미수(대체)", "ABSORB, 월합산"),
-    ("본지점 환산정산 차액", "Due from HO / 환차손", "환차익 / Due from HO", "기준환율±스프레드"),
-    ("Vostro 입금(INR)", "Nostro / 고객계좌", "Vostro 계좌(부채, INR)", "MT950 :61: C"),
-    ("Vostro 출금(INR)", "Vostro 계좌(부채, INR)", "수취인 계좌/RTGS", "MT950 :61: D"),
-]
+GL = []  # 통합 CoA 기준 업무별 분개 요약은 coa_model.gl_summary()에서 생성 (아래)
 
 # ---------------------------------------------------------------------------
 # 9. 기존 요청사항 추적표 (출처, 원요청, 반영위치, 검토의견)
@@ -1701,7 +1707,7 @@ TRACE = [
     ("20250214 (XP73)", "Invoice Category, 단가/수량/총액, Vessel/Voyage", "INV_CATEGORY, INVOICE_ITEM, VESSEL_NAME/VOYAGE_NO", ""),
     ("20250214 (RT73)", "Shipping Date 미래일자 시 Packing list 생략", "R-INV-02", "현행 rto7300 Line 989 'Not Input detail info' 오류 원인"),
     ("20250214 (RT73)", "Invoice → BoE 자동입력", "R-INV-05", ""),
-    ("20250214 (RT13)", "수수료: 42020601 + GST 18%(20990016)만, Direct Import INR 750", "R-IMP-12, TB_FX_REMIT_FEE", "동일주 고객은 CGST/SGST 분리 필요(현행 CMGL 화면과 정합)"),
+    ("20250214 (RT13)", "수수료: 42020601 + GST 18%(20990016)만, Direct Import INR 750", "R-IMP-12, TB_FX_REMIT_FEE", "통합 CoA: 40570010000 + GST 세목 L5(20510500100~300). 동일주 고객은 CGST/SGST 분리 필요(현행 CMGL 화면과 정합)"),
     ("20250214 (RT13)", "TCS Y/N", "TCS_YN, R-LRS-04", "TCS는 LRS(개인) 대상 - 무역송금은 원칙 N"),
     ("20250214 (RT13)", "EEFC 인출 시 in lieu of exchange", "R-IMP-13", ""),
     ("20250214 (RT13)", "BoE Product Code와 RT13 Product Type 상이 허용", "R-IMP-09", "현행 rto1300 Line 992 오류 제거"),
@@ -1834,7 +1840,8 @@ RULES += TF.RULES
 DEADLINES += TF.DEADLINES
 SCREENS += TF.SCREENS
 INTERFACES += TF.INTERFACES
-GL += TF.GL
+import coa_model as COA  # noqa: E402  통합 CoA·업무별 분개
+GL = COA.gl_summary()
 TRACE += TF.TRACE
 RBI_REVIEW = TF.RBI_REVIEW
 TF_FLOW = TF.FLOW
@@ -1851,7 +1858,9 @@ def as_dict():
             "TABLES": T, "RULES": RULES, "DEADLINES": DEADLINES, "INTERFACES": INTERFACES,
             "SCREENS": SCREENS, "GL": GL, "TRACE": TRACE, "FDI_FLOW": FDI_FLOW,
             "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES,
-            "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX}
+            "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX,
+            "COA": COA.coa_rows(), "JOURNAL": COA.journal_rows(), "ACCT_RULE": COA.rule_rows(),
+            "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX}
 
 
 if __name__ == "__main__":

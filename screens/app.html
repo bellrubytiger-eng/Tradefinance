@@ -188,8 +188,8 @@ function gstCalc(charges, convInr, rcpt, state){
   if(rcpt==="NR_NONACCT"){ rows.push(["-","GST 영세율 (수출용역 · LUT)",0]); pos="96 (국외)"; why="해외 비계좌 수령자 → s.13(2) 국외 공급"; }
   else { const intra = rcpt==="R_ACCT" ? (state||BR_STATE)===BR_STATE : true;
     why = rcpt==="R_ACCT" ? "거주자 계좌고객 → 은행 기록상 고객 주 (s.12(12))" : rcpt==="NR_ACCT" ? "비거주 계좌고객 → 공급자 소재지 (s.13(8)(a))" : "비계좌 거주자 → 공급자 소재지 (s.12(12))";
-    if(intra){ const c=r2(gst/2); rows.push(["20990017",`CGST 9% on ${fmt(base)}`,c],["20990018",`SGST 9% on ${fmt(base)}`,r2(gst-c)]); pos=`${BR_STATE} (주내)`; }
-    else { rows.push(["20990016",`IGST 18% on ${fmt(base)}`,gst]); pos=`${state} (주간)`; } }
+    if(intra){ const c=r2(gst/2); rows.push(["20510500100",`CGST 9% on ${fmt(base)}`,c],["20510500200",`SGST 9% on ${fmt(base)}`,r2(gst-c)]); pos=`${BR_STATE} (주내)`; }
+    else { rows.push(["20510500300",`IGST 18% on ${fmt(base)}`,gst]); pos=`${state} (주간)`; } }
   return {rows, pos, why, base, cv, total:r2(rows.reduce((a,r)=>a+(r[2]||0),0))};
 }
 function feeTable(g, extra=[]){ const rows=g.rows.concat(extra);
@@ -322,7 +322,7 @@ S.rt13 = {id:"RT13", t:"Remittance (Trade Finance)", g:"당발송금", tag:"변�
   calc(){ const inr=num("amt")*RATE[val("ccy")], pt=val("pt"); $("#inr").value=fmt(inr);
     const eefc=(CUST["00000038"].acct.find(a=>a[0]===val("acct"))||[])[1]==="EEFC";
     const comm = pt==="03"?P.FLAT_COMM:Math.max(500,Math.min(inr*0.00125,15000));
-    const charges=[["42020601","Commission"+(pt==="03"?" (Direct Import 정액)":""),r2(comm)],["42020603","Cable charge",1000]];
+    const charges=[["40570010000","Commission"+(pt==="03"?" (Direct Import 정액)":""),r2(comm)],["40570030000","Cable charge",1000]];
     if(eefc) charges.push(["4202xxxx","In lieu of Exchange (EEFC 출금, 무환전)",r2(Math.min(inr*0.0025,10000))]);
     const g=gstCalc(charges, eefc?0:inr, "R_ACCT", CUST["00000038"].gstin.slice(0,2));
     $("#fee").innerHTML=feeTable(g, val("tcs")==="Y"?[["TCS-NEW","TCS (예외 수기, GST 비과세)",0]]:[])+
@@ -393,7 +393,7 @@ S.rt21 = {id:"RT21", t:"Inward Remittance Registry", g:"타발송금", tag:"변�
     if(pc==="P0006") h+=`<div class="msg info">FDI는 원금 보전을 위해 수수료 별도징수(SEPARATE) 강제 <span class="rule">R-GST-06</span> · 일반 확인서는 FIRC가 아님 ${formLink("in-fdi","확인서 보기")}</div>`;
     $("#route").innerHTML=h+sh;
     const conv = ["ACCT","SUSP","NEFT","RTGS"].includes(sm) ? inr : 0;
-    const g=gstCalc([["42020611","Inward commission",250]], conv, val("gr"), "06");
+    const g=gstCalc([["40570020000","Inward commission",250]], conv, val("gr"), "06");
     $("#fee21").innerHTML=feeTable(g)+`<div class="msg info">징수방식 ${val("fc")} · ${val("fc")==="DEDUCT"?`입금액 INR ${fmt(inr-g.total)}`:"원금 전액 입금, 수수료 별도"} ${formLink(sm==="SUSP"||sm==="RTGS"||sm==="NEFT"?"in-relay":"in-exp","타발송금 확인서 미리보기")}</div>`; },
   chk(){ return show(leiCheck(num("amt")*RATE[val("ccy")]).concat([["ok","등록 가능"]])); }};
 
@@ -456,7 +456,7 @@ S.fd11 = {id:"FD11", t:"FDI Inflow Registry", g:"FDI", tag:"신규", d:"외국�
     $("#rusd").value=fmtC("USD",req); $("#exc").value=fmtC("USD",exc); $("#sht").value=fmtC("USD",short); $("#cinr").value=short>0?"환전 보류":fmt(cr);
     const exDue=addBiz("IN",val("rd"),5);
     $("#split").innerHTML = short>0 ? `<div class="msg err">수취 USD ${fmtC("USD",recv)} &lt; 약정분 USD ${fmtC("USD",req)} (부족 ${fmtC("USD",short)}) → 환전 보류·외화 미지급금 보관, 부족분 요청(camt.110) 또는 약정 변경 확인 후 환전 <span class="rule">R-FDI-08</span></div>`
-      : exc>0 ? `<div class="msg warn">약정분 USD ${fmtC("USD",conv)}만 환전 → INR ${fmt(cr)} 입금. 초과 USD ${fmtC("USD",exc)}는 <b>환전 없이</b> 외화 미지급금(21100000)으로 분리 → <a href="#fd12">FD12</a> EXCESS로 원송금인·원통화 반환 (기한 ${exDue}, 수수료 반환액 공제) <span class="rule">R-FDI-06/07</span></div><div class="msg info">FIRC·FC-GPR에는 약정 환전분(USD ${fmtC("USD",conv)} / INR ${fmt(cr)})만 표기, 초과 반환 사실은 비고 기재</div>`
+      : exc>0 ? `<div class="msg warn">약정분 USD ${fmtC("USD",conv)}만 환전 → INR ${fmt(cr)} 입금. 초과 USD ${fmtC("USD",exc)}는 <b>환전 없이</b> FDI 초과 반환대기(20181100200)로 분리 → <a href="#fd12">FD12</a> EXCESS로 원송금인·원통화 반환 (기한 ${exDue}, 수수료 반환액 공제) <span class="rule">R-FDI-06/07</span></div><div class="msg info">FIRC·FC-GPR에는 약정 환전분(USD ${fmtC("USD",conv)} / INR ${fmt(cr)})만 표기, 초과 반환 사실은 비고 기재</div>`
       : `<div class="msg ok">수취액 = 약정분 · 전액 환전</div>`;
     const rd=val("rd"), a=addD(rd,P.FDI_ALLOT), rf=addD(rd,P.FDI_ALLOT+P.FDI_REFUND), ad=val("ad"), st=(d,done)=>done?"done":(BIZ>d?"over":diff(BIZ,d)<=15?"due":"");
     $("#fdtl").innerHTML=`<div class="tl"><div class="done"><b>${rd}</b><span>수취 · FIRC</span></div><div class="${st(a,!!ad)}"><b>${a}</b><span>배정기한 (+60일)${!ad&&BIZ>a?" · 경과":""}</span></div><div class="${st(rf,false)}"><b>${rf}</b><span>미배정분 반환기한 (+75일)</span></div><div class="${ad?st(addD(ad,P.FCGPR),!!val("srn")):""}"><b>${ad?addD(ad,P.FCGPR):"배정 후 산출"}</b><span>FC-GPR 신고 (+30일)</span></div></div>`+
@@ -587,7 +587,7 @@ S.rt14 = {id:"RT14", t:"Non-Resident Outward Remittance", g:"당발송금", tag:
     else m.push(["info",acc==="NRO"?"경상소득(세후): 한도 외, 소득·세금 증빙 확인":`${acc} 잔액: 송금 자유 (원천 증빙 불요)`]);
     if(acc==="NRO" && (!val("ca")||!val("cb"))) m.push(["err","NRO 송금: Form 15CA + 15CB 필수 <span class='rule'>R-NR-02</span>"]);
     m.push(["info","비거주자: LRS·TCS 비적용 <span class='rule'>R-NR-04</span>"]);
-    const g=gstCalc([["42020601","Commission",2500],["42020603","Cable charge",1000]], acc==="FCNR"&&val("ccy")==="USD"?0:inr, "NR_ACCT", "");
+    const g=gstCalc([["40570010000","Commission",2500],["40570030000","Cable charge",1000]], acc==="FCNR"&&val("ccy")==="USD"?0:inr, "NR_ACCT", "");
     $("#r14").innerHTML=lim+m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")+feeTable(g)+`<div class="msg info">${formLink("out-nro","당발송금 확인서 (NRO) 미리보기")}</div>`; },
   chk(){ this.calc(); return show($("#r14 .msg.err")?[["err","한도·서류 오류"]]:[["ok","비거주자 송금 등록 가능 · pacs.008 생성"]]); }};
 
@@ -609,7 +609,7 @@ S.rt22 = {id:"RT22", t:"Settle of Pending (Suspense)", g:"타발송금", tag:"�
       const inr=r2(f*rate); $("#i"+i).textContent=f?fmt(inr):""; return {f,inr,rate}; });
     const usedF=r2(legs[0].f+legs[1].f), inrTot=r2(legs[0].inr+legs[1].inr), bal=r2(r[5]-usedF), m=[];
     $("#legmsg").innerHTML=`<div class="msg ${usedF>r[5]?"err":"info"}">환전 합계 ${r[3]} ${fmt(usedF)} / 보류잔액 ${fmt(r[5])} → 잔여 ${fmt(bal)} ${usedF>r[5]?"(초과)":""}</div>`;
-    const g=gstCalc([["42020611","Inward commission (relay)",500],["42020650","RTGS/NEFT charge",25]], inrTot, "R_NONACCT", val("pg").slice(0,2));
+    const g=gstCalc([["40570020000","Inward commission (relay)",500],["40570070000","RTGS/NEFT charge",25]], inrTot, "R_NONACCT", val("pg").slice(0,2));
     const pay = val("fc")==="DEDUCT"? r2(inrTot-g.total) : inrTot;
     $("#rail").value = pay>=2e5?"RTGS":"NEFT";
     if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(val("ifsc"))) m.push(["err","IFSC 형식 오류 (예: HDFC0001234) <span class='rule'>R-DOM-02</span>"]);
@@ -906,7 +906,7 @@ const TIERS = [[-0.10,0.10,"T1 무역금융팀장"],[-0.25,0.30,"T2 부지점장
 const tierOf = a => TIERS.find(t=>a>=t[0]-1e-9&&a<=t[1]+1e-9);
 const PANELS = {DISCOUNT:["disc"],PURCHASE:["disc"],NEGOTIATION:["disc"],COLLECTION_DA:["coll"],COLLECTION_DP:["coll"],OPEN_ACCOUNT:["oa"],TREDS:["treds","disc"]};
 
-S.tf11 = {id:"TF11", t:"Trade Finance Registration", g:"무역금융", tag:"신규", d:"어음할인·매입·LC매입·D/A·D/P·오픈어카운트·TReDS를 한 화면에서 등록합니다. 거래유형을 고르면 필요한 패널만 나타나고, 적용금리는 기준금리·기간·신용·국가·정책 5단계로 산출해 근거를 남깁니다. 순지급액은 미지급금(A/P 21100000)에 계상한 뒤 SF11에서 지급합니다.",
+S.tf11 = {id:"TF11", t:"Trade Finance Registration", g:"무역금융", tag:"신규", d:"어음할인·매입·LC매입·D/A·D/P·오픈어카운트·TReDS를 한 화면에서 등록합니다. 거래유형을 고르면 필요한 패널만 나타나고, 적용금리는 기준금리·기간·신용·국가·정책 5단계로 산출해 근거를 남깁니다. 순지급액은 미지급금(A/P 20440800000)에 계상한 뒤 SF11에서 지급합니다.",
   html:()=>`<section class="sec"><div class="kpis" id="limhdr"></div></section>`+
     SEC("① Common Header",F({l:"Bill Ref No",id:"bref",v:"BR-NOIDA-261031-001",ro:1})+F({l:"Category",id:"cat",t:"sel",rq:1,o:[["DISCOUNT","어음할인 Bill Discount"],["PURCHASE","어음매입 Bill Purchase"],["NEGOTIATION","LC 매입 Negotiation"],["COLLECTION_DA","D/A 추심"],["COLLECTION_DP","D/P 추심"],["OPEN_ACCOUNT","오픈어카운트"],["TREDS","TReDS"]],v:"NEGOTIATION"})+
       F({l:"Bill Type",id:"btype",t:"sel",o:["EXPORT_USANCE","EXPORT_SIGHT","IMPORT_USANCE","IMPORT_SIGHT","INLAND_DEMAND","INLAND_USANCE","CLEAN"],v:"EXPORT_USANCE"})+
@@ -920,7 +920,7 @@ S.tf11 = {id:"TF11", t:"Trade Finance Registration", g:"무역금융", tag:"신�
     SEC("⑤ Collection D/A · D/P",F({l:"Direction",id:"cdir",t:"sel",o:["OUTWARD","INWARD"],v:"OUTWARD"})+F({l:"Presenting Bank",id:"pbk",v:"CITIUS33"})+F({l:"Protest",id:"prt",t:"sel",o:["N","Y"],v:"N"})+F({l:"Message",id:"cmsg",v:"MT400/410/412/416 (Cat4 MT)",ro:1}),3,"URC 522").replace('class="sec"','class="sec" id="p-coll"')+
     SEC("⑥ Open Account",F({l:"OA Type",id:"oat",t:"sel",o:["DEFERRED_PAYMENT","ADVANCE","CAD","CONSIGNMENT","REMITTANCE_USANCE"],v:"DEFERRED_PAYMENT"})+F({l:"Payment Due",id:"pdue",t:"date",v:"2027-06-30"})+F({l:"Trade Credit",id:"tcf",ro:1}),3,"R-TF-06").replace('class="sec"','class="sec" id="p-oa"')+
     SEC("⑦ TReDS",F({l:"Platform",id:"plt",t:"sel",o:["RXIL","M1xchange","Invoicemart"],v:"RXIL"})+F({l:"FU No",id:"fu",v:"RX-FU-26103100417"})+F({l:"Seller Udyam",id:"udy",v:"UDYAM-UP-29-0012345"})+F({l:"Buyer Acceptance",id:"bacc",t:"date",v:"2026-10-30"})+F({l:"Insurance Premium Payer",id:"ipp",t:"sel",o:[["FIN","금융기관"],["BUY","매입자"],["SEL","매출자"]],v:"FIN"})+F({l:"Re-assigned",id:"rea",t:"sel",o:["N","Y"],v:"N"}),3,"RBI TReDS Directions 2026 · 무소구 · PSL(MSME)").replace('class="sec"','class="sec" id="p-treds"')+
-    SEC("A/P Disbursement (GL 21100000)",F({l:"Payment Method",id:"pm",t:"sel",o:[["RTGS","RTGS"],["NEFT","NEFT"],["INTERNAL","당행 계좌"],["SWIFT","SWIFT"]],v:"RTGS"})+F({l:"Beneficiary A/c",id:"bac",v:"00123456789"})+F({l:"IFSC",id:"ifsc",v:"HDFC0001234"}),3,"승인 시 A/P 계상 → SF11에서 지급")+
+    SEC("A/P Disbursement (GL 20440800000)",F({l:"Payment Method",id:"pm",t:"sel",o:[["RTGS","RTGS"],["NEFT","NEFT"],["INTERNAL","당행 계좌"],["SWIFT","SWIFT"]],v:"RTGS"})+F({l:"Beneficiary A/c",id:"bac",v:"00123456789"})+F({l:"IFSC",id:"ifsc",v:"HDFC0001234"}),3,"승인 시 A/P 계상 → SF11에서 지급")+
     `<section class="sec"><h3>⑧ Compliance</h3><div id="tfc"></div></section>`,
   init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
   calc(){ const cat=val("cat"), ccy=val("ccy"), amt=num("amt"), days=num("ten"), pan=PANELS[cat]||[]; this.r=null;
@@ -1024,7 +1024,7 @@ S.tf81 = {id:"TF81", t:"Trade Finance EOD", g:"무역금융", tag:"신규", d:"�
 
 S.sf11 = {id:"SF11", t:"SFMS Message Execution", g:"무역금융", tag:"신규", d:"미지급금(A/P) 지급 전문을 작성해 Velocis 미들웨어로 SFMS(RTGS·NEFT)에 보냅니다. 송신 전 규칙 엔진이 IFSC·잔액·채널·중복·AML을 검사하고, 거절·반환·시한초과·미매칭 건은 재처리 큐에서 다룹니다.",
   ap:[["BR-NOIDA-261031-001","Bill Discount","SEOUL PRECISION PARTS INDIA LTD",42827300.30,"HDFC0001234","00123456789"],["BR-NOIDA-260812-007","Bill Discount","Kaveri Agro Pvt Ltd",185000,"SBIN0004567","30987654321"],["SP2610290004","Inward Relay","KAVERI TEXTILES PVT LTD",4599400,"HDFC0001234","50200014410"],["TR-RXIL-260812-003","TReDS","Shree Tools MSME",4410000,"ICIC0002345","01234567890"]],
-  html(){ return SEC("1. A/P Items (GL 21100000 · TB_AP_ITEM)",TABLE(["","Ref","Type","Beneficiary",["A/P Balance (₹)","n"]],this.ap.map((r,i)=>TR([`<input type="radio" name="ap" value="${i}" ${i===0?"checked":""} aria-label="${r[0]}">`,r[0],r[1],r[2],[fmt(r[3]),"n"]]))),0,"할인 순지급·타발 중계 공용")+
+  html(){ return SEC("1. A/P Items (TB_AP_ITEM · TF 20440800000 / 송금 20181100xxx)",TABLE(["","Ref","Type","Beneficiary",["A/P Balance (₹)","n"]],this.ap.map((r,i)=>TR([`<input type="radio" name="ap" value="${i}" ${i===0?"checked":""} aria-label="${r[0]}">`,r[0],r[1],r[2],[fmt(r[3]),"n"]]))),0,"할인 순지급·타발 중계 공용")+
       SEC("2. Payment",F({l:"End-to-End ID",id:"e2e",ro:1})+F({l:"Amount (₹)",id:"pamt",t:"num"})+F({l:"Channel",id:"ch",t:"sel",o:["RTGS","NEFT"],v:"RTGS"})+F({l:"Beneficiary",id:"bn"})+F({l:"IFSC",id:"ifsc",max:11})+F({l:"Account",id:"acc"})+F({l:"Override Reason",id:"ovr",s:3}))+
       `<section class="sec"><h3>3. Rule Validation <small>SFMS 요건 7.2</small></h3><div id="sfr"></div></section><section class="sec"><h3>4. pacs.008 Preview</h3><pre class="mt" id="sfx"></pre></section>`+
       SEC("Exceptions",TABLE(["Msg ID","Channel","E2E","Status","Reason","Handling"],[TR(["NHIN26081300042","NEFT","BR-NOIDA-260812-007",pill("REJECTED","err"),"AC03 계좌오류","정정 재송신 (0/3) · R-EXC"]),TR(["NHIN26081300051","RTGS","BR-NOIDA-260810-004",pill("TIMEOUT","warn"),"38분 > 30분","상태조회 후에만 재송신 · R-EXC-002"]),TR(["IN260813RT00918","RTGS IN","BR-NOIDA-260515-009",pill("UNMATCHED","err"),"차액 -24,920","수작업 매칭 · R-MCH-002"]),TR(["IN260813IF00011","IFN 734","BR-NOIDA-260801-021",pill("RECEIVED","info"),"개설은행 거절","TF41 재평가 · R-IFN-001"])]),0); },
@@ -1064,7 +1064,7 @@ S.sm11 = {id:"SM11", t:"FX & Remittance Simulator", g:"환전", tag:"신규", d:
     let charges=[], exc=0, conv=fcy, req=0;
     if(t==="IN_FDI"){ req=Math.ceil(num("fai")/rate*100)/100; exc=r2(Math.max(0,fcy-req)); conv=fcy>=req?req:0; inr=r2(conv*rate); }
     const comm = t==="OUT_TRD" ? r2(Math.max(500,Math.min(inr*0.00125,15000))) : num("com");
-    if(comm) charges.push(["42020601","Commission",comm]); if(num("cab")) charges.push(["42020603","Cable charge",num("cab")]);
+    if(comm) charges.push(["40570010000","Commission",comm]); if(num("cab")) charges.push(["40570030000","Cable charge",num("cab")]);
     const g=gstCalc(charges, eefc?0:inr, val("gr"), val("gs"));
     let tcs=0; if(t==="OUT_LRS"){ const fy=num("fyi"), base=Math.max(0,fy+inr-Math.max(P.TCS_TH,fy)), rt={EDU:5,LOAN:0,MED:5,OTH:20}[val("lc")]; tcs=r2(base*rt/100); }
     const out=/^OUT_/.test(t);
