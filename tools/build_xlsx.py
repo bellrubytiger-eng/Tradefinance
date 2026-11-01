@@ -75,7 +75,8 @@ def main(out):
              ("11.요청사항추적", "기존 개발요청서 항목별 반영위치·검토의견"),
              ("12.서식필드매핑", "고객 서식 4종(FIRC·당발·타발·환전) 항목별 DB 소스"),
              ("13.FDI화면가이드", "FDI 단계별 사용 화면"),
-             ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면")]
+             ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면"),
+             ("15.RBI기준검토", "업로드 무역금융 자료·기존 설계의 RBI 최신 기준 대조 결과")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -144,10 +145,14 @@ def main(out):
           note="고객 서식(screens/forms.html)의 각 항목이 어느 테이블·컬럼에서 오는지. 발급 시 값 전체를 TB_FX_ADVICE_ISSUE.SNAPSHOT_JSON에 저장")
     sheet(wb, "13.FDI화면가이드", ["단계", "상황", "사용 화면", "처리 내용", "생성 데이터/서식"], M.FDI_FLOW, [6, 34, 30, 70, 40],
           note="FDI 유입은 RT21 → FD11 (비계좌는 RT22, 에스크로는 FD13), 반환은 FD12. RT11·RT13은 FDI 유입에 사용하지 않음")
+    sheet(wb, "15.RBI기준검토", ["No", "대상", "기존 내용", "RBI 최신 기준 (2026-11-01)", "반영", "근거", "확인 상태"], M.RBI_REVIEW,
+          [5, 22, 40, 70, 44, 34, 14],
+          note="확인 상태: 2차출처 = 법률·회계법인 요약으로 확인(RBI 원문 대조 필요) / 미확인 = 출처 미발견, 기존 값을 지점 정책으로 유지 / 계산확인 = 산식 검증")
     sheet(wb, "14.SWIFT카탈로그", ["유형", "표준", "Cat", "명칭", "대응 유형", "현재 송신형식", "방향", "자동생성 원천", "수신 시 연결", "VERIFY"],
           M.SWIFT_TYPES, [11, 6, 5, 40, 18, 10, 7, 34, 20, 7], verify_col=9,
           note="CBPR+ 결제·은행이체·입출금통지는 2025.11 이후 MX로 송신(MT는 수신 번역·레거시용). 보고(MT940/950)·Cat3·Cat7은 MT 유지 - SWIFT 최신 일정 확인(VERIFY)")
 
+    wb.move_sheet("15.RBI기준검토", offset=1)
     wb.save(out)
     print("saved", out)
 
@@ -167,7 +172,7 @@ def build_calc(wb):
         ("송금액(USD)", 250000, "input_num"),
         ("수입기한", f"=EDATE(B5,IF(B6=\"Y\",VALUE({ref('IMP_ADV_IMPORT_MONTHS_CAP')}),VALUE({ref('IMP_ADV_IMPORT_MONTHS')})))", "date"),
         ("수입증빙(BoE) 제출기한", f"=B8+VALUE({ref('IMP_ADV_EVIDENCE_GRACE_DAYS')})", "date"),
-        ("BG/SBLC 필요", f"=IF(B7>VALUE({ref('IMP_ADV_BG_THRESHOLD_USD')}),\"필요\",\"불요\")", "text"),
+        ("BG/SBLC 요구 (지점 정책)", f"=IF(B7>VALUE({ref('IMP_ADV_BG_THRESHOLD_USD')}),\"필요\",\"불요\")", "text"),
         ("BoE 등록 허용 최종일", f"=B5+VALUE({ref('BOE_REG_LIMIT_DAYS')})", "date"),
         ("", None, None),
         ("수출", None, None),

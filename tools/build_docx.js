@@ -93,7 +93,7 @@ C.push(H2("1.3 설계 원칙"));
   "단일 송금원장(TB_FX_REMIT_MST): 모든 송금 1건 = 1행. 보고서 시스템은 원장 + 상세 테이블만으로 모든 RBI 보고를 재현할 수 있어야 한다.",
   "스냅샷 원칙: PAN·IEC·LEI·고객유형은 송금 시점 값을 원장에 복사 저장한다(고객정보 변경 후에도 과거 보고 재현).",
   "잔액은 배분원장(TB_TRD_PAY_ALLOC)의 합계로만 갱신: Invoice·BoE·Shipping Bill·IRM의 Total / Consumed / Balance 를 하나의 서비스에서 일관 처리.",
-  "규정 수치는 하드코딩 금지: TB_FX_PARAM 에 유효기간(EFF_FROM/TO)과 함께 관리하고, 기한 산출 시 사용값을 스냅샷 저장한다(2025.11 RBI 한시완화처럼 선적일 기준 이력 적용).",
+  "규정 수치는 하드코딩 금지: TB_FX_PARAM 에 유효기간(EFF_FROM/TO)과 함께 관리하고, 기한 산출 시 사용값을 스냅샷 저장한다(수출 회수기한 15개월→9개월 변경처럼 선적일 기준 이력 적용).",
   "모든 규제기한은 TB_FX_OBLIGATION 단일 테이블: 기한유형·기산일·기한·상태만 보면 미이행 현황을 산출할 수 있도록 한다.",
   "ISO 20022 우선: 크로스보더 당발은 pacs.008/pacs.009 생성. 기존 화면의 TAG70/TAG72 항목은 MX 필드로 매핑한다.",
 ].forEach((t) => C.push(B(t)));
@@ -106,17 +106,24 @@ C.push(TBL(["구분", "근거", "시스템 반영"], [
   ["외환 일반", "Foreign Exchange Management Act 1999, Current Account Transactions Rules 2000(Schedule I~III)", "Purpose별 허용/금지, 금액한도 검증"],
   ["개인 송금", "RBI Master Direction - Liberalised Remittance Scheme", "RT12, USD 250,000/FY, Form A2, PAN"],
   ["세금", "Income-tax Act s.206C(1G) TCS, s.195 / Rule 37BB (Form 15CA·15CB)", "TCS 자동계산, 15CA/CB 검증 (2026.4 Income-tax Act 2025 조항 대응 확인)"],
-  ["수입", "RBI Master Direction - Import of Goods and Services, IDPMS 운영지침", "선수금 기한, BoE 매칭, ORM 보고"],
-  ["수출", "RBI Master Direction - Export of Goods and Services, EDPMS 운영지침", "회수기한, IRM, SB 매핑, 연장/상각"],
+  ["수출입 (2026.10.1~)", "FEM (Export and Import of Goods and Services) Regulations, 2026 (FEMA 23(R)/2026-RB, 2026.9.22 개정) + RBI Directions on Export and Import, 2026", "회수기한 9개월(INR 12), 수입 계약기한·AD 재량, ₹10 lakh 신고 종결, EDF, FETERS"],
+  ["여신·비자금여신", "RBI (Commercial Banks – Credit Facilities / Interest Rates on Advances / IRACP) Directions, 2025, Non-Fund Based Credit Facilities Directions, 2025", "수출신용, 할인 금리, SMA·NPA, LC·보증"],
+  ["보증(FEMA)", "FEM (Guarantees) Regulations, 2026", "비거주자 관련 보증, 분기 보고"],
+  ["TReDS", "RBI (TReDS) Directions, 2026", "MSME 매출채권 할인"],
   ["FDI", "FEMA (Non-Debt Instruments) Rules 2019, Mode of Payment & Reporting Regulations 2019, Press Note 3(2020)", "60일 배정, 75일 반환, FC-GPR 30일, 인접국 정부승인"],
   ["ODI", "FEMA (Overseas Investment) Rules/Regulations 2022", "RT13 Product 05"],
   ["LEI", "RBI circular - LEI for large value cross-border transactions", "비개인 INR 50 crore 이상 LEI 필수"],
   ["Vostro", "RBI - International trade settlement in INR (SRVA, 2022.7)", "SRVA 계좌유형, 사용제한"],
-  ["KYC/AML", "RBI Master Direction - KYC 2016, PMLA 2002", "고객 KYC 검증, 제재국 차단, TBML 데이터"],
+  ["KYC/AML", "RBI (Commercial Banks – KYC) Directions, 2025, PMLA 2002", "고객 KYC 검증, 제재국 차단, TBML 데이터"],
   ["메시지", "SWIFT CBPR+ (MT/MX 공존기간 2025.11 종료), MT950 Standard", "pacs.008 생성, 구조화 주소, MT950 생성"],
 ], [1, 3, 2.4]));
 C.push(H2("2.2 핵심 규정 파라미터"));
 C.push(TBL(["파라미터", "명칭", "값", "근거", "VERIFY"], M.PARAMS.map((p) => [p[0], p[1], `${p[2]} ${p[3]}`, p[5], p[6]]), [2.2, 2.6, 1.1, 2.6, 0.6], { verifyCol: 4, size: 15 }));
+
+C.push(H2("2.3 RBI 최신 기준 검토 (2026-11-01 기준)"));
+C.push(P("업로드된 무역금융 요청서·화면설계 v6·SFMS 요건서와 기존 설계를 RBI 최신 기준과 대조했습니다. 2026년 10월 1일부터 수출입 규정이 전면 개편되었고, 2025년 11월 28일 RBI 마스터서큘러가 'Directions, 2025'로 통합되었으며, 비자금여신(LC·보증)·FEMA 보증·TReDS 규정도 새로 시행되었습니다."));
+C.push(NOTE("확인 수준: RBI 웹사이트 원문은 이번 작업 환경에서 열람할 수 없어 법률·회계법인 요약과 은행 공지로 확인했습니다(2차출처). 운영 반영 전 RBI 관보·Directions 원문으로 최종 대조가 필요합니다. '미확인' 항목은 출처를 찾지 못해 기존 값을 지점 정책으로 유지한 것입니다."));
+C.push(TBL(["No", "대상", "기존 내용", "RBI 최신 기준", "반영", "확인"], M.RBI_REVIEW.map((r) => [r[0], r[1], r[2], r[3], r[4], r[6]]), [0.3, 0.9, 1.5, 2.6, 1.7, 0.6], { size: 13 }));
 
 // ---------------- 3. 프로세스 ----------------
 C.push(H1("3. TO-BE 업무 프로세스"));
@@ -133,7 +140,7 @@ flow("3.1 개인 LRS 당발송금 (RT12)", [
 flow("3.2 수입 선수금 송금 (RT13 Product 01)", [
   ["RT73에서 Proforma Invoice 등록(유효기간·Incoterms·HS·품목)", "TB_TRD_INVOICE(_ITEM)"],
   ["RT13: IEC(CH11)·LEI 판정, Invoice 돋보기 조회 → 배분액 입력", "R-IMP-01/02/03"],
-  ["USD 200,000 초과 시 BG/SBLC 정보 입력", "R-IMP-06"],
+  ["주문 진정성·선수금 필요성 평가 기록, 지점 정책 기준(USD 200,000) 초과 시 BG/SBLC 요구 (2026 규정상 금액 기준은 폐지)", "R-IMP-06"],
   ["승인 → Invoice Consumed/Balance 갱신, ORM(A) 생성", "TB_TRD_PAY_ALLOC, TB_IF_IDPMS_ORM"],
   ["선수금 기한 생성: 송금일+6M(자본재 36M)+15일", "TB_TRD_ADV_IMP, TB_FX_OBLIGATION"],
   ["IDPMS BoE 수신 → 자동/수동 매칭 → 증빙액 갱신 → 완결 시 FULFILLED, Settlement 보고", "IF-IDP-02/03"],
@@ -142,7 +149,7 @@ flow("3.2 수입 선수금 송금 (RT13 Product 01)", [
 flow("3.3 수입대금 사후송금 / Direct Import (Product 02·03)", [
   ["BoE 존재 확인(IDPMS 수신분 우선, 미수신 시 RT73 수기등록)", "TB_TRD_BOE"],
   ["RT13 Amount Limit 탭: Invoice Total/Consumed/Balance, BoE Ref/Registration Date/Value 표시", "R-IMP-08/09/10"],
-  ["선적일+6개월 결제기한 검증(초과 시 연장근거)", "R-IMP-05"],
+  ["계약상 결제기한 검증(미기재 시 선적+6개월 모니터링), 초과 시 AD 연장 사유 또는 무역신용 판정", "R-IMP-05"],
   ["수수료: Product 03은 INR 750 정액 + GST 18%, EEFC 출금 시 In lieu of Exchange", "R-IMP-12/13"],
   ["승인 → BoE 미결제액 차감 → IDPMS Settlement 보고, 완결 시 Closure", "TB_IF_IDPMS_SETL"],
 ]);
@@ -319,13 +326,14 @@ C.push(H2("5.4 인보이스 · BoE 유효기간 및 서류 도착기한"));
 C.push(TBL(["대상", "기산일", "기한", "시스템 처리"], [
   ["Proforma Invoice", "Invoice 발행일", "인보이스상 유효일, 미기재 시 +180일(내부정책)", "유효기간 경과 Invoice로 선수금 송금 차단"],
   ["Commercial Invoice", "Invoice 발행일", "+180일 경과 시 경고", "결제기한(선적+6M)과 연계 검증"],
-  ["수입 선수금 → 물품 수입", "송금일", "+6개월 (자본재 +3년)", "OBLIGATION IMP_ADV_EVID"],
+  ["수입 선수금 → 물품 수입", "송금일", "+6개월 (자본재 +3년) - 지점 정책, 2026 Directions 확인", "OBLIGATION IMP_ADV_EVID"],
   ["수입 선수금 → 수입증빙(BoE) 제출", "수입기한", "+15일", "미제출 시 OVERDUE·IDPMS 미결 ORM"],
   ["BoE 등록일 (RT13 검증)", "송금일", "180일 이내", "초과 시 등록 오류"],
-  ["수입대금 결제", "선적일(B/L·AWB)", "+6개월", "초과 시 연장근거/Trade Credit"],
+  ["수입대금 결제", "계약 결제기한", "계약상 기한 (고정 6개월 폐지)", "AD 연장 사유 / 무역신용"],
   ["수출서류 제출", "LEO(수출일)", "+21일", "지연사유 입력"],
-  ["수출대금 회수", "LEO", "+9개월 (해외창고 15개월, 한시완화 확인)", "연장/상각/상계, EDPMS 보고"],
-  ["수출선수금 → 선적", "수취일", "+1년 (한시완화 확인)", "미이행 시 반환"],
+  ["수출대금 회수", "선적(LEO)일 / 서비스 인보이스일", "+9개월 (INR 인보이스·결제 12개월)", "AD 정책 연장·감액·상계, EDPMS 보고"],
+  ["수출선수금 → 선적", "수취일", "+3년", "미이행 시 반환"],
+  ["서비스 수출 EDF", "인보이스 월말", "+30일", "EDF 제출"],
   ["FDI 배정 / 반환 / FC-GPR", "수취일 / 수취일 / 배정일", "+60일 / +75일 / +30일", "FD11·FD12 기한관리"],
 ], [1.8, 1.2, 2, 2]));
 C.push(H2("5.5 기한관리 매트릭스"));
@@ -411,11 +419,27 @@ C.push(H2("10.1 확인이 필요한 주요 검토의견"));
   "FDI KYC: 기본 의무는 송금인. 수취인 EDD 기준(INR 10 crore)과 KYC 확인 전 입금 보류 여부(FDI_HOLD_UNTIL_KYC=N)는 내부정책 가정값. MT199 요청 문안은 컴플라이언스 검토 필요.",
   "본지점 기금: 갑기금 무이자 / 을A 거래성 / 을B 여신성으로 구분. 을B 우대조건의 '동일 금액'은 '이상'으로 해석(파라미터 IO_PREF_AMT_RULE), 기간구간 스프레드 값은 예시이므로 본점 자금부 확정 필요.",
   "RA 휴일 차이: 지점이 늦게 지급한 경우(본점 선수취)와 먼저 지급한 경우(지점 자금부담)를 부호(±)로 구분해 이자 방향을 정함. 고객 청구는 하지 않음(요청하신 방안 반영).",
-  "RBI 한시완화(2025.11, 수출 회수 15개월·선수금 선적 3년): 적용 대상기간을 컴플라이언스 확인 후 TB_FX_PARAM 유효기간 행으로 등록.",
+  "2026.10.1 수출입 규정 전면 개편(9개월·계약기한·AD 재량)은 2차 출처로 확인했으며, RBI 관보 원문(FEMA 23(R)/2026-RB 및 23(R)/(1)/2026-RB)과 Directions 원문 대조가 필요함. 상세는 2.3절.",
 ].forEach((t) => C.push(N(t)));
 
 // ---------------- 10. 이행 ----------------
-C.push(H1("11. 이행 계획(안)"));
+C.push(H1("11. 무역금융(여신) 모듈 통합"));
+C.push(P("지점이 작성한 무역금융 요청서(어음할인·매입·D/A·D/P·오픈어카운트·TReDS, M1~M8)와 화면설계 v6, SFMS 인터페이스 요건서를 이 설계에 통합했습니다. 업로드 자료는 LC 기반 매입까지만 다루고 LC 개설·보증 모듈은 '별도 모듈'로 남겨 두었으므로, 신용장(LC11)과 보증(BG11)은 RBI 최신 기준으로 새로 설계했습니다."));
+C.push(H2("11.1 처리 흐름"));
+C.push(TBL(["단계", "처리", "데이터"], M.TF_FLOW, [1.4, 4, 1.6], { size: 16 }));
+C.push(H2("11.2 기존 설계와의 통합 지점"));
+[
+  "A/P 단일화: 할인 순지급액과 비계좌 타발 보류를 모두 GL 21100000 미지급금(TB_AP_ITEM)으로 관리. 기존 'Remittance Payable 신규 GL'은 폐지",
+  "SFMS 단일 경로: 무역금융 A/P 지급, RT22 타발 중계, FDI·에스크로 지급 모두 Velocis 미들웨어 → SFMS(TB_SFMS_MSG). 규칙 ID는 지점 SFMS 요건서(R-VAL·RTE·CTL·EXC·MCH·IFN)를 그대로 사용",
+  "EDPMS·IDPMS: 무역금융 거래(TB_TF_BILL)는 기존 Shipping Bill·BoE·IRM 원장과 연결해 같은 보고 경로 사용",
+  "RA·본지점: 본점 개설 LC의 상환(RA11)은 기존 본지점 정산(IO21)으로, 지점 개설 LC의 상환은 LC11에서 MT740 발행",
+  "개설은행 평가: LC 매입 신용 프리미엄과 단일은행 한도에 사용, 734 거절(SWIFT·SFMS) 자동 적재",
+  "GST: 할인료(이자)는 비과세, 수수료·전신료·보증료는 R-GST 규칙으로 과세",
+].forEach((t) => C.push(B(t)));
+C.push(H2("11.3 신용장·보증 핵심 규칙"));
+C.push(TBL(["규칙", "내용"], M.RULES.filter((r) => /^R-(LC|BG)-/.test(r[0])).map((r) => [r[0] + " " + r[3], r[4]]), [1.4, 5], { size: 15 }));
+
+C.push(H1("12. 이행 계획(안)"));
 C.push(TBL(["단계", "범위", "비고"], [
   ["1단계", "CH11 확장, RT13/RT73/XP73 개선(기존 요청 전체), TB_TRD_PAY_ALLOC 잔액엔진, 수수료·GST 체계", "테스트 중인 개선사항 우선 마무리"],
   ["2단계", "RT12 LRS + TCS + CIMS LRS 일일보고, RT11 일반송금 ISO 20022, RT14 비거주자, FX11/FX21 환전, GST 엔진(R-GST)", "개인 고객 오픈"],
@@ -424,7 +448,7 @@ C.push(TBL(["단계", "범위", "비고"], [
   ["5단계", "보고서 시스템 연동(V_RPT 뷰), TBML 연계, 이행 데이터 이관·대사", "과거 미결 BoE/SB 이관 포함"],
 ], [0.8, 4, 2]));
 C.push(H2("테스트 시나리오(요약)"));
-["LRS: FY 경계(3/31→4/1) 누적 리셋, 동시 송금 2건 한도 경합, TCS 기준 초과 직전/직후", "선수금: 자본재/일반재 기한, 부분 BoE 매칭 후 잔여 OVERDUE, BG 기준 경계값(USD 200,000)", "Invoice: 다건 분할송금 후 취소 → Balance 원복, 미래 선적일 Packing List 생략", "LEI: INR 49.99 crore + 만료(경고), 50 crore + 만료(차단)", "FDI: 61일째 배정 불가 경고, 76일째 반환 시 RBI 승인 요구, INR 확정 역산 끝전", "MT950: 0건(무거래), 250건(3페이지 분할), NAK 재발송 시 :28C: 유지"].forEach((t) => C.push(B(t)));
+["LRS: FY 경계(3/31→4/1) 누적 리셋, 동시 송금 2건 한도 경합, TCS 기준 초과 직전/직후", "선수금: 자본재/일반재 기한, 부분 BoE 매칭 후 잔여 OVERDUE, 지점 BG 정책 경계값(USD 200,000)", "Invoice: 다건 분할송금 후 취소 → Balance 원복, 미래 선적일 Packing List 생략", "LEI: INR 49.99 crore + 만료(경고), 50 crore + 만료(차단)", "FDI: 61일째 배정 불가 경고, 76일째 반환 시 RBI 승인 요구, INR 확정 역산 끝전", "MT950: 0건(무거래), 250건(3페이지 분할), NAK 재발송 시 :28C: 유지"].forEach((t) => C.push(B(t)));
 
 const doc = new Document({
   creator: "GBS India FX Project", title: "외환·무역송금 요건정의 및 설계서",

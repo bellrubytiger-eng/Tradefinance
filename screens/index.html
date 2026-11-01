@@ -336,8 +336,8 @@ S.rt13 = {id:"RT13", t:"Remittance (Trade Finance)", g:"당발송금", tag:"변�
       `<div class="msg info">Commission은 CCY/Amount 수기입력 가능. EEFC 출금은 환전이 없어 환전 과세표준 미발생. ${formLink("out-imp","당발송금 확인서 미리보기")} <span class="rule">R-IMP-12/13</span></div>`;
     if(this.cur===1){ const cap=val("cap")==="Y", due=addM(val("vd")||BIZ,cap?P.IMP_ADV_CAP_M:P.IMP_ADV_M), ev=addD(due,P.IMP_GRACE), usd=inr/RATE.USD;
       $("#advbox").innerHTML= pt==="01"? `<div class="tl"><div class="done"><b>${val("vd")}</b><span>선수금 송금</span></div><div class="due"><b>${due}</b><span>수입기한 (+${cap?36:6}M)</span></div><div><b>${ev}</b><span>BoE 증빙기한 (+15일)</span></div></div>`+
-        (usd>P.BG_USD?`<div class="msg ${val("bg")?"ok":"err"}">USD ${fmt(usd,0)} &gt; ${fmt(P.BG_USD,0)}: BG/SBLC 정보 ${val("bg")?"입력됨":"필수"} <span class="rule">R-IMP-06</span></div>`:"")
-        : `<div class="msg info">Shipment ${val("shp")} → 결제기한 ${addM(val("shp"),6)} (선적+6개월) <span class="rule">R-IMP-05</span></div>`; }
+        (usd>P.BG_USD?`<div class="msg ${val("bg")?"ok":"err"}">USD ${fmt(usd,0)} &gt; ${fmt(P.BG_USD,0)} (지점 정책 기준, 2026 규정상 금액 기준 폐지): BG/SBLC ${val("bg")?"입력됨":"요구"} · 주문 진정성 평가 기록 <span class="rule">R-IMP-06</span></div>`:`<div class="msg info">주문 진정성·선수금 필요성 평가 기록 (2026 Directions) <span class="rule">R-IMP-06</span></div>`)
+        : `<div class="msg info">결제기한은 계약상 기한 (미기재 시 선적 ${val("shp")} + 6개월 = ${addM(val("shp"),6)} 모니터링, 2026 규정상 고정기한 없음) <span class="rule">R-IMP-05</span></div>`; }
     if(this.cur===2){ const m=[]; this.inv.forEach((r,k)=>{ const a=num("al"+k); if(a>r[5]-r[6]) m.push(["err",`${r[0]}: 배분액 ${fmt(a)} &gt; Balance ${fmt(r[5]-r[6])} <span class='rule'>R-IMP-02</span>`]);
         if(a && r[1]==="PROFORMA" && r[3] && (val("vd")>r[3])) m.push(["err",`${r[0]}: Proforma 유효기간(${r[3]}) 경과 <span class='rule'>R-IMP-03</span>`]); });
       const tot=this.inv.reduce((s,r,k)=>s+num("al"+k),0); if(Math.abs(tot-num("amt"))>0.005) m.push(["warn",`인보이스 배분 합계 ${fmt(tot)} ≠ 송금액 ${fmt(num("amt"))}`]);
@@ -408,7 +408,7 @@ S.rt25 = {id:"RT25", t:"Export Realization (IRM ↔ SB)", g:"타발송금", tag:
   sb:[["5521907","2026-02-11","INMAA1","2026-02-12","USD",64000,40000],["5630118","2026-03-20","INNSA1","2026-03-20","USD",38500,0],["5799021","2026-06-02","INDEL4","2026-06-03","USD",22000,0]],
   html(){ return custBlock("00000052","Exporter (CH11)")+SEC("Inward Remittance (IRM)",TABLE(["IRM No","Remitter","CCY",["Amount","n"],["Utilized","n"],["Balance","n"]],[TR(["0291402261031000017","DAESUNG FOODS CO LTD","USD",["86,400.00","n"],["0.00","n"],["86,400.00","n"]],"sel")]),0)+
     SEC("Shipping Bills (EDPMS)",TABLE(["SB No","SB Date","Port","LEO","CCY",["FOB","n"],["Realized","n"],["Outstanding","n"],"Realize Due","Status",["Map Amt","n"]],this.sb.map((r,k)=>{const due=addM(r[3],P.EXP_REAL_M), left=diff(BIZ,due);
-      return TR([r[0],r[1],r[2],r[3],r[4],[fmt(r[5]),"n"],[fmt(r[6]),"n"],[fmt(r[5]-r[6]),"n"],due,left<0?pill(`OVERDUE ${-left}d`,"err"):left<=30?pill(`D-${left}`,"warn"):pill("OPEN","info"),[`<input class="n" id="m${k}" style="width:110px" value="${k===0?"24,000.00":k===1?"38,500.00":""}" aria-label="맵핑액">`,"n"]]);}))+`<div id="r25"></div>`,0,"회수기한 = LEO + 9개월 (파라미터 이력 적용)"); },
+      return TR([r[0],r[1],r[2],r[3],r[4],[fmt(r[5]),"n"],[fmt(r[6]),"n"],[fmt(r[5]-r[6]),"n"],due,left<0?pill(`OVERDUE ${-left}d`,"err"):left<=30?pill(`D-${left}`,"warn"):pill("OPEN","info"),[`<input class="n" id="m${k}" style="width:110px" value="${k===0?"24,000.00":k===1?"38,500.00":""}" aria-label="맵핑액">`,"n"]]);}))+`<div id="r25"></div>`,0,"회수기한 = 선적(LEO) + 9개월 (INR 인보이스·결제 12개월, FEM EXIM Regs 2026)"); },
   init(){ $$("#view input").forEach(e=>e.addEventListener("input",()=>this.calc())); this.calc(); },
   calc(){ const m=[]; let tot=0; this.sb.forEach((r,k)=>{const a=num("m"+k); tot+=a; if(a>r[5]-r[6]) m.push(["err",`SB ${r[0]}: 맵핑액이 미회수액 초과 <span class='rule'>R-EXP-04</span>`]);});
     if(tot>86400) m.push(["err",`맵핑 합계 ${fmt(tot)} &gt; IRM 잔액 86,400.00`]);
@@ -890,6 +890,144 @@ S.cm21 = {id:"CM21", t:"Holiday Calendar (IN/US/KR)", g:"본지점", tag:"신규
       : `<div class="msg info">${add.cal} 휴일: 해당 통화 결제일만 재검증 (R-HOL-01)</div>`; },
   chk(){ this.calc(); return show([["ok","휴일 등록 · 영향 거래 재계산 · 본점 통보 초안 생성"]]); }};
 
+
+/* ===================== 무역금융(여신) 모듈 ===================== */
+const ISSUERS = {"SCBLUS33":["[Bank S] New York","US",88,92,85,"A",0.35,8,0],"HVBKKRSE":["[Bank K] Seoul","KR",79,80,95,"A",0.35,8,0],"DEUTDEFF":["[Bank D] Frankfurt","DE",70,72,58,"B",0.60,5,2],"XXXXAEAD":["[Bank X] Dubai","AE",0,55,30,"D",1.75,1,5]};
+const CTRY_PREM = {US:0.20,KR:0.30,DE:0.20,AE:0.55,IN:0};
+const TIERS = [[-0.10,0.10,"T1 무역금융팀장"],[-0.25,0.30,"T2 부지점장"],[-0.40,0.60,"T3 지점장"],[-0.50,1.00,"T4 지점장+CRO 공동"]];
+const tierOf = a => TIERS.find(t=>a>=t[0]-1e-9&&a<=t[1]+1e-9);
+const PANELS = {DISCOUNT:["disc"],PURCHASE:["disc"],NEGOTIATION:["disc"],COLLECTION_DA:["coll"],COLLECTION_DP:["coll"],OPEN_ACCOUNT:["oa"],TREDS:["treds","disc"]};
+
+S.tf11 = {id:"TF11", t:"Trade Finance Registration", g:"무역금융", tag:"신규", d:"어음할인·매입·LC매입·D/A·D/P·오픈어카운트·TReDS를 한 화면에서 등록합니다. 거래유형을 고르면 필요한 패널만 나타나고, 적용금리는 기준금리·기간·신용·국가·정책 5단계로 산출해 근거를 남깁니다. 순지급액은 미지급금(A/P 21100000)에 계상한 뒤 SF11에서 지급합니다.",
+  html:()=>`<section class="sec"><div class="kpis" id="limhdr"></div></section>`+
+    SEC("① Common Header",F({l:"Bill Ref No",id:"bref",v:"BR-NOIDA-261031-001",ro:1})+F({l:"Category",id:"cat",t:"sel",rq:1,o:[["DISCOUNT","어음할인 Bill Discount"],["PURCHASE","어음매입 Bill Purchase"],["NEGOTIATION","LC 매입 Negotiation"],["COLLECTION_DA","D/A 추심"],["COLLECTION_DP","D/P 추심"],["OPEN_ACCOUNT","오픈어카운트"],["TREDS","TReDS"]],v:"NEGOTIATION"})+
+      F({l:"Bill Type",id:"btype",t:"sel",o:["EXPORT_USANCE","EXPORT_SIGHT","IMPORT_USANCE","IMPORT_SIGHT","INLAND_DEMAND","INLAND_USANCE","CLEAN"],v:"EXPORT_USANCE"})+
+      F({l:"Currency / Amount",id:"ccy",t:"sel",o:["USD","INR","EUR","JPY"],v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="500,000.00" aria-label="어음금액">`,s:2})+F({l:"INR Invoiced/Settled",id:"inrinv",t:"sel",o:[["N","N"],["Y","Y (회수 12개월)"]],v:"N"})+
+      F({l:"Bill Date",id:"bdt",t:"date",v:BIZ})+F({l:"Tenor (days)",id:"ten",t:"num",v:"90"})+F({l:"Due Date",id:"due",ro:1})+
+      F({l:"Shipment Date",id:"shp",t:"date",v:"2026-10-28"})+F({l:"Realization Due",id:"rdue",ro:1})+F({l:"HS Code",id:"hs",v:"84295200"}))+
+    SEC("② Parties",F({l:"Customer",id:"cno",v:"00000052",btn:"cust"})+F({l:"Drawer (Exporter)",id:"drw",v:"SEOUL PRECISION PARTS INDIA LTD",s:2})+F({l:"Drawee (Importer)",id:"dre",v:"XYZ CORP"})+
+      F({l:"Drawee Country",id:"dct",t:"sel",o:["US","KR","DE","AE"],v:"US"})+F({l:"Issuing / Collecting Bank",id:"ibic",t:"sel",o:Object.entries(ISSUERS).map(([k,v])=>[k,`${k} · ${v[0]} · ${v[5]}`]),v:"SCBLUS33"})+F({l:"Sanction Screening",id:"scr",v:"CLEAR - "+BIZ,ro:1}))+
+    SEC("③ Documents",TABLE(["#","Type","No","Date","Orig","Copy","Status"],[TR(["1","B/L","MAEU-2026102801","2026-10-28","3","3",pill("확인","ok")]),TR(["2","Invoice","INV-2026-1092","2026-10-26","1","2",pill("확인","ok")]),TR(["3","P/L","PL-2026-1092","2026-10-26","1","2",pill("확인","ok")]),TR(["4","Insurance",`<select id="ins" aria-label="보험증권"><option value="RCVD">접수</option><option value="MISS">미접수</option></select>`,"-","-","-",""]),TR(["5","S/B","5891203","2026-10-27","1","1",pill("확인 · EDPMS","ok")])]),0,"필수서류 미접수 시 승인요청 차단 (OA 선택)")+
+    `<section class="sec" id="p-disc"><h3>④ Discount Calculation <small>R-TF-02~04 · 12</small></h3><div id="disc"></div></section>`+
+    SEC("⑤ Collection D/A · D/P",F({l:"Direction",id:"cdir",t:"sel",o:["OUTWARD","INWARD"],v:"OUTWARD"})+F({l:"Presenting Bank",id:"pbk",v:"CITIUS33"})+F({l:"Protest",id:"prt",t:"sel",o:["N","Y"],v:"N"})+F({l:"Message",id:"cmsg",v:"MT400/410/412/416 (Cat4 MT)",ro:1}),3,"URC 522").replace('class="sec"','class="sec" id="p-coll"')+
+    SEC("⑥ Open Account",F({l:"OA Type",id:"oat",t:"sel",o:["DEFERRED_PAYMENT","ADVANCE","CAD","CONSIGNMENT","REMITTANCE_USANCE"],v:"DEFERRED_PAYMENT"})+F({l:"Payment Due",id:"pdue",t:"date",v:"2027-06-30"})+F({l:"Trade Credit",id:"tcf",ro:1}),3,"R-TF-06").replace('class="sec"','class="sec" id="p-oa"')+
+    SEC("⑦ TReDS",F({l:"Platform",id:"plt",t:"sel",o:["RXIL","M1xchange","Invoicemart"],v:"RXIL"})+F({l:"FU No",id:"fu",v:"RX-FU-26103100417"})+F({l:"Seller Udyam",id:"udy",v:"UDYAM-UP-29-0012345"})+F({l:"Buyer Acceptance",id:"bacc",t:"date",v:"2026-10-30"})+F({l:"Insurance Premium Payer",id:"ipp",t:"sel",o:[["FIN","금융기관"],["BUY","매입자"],["SEL","매출자"]],v:"FIN"})+F({l:"Re-assigned",id:"rea",t:"sel",o:["N","Y"],v:"N"}),3,"RBI TReDS Directions 2026 · 무소구 · PSL(MSME)").replace('class="sec"','class="sec" id="p-treds"')+
+    SEC("A/P Disbursement (GL 21100000)",F({l:"Payment Method",id:"pm",t:"sel",o:[["RTGS","RTGS"],["NEFT","NEFT"],["INTERNAL","당행 계좌"],["SWIFT","SWIFT"]],v:"RTGS"})+F({l:"Beneficiary A/c",id:"bac",v:"00123456789"})+F({l:"IFSC",id:"ifsc",v:"HDFC0001234"}),3,"승인 시 A/P 계상 → SF11에서 지급")+
+    `<section class="sec"><h3>⑧ Compliance</h3><div id="tfc"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const cat=val("cat"), ccy=val("ccy"), amt=num("amt"), days=num("ten"), pan=PANELS[cat]||[]; this.r=null;
+    ["disc","coll","oa","treds"].forEach(k=>{ const el=$("#p-"+k); if(el) el.hidden=!pan.includes(k); });
+    const due=addD(val("bdt"),days); $("#due").value=due;
+    const goods=!/^INLAND/.test(val("btype")), rm=val("inrinv")==="Y"?12:9; const rdue=addM(val("shp")||val("bdt"),rm); $("#rdue").value=`${rdue} (${rm}개월)`;
+    const isu=ISSUERS[val("ibic")], fx=RATE[ccy]||1, usd=amt*fx/RATE.USD;
+    // ④ 5단계
+    if(pan.includes("disc")){
+      const BASES={INR:["MCLR 1Y",9.97,0],USD:["SOFR + 조달마진",4.30,1.20],EUR:["EURIBOR + 조달마진",2.10,1.20],JPY:["TONA + 조달마진",0.50,1.20]}, B=BASES[ccy]||BASES.USD, base=r2(B[1]+B[2]), tsp = days<=90?0.25:days<=180?0.50:0.85;
+      const cp = cat==="NEGOTIATION" ? (isu[5]==="E"?null:isu[6]) : 0.60, cyp = CTRY_PREM[cat==="NEGOTIATION"?isu[1]:val("dct")]||0;
+      if(this.pol===undefined) this.pol=0.60;
+      const pol = num("pol")||(($("#pol")?null:this.pol)) || 0; 
+      const eff = base+tsp+(cp||0)+cyp+pol, dc = ccy==="INR"?365:360, disc=r2(amt*eff/100*days/dc), comm=500, mchg=25, gst=r2((comm+mchg)*0.18), net=r2(amt-disc-comm-gst-mchg), tier=tierOf(pol);
+      $("#disc").innerHTML=`<div class="grid">${F({l:"Rate Type",id:"rtp",v:B[0],ro:1})+F({l:"① Base",id:"b1",v:base.toFixed(2)+"%"+(B[2]?` (${B[1].toFixed(2)}+${B[2].toFixed(2)})`:""),ro:1})+F({l:"② Tenor Spread",id:"b2",v:tsp.toFixed(2)+"% ("+(days<=90?"≤90":days<=180?"91~180":">180")+"일)",ro:1})+
+        F({l:"③ Credit Premium",id:"b3",v:cp===null?"취급불가 (E)":(cp.toFixed(2)+"% · "+(cat==="NEGOTIATION"?"개설은행 "+isu[5]:"수출자 등급")),ro:1})+F({l:"④ Country Premium",id:"b4",v:cyp.toFixed(2)+"%",ro:1})+F({l:"⑤ Policy Premium (%)",id:"pol",t:"num",v:pol.toFixed(2)})+
+        F({l:"Policy Reason",id:"prs",t:"sel",o:[["","-"],["D1","D1 경쟁 대응"],["D2","D2 거래관계"],["U1","U1 신용우려"],["U2","U2 집중도"]],v:"U2"})+F({l:"Effective Rate",id:"eff",v:eff.toFixed(2)+"%",ro:1})+F({l:"Day Count",id:"dcv",v:`ACT/${dc}`,ro:1})}</div>`+
+        TABLE(["Discount Days",["Discount","n"],["Commission","n"],["GST 18% (수수료·전신료)","n"],["Msg Charge","n"],["Net Proceeds → A/P","n"]],[TR([String(days),[fmtC(ccy,disc),"n"],[fmtC(ccy,comm),"n"],[fmtC(ccy,gst),"n"],[fmtC(ccy,mchg),"n"],[`<b>${fmtC(ccy,net)}</b>`,"n"]])])+
+        `<div class="kpis"><div class="kpi"><span>할인비율</span><b>${(eff*days/dc).toFixed(2)}%</b></div><div class="kpi"><span>총공제비율</span><b>${((amt-net)/amt*100).toFixed(2)}%</b></div><div class="kpi"><span>순지급비율</span><b>${(net/amt*100).toFixed(2)}%</b></div><div class="kpi"><span>결재선</span><b style="font-size:13px">${tier?tier[2]:"범위 초과 차단"}</b></div></div>`+
+        `<div class="msg info">할인료(이자)는 GST 비과세, 수수료·전신료만 과세 (R-GST-01). 할인료 = ${fmtC(ccy,amt)} × ${eff.toFixed(2)}% × ${days}/${dc}</div>`;
+      $("#pol").addEventListener("input",()=>{ this.pol=num("pol"); this.calc(); }); $("#prs").addEventListener("input",()=>this.calc());
+      this.r={eff,base,cp,tier,net,pol};
+    }
+    // 한도 헤더 (USD)
+    const lim=[["전체 여신한도",2000000,780000],["상품 "+(cat==="NEGOTIATION"?"LC 매입":"BD")+" Sub-limit",1000000,500000],["단일거래상대방 "+(cat==="NEGOTIATION"?val("ibic"):val("dre")),2500000,1200000],["국가 "+(cat==="NEGOTIATION"?isu[1]:val("dct")),3000000,780000]];
+    const uses = ["COLLECTION_DA","COLLECTION_DP","OPEN_ACCOUNT"].includes(cat)?0:usd;
+    $("#limhdr").innerHTML=lim.map(([n,s,u])=>{ const after=(u+uses)/s*100; return `<div class="kpi"><span>${n}</span><b style="font-size:15px;color:var(${after>100?"--err":after>=80?"--warn":"--fg"})">${fmtC("USD",s-u-uses,0)}</b><span>승인 후 가용 · ${after.toFixed(0)}%</span></div>`; }).join("");
+    $("#tfc").innerHTML=this.comp(cat,usd,lim,uses,isu,rdue,due);
+    if(pan.includes("oa")) $("#tcf").value = (diff(val("shp"),val("pdue"))>183 && /IMPORT/.test(val("btype")))?"해당 → 무역신용 검증":"해당없음"; },
+  comp(cat,usd,lim,uses,isu,rdue,due){ const m=[];
+    lim.forEach(([n,s,u])=>{ const a=(u+uses)/s*100; if(a>100) m.push(["err",`${n} 초과 (${a.toFixed(0)}%) → 등록 차단 <span class='rule'>R-TF-05</span>`]); else if(a>=80) m.push(["warn",`${n} 소진 ${a.toFixed(0)}% ≥ 80% 경고`]); });
+    if(cat==="NEGOTIATION"){ if(isu[5]==="E") m.push(["err","개설은행 E등급: 신규 취급 불가 <span class='rule'>R-TF-03</span>"]); if(isu[5]==="D") m.push(["warn","개설은행 D등급: 확인LC 또는 ECGC 부보 조건"]); }
+    if(this.r && !this.r.tier) m.push(["err","정책 프리미엄 범위 초과 (-0.50 ~ +1.00) → 별도 여신품의 <span class='rule'>R-TF-04</span>"]);
+    if(this.r && this.r.pol && !val("prs")) m.push(["err","정책 프리미엄 사유코드 필수"]);
+    if(due>rdue && /EXPORT/.test(val("btype"))) m.push(["err",`만기 ${due} > 회수기한 ${rdue} (9개월, INR 12개월) <span class='rule'>R-TF-07</span>`]);
+    else if(/EXPORT/.test(val("btype"))) m.push(["ok",`회수기한 ${rdue} 이내 · FEM EXIM Regs 2026`]);
+    if(/IMPORT_USANCE/.test(val("btype")) && num("ten")>180) m.push(["warn","수입 유전스 > 180일 (지점 내부 상한, 자본재 360일) → 무역신용 검토 <span class='rule'>R-TF-08</span>"]);
+    if($("#ins") && val("ins")==="MISS" && cat!=="OPEN_ACCOUNT") m.push(["err","필수서류(보험증권) 미접수 → 승인요청 차단 <span class='rule'>R-TF-15</span>"]);
+    if(cat==="TREDS"){ if(val("ipp")==="SEL") m.push(["err","TReDS 보험료를 매출자에게 부담시킬 수 없음 <span class='rule'>R-TF-14</span>"]); m.push(["info","MSME Udyam 확인 → PSL(MSME) 자동 분류 · 무소구"]); }
+    m.push(["info","EDPMS: S/B 5891203 연결 · 할인 시점 자동 보고 <span class='rule'>R-TF-16</span>"]);
+    if(usd*RATE.USD>=5e7 && false) m.push(["info",""]);
+    return m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join(""); },
+  chk(){ this.calc(); const fund=(PANELS[val("cat")]||[]).includes("disc"); return show($("#tfc .msg.err")?[["err","컴플라이언스·한도 오류 → 승인요청 차단"]]:[["ok",fund?`승인요청 가능 · ${this.r&&this.r.tier?this.r.tier[2]+" 결재":"결재"} · 승인 시 A/P 계상 → SF11`:"승인요청 가능 · 자금 미제공(추심·OA) → 한도 미차감, EDPMS/IDPMS·추심 관리"]]); }};
+
+S.tf31 = {id:"TF31", t:"Limit Management", g:"무역금융", tag:"신규", d:"업체별 5층 한도(전체·상품·단일거래상대방·국가·일중)를 조회합니다. 소진율 80% 이상은 경고, 100%는 신규 등록 차단이며, 취소·만기회수 시 자동 복원됩니다.",
+  html:()=>SEC("SEOUL PRECISION PARTS INDIA LTD (00000052)",TABLE(["Level","Limit",["Sanctioned","n"],["Utilized","n"],["Available","n"],"Usage","Valid To","Status"],[
+      ["OVERALL","전체 여신한도",2000000,780000],["PRODUCT","└ 어음할인 (BD)",1000000,500000],["PRODUCT","└ LC 매입",500000,280000],["PRODUCT","└ 수입 LC 개설",500000,120000],["PRODUCT","└ 보증 (BG)",400000,330000],["CPTY","└ 단일거래상대방 XYZ CORP",500000,500000],["COUNTRY","└ 국가 US",3000000,780000],["INTRADAY","└ 일중 한도",300000,0]
+    ].map(r=>{ const p=r[3]/r[2]*100; return TR([r[0],r[1],[fmtC("USD",r[2],0),"n"],[fmtC("USD",r[3],0),"n"],[fmtC("USD",r[2]-r[3],0),"n"],`<div class="gauge" style="width:120px" role="img" aria-label="${p.toFixed(0)}%"><i style="width:${Math.min(100,p)}%;background:var(${p>=100?"--err":p>=80?"--warn":"--brand"})"></i></div>`,"2027-03-31",pill(p>=100?"소진 · 차단":p>=80?"80% 경고":"활성",p>=100?"err":p>=80?"warn":"ok")]); })),0,"R-TF-05 · TB_TF_LIMIT")+
+    SEC("Active Utilisations (TB_TF_LIMIT_UTIL)",TABLE(["Ref","Type","Counterparty","CCY",["Amount","n"],"Due","Status"],[TR(["BR-NOIDA-260813-001","DISCOUNT","XYZ CORP (US)","USD",["500,000.00","n"],"2026-11-11",pill("USED","warn")]),TR(["BR-NOIDA-260720-015","NEGOTIATION","DEF Trading (DE)","EUR",["250,000.00","n"],"2026-10-18",pill("OVERDUE","err")]),TR(["LC2609150004","LC_IMP","KR supplier","USD",["120,000.00","n"],"2027-01-15",pill("USED","warn")]),TR(["BG2604010002","BG_PERF","NHAI","INR",["2,75,00,000.00","n"],"2027-09-30",pill("USED","warn")])]),0)};
+
+S.tf41 = {id:"TF41", t:"Issuing Bank Evaluation", g:"무역금융", tag:"신규", d:"LC 매입의 회수 위험은 개설은행에 있으므로, 신용 프리미엄과 단일은행 한도는 개설은행 평가로 정합니다. 재무건전성 40, 외부등급 35, 당행 거래이력 25를 합산하며, 거래이력에는 최근 24개월 734 거절 건수가 자동 반영됩니다.",
+  html:()=>SEC("Evaluations",TABLE(["BIC","Bank","Ctry",["Ax1 Basel III (40)","n"],["Ax2 Rating (35)","n"],["Ax3 History (25)","n"],["734 (24M)","n"],["Score","n"],"Grade",["Premium","n"],["Cap (% Tier1)","n"],"Next"],Object.entries(ISSUERS).map(([k,v])=>{ const nb=v[2]===0; const sc=nb? v[3]*0.55+v[4]*0.25 : v[2]*0.40+v[3]*0.35+v[4]*0.25;
+      const g=sc>=90?"S":sc>=75?"A":sc>=60?"B":sc>=45?"C":sc>=30?"D":"E"; return TR([k,v[0],v[1],[nb?"0 (자료 없음 → Ax2 55%)":String(v[2]),"n"],[String(v[3]),"n"],[String(v[4]),"n"],[String(v[8]),"n"],[`<b>${sc.toFixed(1)}</b>`,"n"],pill(g,g<="B"?"ok":g==="C"?"warn":"err"),[{S:0.15,A:0.35,B:0.60,C:1.00,D:1.75,E:"-"}[g],"n"],[{S:10,A:8,B:5,C:3,D:1,E:0}[g],"n"],"2027-04-30"]); })),0,"S≥90 · A≥75 · B≥60 · C≥45 · D≥30 · E<30")+
+    `<div class="msg info">IFN 734 / MT734 거절 수신 시 해당 은행 Ax3 자동 갱신·재평가 알림 <span class="rule">R-LC-04 · R-IFN-001</span> · 등급 변동·부도·국가등급 하향 시 즉시 재평가</div>`};
+
+S.lc11 = {id:"LC11", t:"Letter of Credit", g:"무역금융", tag:"신규", d:"수입 LC 개설, 수출 LC 통지·확인·매입, 내국 LC(SFMS IFN 700)를 처리합니다. LC·보증 같은 비자금여신은 원칙적으로 당행 자금여신 거래 고객에게만 제공하며(2026.4.1 시행 NFB Directions), 서류 제시 후 5은행영업일 안에 심사를 마칩니다.",
+  html:()=>SEC("LC",F({l:"Role",id:"role",t:"sel",o:[["ISSUE","ISSUE 수입LC 개설"],["ADVISE","ADVISE 통지"],["CONFIRM","CONFIRM 확인"],["NEGO","NEGO 매입"]],v:"ISSUE"})+F({l:"Scope / Channel",id:"scope",t:"sel",o:[["IMPORT","IMPORT · SWIFT MT700"],["INLAND","INLAND · SFMS IFN 700"]],v:"IMPORT"})+F({l:"LC No",id:"lcno",v:"NOI26LC00417"})+
+      F({l:"Applicant",id:"app",v:"HANBIT AGRO INDIA PVT LTD (00000038)",s:2})+F({l:"Fund-based Facility",id:"fbf",t:"sel",o:[["Y","Y - 당행 자금여신 거래"],["N","N"]],v:"Y"})+
+      F({l:"CCY / Amount",id:"ccy",t:"sel",o:["USD","EUR","INR"],v:"USD",suf:`<input id="amt" class="n rq" value="120,000.00" aria-label="LC 금액">`,s:2})+F({l:"Tolerance",id:"tol",v:"05/05"})+
+      F({l:"Available by",id:"avl",t:"sel",o:["PAYMENT","ACCEPTANCE","NEGOTIATION","DEF PAYMENT"],v:"ACCEPTANCE"})+F({l:"Usance (days)",id:"usd",t:"num",v:"180"})+F({l:"Latest Shipment",id:"lsd",t:"date",v:"2026-12-15"})+
+      F({l:"Expiry",id:"exp",t:"date",v:"2027-01-15"})+F({l:"Capital Goods",id:"capg",t:"sel",o:["N","Y"],v:"N"})+F({l:"Margin %",id:"mgn",t:"num",v:"10"})+F({l:"Reimbursing Bank",id:"rmb",v:"[HOBIC] (MT740)"}))+
+    SEC("Presentation (TB_LC_PRESENTATION)",F({l:"Presented On",id:"pdt",t:"date",v:"2026-11-05"})+F({l:"Doc Amount",id:"damt",t:"num",v:"118,500.00"})+F({l:"Discrepancies",id:"dsc",v:"Late shipment; B/L not clean",s:3})+F({l:"Decision",id:"dec",t:"sel",o:[["COMPLY","일치"],["DISCREP","하자 → 개설의뢰인 포기 문의"],["REFUSED","거절 (734)"]],v:"DISCREP"}))+
+    `<section class="sec"><h3>Check <small>R-LC-01~05 · UCP 600</small></h3><div id="lcr"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const m=[], due=addBiz("IN",val("pdt"),5), amt=num("amt"), tol=1+(+val("tol").split("/")[0]||0)/100;
+    if(val("fbf")==="N") m.push(["err","비자금여신(LC)은 원칙적으로 당행 자금여신 거래 고객에게만 (예외: 역보증·전액담보·자금여신은행 NOC) <span class='rule'>R-LC-02</span>"]);
+    const u=num("usd"), cap=val("capg")==="Y"; if(u>(cap?360:180)) m.push(["warn",`유전스 ${u}일 > 지점 상한(${cap?"자본재 360":"일반 180"}일) → 무역신용 검토 <span class='rule'>R-TF-08 · R-TF-06</span>`]);
+    if(num("damt")>amt*tol) m.push(["err","청구금액이 LC 금액(과부족 포함) 초과"]);
+    m.push(["info",`서류 제시 ${val("pdt")} → 심사기한 ${due} (다음날부터 IN 은행영업일 5일) <span class='rule'>R-LC-03</span>`]);
+    if(val("dec")==="REFUSED") m.push(["warn","단일 거절통지 MT734에 모든 하자 기재 · 서류 보관/반송 의사 표시 (UCP 600 Art.16)"]);
+    m.push(["info",`${val("scope")==="INLAND"?"SFMS IFN 700 (Velocis 경유)":"SWIFT MT700 (Cat7 MT 유지)"} · 상환은행 ${val("rmb")} · 증거금 ${fmtC(val("ccy"),amt*num("mgn")/100)}`]);
+    $("#lcr").innerHTML=m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")+`<pre class="mt">{2:I700[ADV BANK BIC]XXXXN}\n{4:\n:27:1/1\n:40A:IRREVOCABLE\n:20:${val("lcno")}\n:31C:${BIZ.replace(/-/g,"").slice(2)}\n:40E:UCP LATEST VERSION\n:31D:${val("exp").replace(/-/g,"").slice(2)}NOIDA\n:50:${val("app").replace(/ \(.*$/,"")}\n:32B:${val("ccy")}${amt.toFixed(2).replace(".",",")}\n:39A:${val("tol")}\n:41D:ANY BANK BY ${val("avl")}\n:42C:${u} DAYS AFTER B/L DATE\n:44C:${val("lsd").replace(/-/g,"").slice(2)}\n:53A:${val("rmb").split(" ")[0]}\n-}</pre>`; },
+  chk(){ this.calc(); return show($("#lcr .msg.err")?[["err","LC 검증 오류"]]:[["ok","LC 등록 가능 · 한도 차감(미결제 잔액) · MT700 승인 대기"]]); }};
+
+S.bg11 = {id:"BG11", t:"Bank Guarantee", g:"무역금융", tag:"신규", d:"국내·해외 보증과 보증신용장(SBLC)을 발행하고 청구를 처리합니다. 만료일과 별도로 청구만료일(만료 후 12개월 이상)을 두고, 국내 보증은 SFMS IFN 760COV로 수익자 은행에 통지합니다. 비거주자 관련 보증은 FEMA 보증 규정에 따라 분기 보고합니다.",
+  html:()=>SEC("Guarantee",F({l:"Scope",id:"scope",t:"sel",o:[["INLAND","INLAND 국내 수익자"],["OUTWARD","OUTWARD 해외 수익자"],["INWARD_CG","INWARD_CG 역보증 기반 국내 발행"]],v:"INLAND"})+F({l:"Type",id:"bt",t:"sel",o:[["PERF","PERF 이행"],["FIN","FIN 금융"],["BID","BID 입찰"],["ADVPMT","ADVPMT 선급금"],["SBLC","SBLC"]],v:"PERF"})+F({l:"Rules",id:"rl",t:"sel",o:["LOCAL","URDG758","ISP98"],v:"LOCAL"})+
+      F({l:"Applicant",id:"app",v:"SEOUL PRECISION PARTS INDIA LTD",s:2})+F({l:"Fund-based Facility",id:"fbf",t:"sel",o:["Y","N"],v:"Y"})+F({l:"Beneficiary",id:"ben",v:"National Highways Authority of India",s:2})+F({l:"Beneficiary Bank IFSC",id:"bifsc",v:"SBIN0001234"})+
+      F({l:"CCY / Amount",id:"ccy",t:"sel",o:["INR","USD"],v:"INR",suf:`<input id="amt" class="n rq" value="2,75,00,000.00" aria-label="보증금액">`,s:2})+F({l:"Issue",id:"isd",t:"date",v:"2026-04-01"})+F({l:"Expiry",id:"exd",t:"date",v:"2027-09-30"})+F({l:"Claim Expiry",id:"cex",t:"date",v:"2028-09-30"})+
+      F({l:"e-BG (NeSL)",id:"ebg",t:"sel",o:["Y","N"],v:"Y"})+F({l:"Stamp Duty (UP)",id:"stp",v:"e-Stamp [No.]"})+F({l:"Enables other RE's fund credit",id:"ore",t:"sel",o:[["N","N"],["Y","Y"]],v:"N"})+F({l:"Trade-related",id:"trd",t:"sel",o:["Y","N"],v:"Y"})+F({l:"Commission p.a. %",id:"cr",t:"num",v:"1.20"}))+
+    SEC("Claim / Invocation (TB_BG_CLAIM)",F({l:"Claim Date",id:"cld",t:"date",v:""})+F({l:"Claim Amount",id:"cla",t:"num",v:""})+F({l:"Court Restraint",id:"crt",t:"sel",o:["N","Y"],v:"N"}))+
+    `<section class="sec"><h3>Check <small>R-BG-01~05 · NFB Directions 2025 · FEM (Guarantees) Regs 2026</small></h3><div id="bgr"></div></section>`,
+  init(){ const u=()=>this.calc(); $$("#view input,#view select").forEach(e=>e.addEventListener("input",u)); u(); },
+  calc(){ const m=[], sc=val("scope"), nr=sc!=="INLAND", amt=num("amt"), months=Math.round(diff(val("isd"),val("exd"))/30.4), fee=r2(amt*num("cr")/100*diff(val("isd"),val("exd"))/365), g=gstCalc([["42050001","Guarantee commission",fee]],0,"R_ACCT","06");
+    if(val("fbf")==="N") m.push(["err","비자금여신은 원칙적으로 자금여신 거래 고객에게만 (역보증·전액담보·NOC 예외) <span class='rule'>R-LC-02</span>"]);
+    if(val("ore")==="Y" && val("trd")!=="Y") m.push(["err","타 규제기관의 자금여신을 가능케 하는 보증 금지 (무역거래 예외) <span class='rule'>R-BG-01</span>"]);
+    const minC=addM(val("exd"),12); m.push(val("cex")<minC?["err",`청구만료일 ${val("cex")} < 만료+12개월 (${minC}) <span class='rule'>R-BG-02</span>`]:["ok",`청구만료일 ${val("cex")} (만료 후 ${Math.round(diff(val("exd"),val("cex"))/30.4)}개월) · 경과 시 자동 해지·한도 복원`]);
+    if(!nr) m.push(["info",`국내 BG: SFMS IFN 760 + IFN 760COV → 수익자 은행 ${val("bifsc")} ${val("ebg")==="Y"?"· e-BG NeSL 참조 저장":""} <span class='rule'>R-BG-03</span>`]);
+    else { const q=Math.floor((D(BIZ).getUTCMonth())/3), qe=iso(new Date(Date.UTC(D(BIZ).getUTCFullYear(),q*3+3,0))); m.push(["warn",`비거주자 관련 보증: 기초거래 FEMA 적합성 확인 후 발행 · 분기말 ${qe} 후 30일(${addD(qe,30)})까지 AD 보고 <span class='rule'>R-BG-04</span>`]); m.push(["info",sc==="INWARD_CG"?"해외은행(본점 포함) MT760 역보증 수령 후 국내 발행 · 역보증 참조 필수":"해외 수익자: MT760 (Cat7 MT)"]); }
+    if(val("cld")){ const ok=val("cld")<=val("cex"); m.push(ok?["info",`청구 접수 → 심사기한 ${addBiz("IN",val("cld"),5)} · ${val("crt")==="Y"?"법원 금지명령: 지급 보류":"법원 금지명령 없으면 지급 의무"} · 미상환분 대지급 여신 전환 <span class='rule'>R-BG-05</span>`]:["err","청구만료일 경과 청구 → 거절"]);
+      if(num("cla")>amt) m.push(["err","청구액 > 보증금액"]); }
+    $("#bgr").innerHTML=m.map(([k,t])=>`<div class="msg ${k}">${t}</div>`).join("")+`<div class="msg info">기간 ${months}개월 · 보증료 INR ${fmt(fee)} (연 ${num("cr")}% 기간 안분) + GST</div>`+feeTable(g); },
+  chk(){ this.calc(); return show($("#bgr .msg.err")?[["err","보증 검증 오류"]]:[["ok","보증 발행 가능 · 한도 차감 · 전문 승인 대기"]]); }};
+
+S.tf81 = {id:"TF81", t:"Trade Finance EOD", g:"무역금융", tag:"신규", d:"일일마감 9개 작업을 순서대로 실행합니다. 각 작업은 따로 다시 실행할 수 있고, Dry Run은 데이터를 바꾸지 않고 결과만 보여줍니다. 자산건전성은 연체일수로 자동 판정하며 수기 변경은 허용하지 않습니다.",
+  jobs:[["① 이자발생","미실현할인 → 할인수익 일할 대체 (NPA 제외)","142건 · INR 3,84,210.55"],["② 만기도래","당일 만기 상태 전환·입금 확인","6건"],["③ 연체전환","만기 경과 미회수 → OVERDUE","2건"],["④ 자산건전성","DPD → SMA-0/1/2·NPA, 충당금, CRILC(₹5 crore↑)","SMA-1 1건 · NPA 0"],["⑤ 외화결정","만기+30일 미회수 외화어음 → 전신환매도율 INR","1건 · EUR 250,000"],["⑥ EDPMS·IDPMS","당일분 전송·회신 대사","18건"],["⑦ TReDS 대사","3개 플랫폼 정산 대사","11건 · 불일치 0"],["⑧ 추심 독촉","만기 임박 알림·독촉 MT420 초안","3건"],["⑨ 마감요약·잠금","요약보고·영업일 입력 차단","-"]],
+  html(){ return SEC(`EOD ${BIZ}`,F({l:"Mode",id:"mode",t:"sel",o:[["DRY","Dry Run (변경 없음)"],["RUN","실행"]],v:"DRY"})+F({l:"From Job",id:"fj",t:"sel",o:this.jobs.map((j,i)=>[String(i),j[0]]),v:"0"}))+
+      SEC("Jobs",TABLE(["Job","Description","Result","Status"],this.jobs.map((j,i)=>TR([j[0],j[1],j[2],`<span id="js${i}">${pill("대기","info")}</span>`]))),0)+
+      SEC("Asset Classification Sample (TB_TF_ASSET_CLASS)",TABLE(["Ref","Due",["DPD","n"],"Class","Exposure ≥ ₹5 crore","CRILC","Income"],[["BR-NOIDA-260720-015","2026-10-18"],["BR-NOIDA-260905-003","2026-09-25"],["BR-NOIDA-260801-021","2026-08-01"]].map(([r,d])=>{ const dpd=diff(d,BIZ), c=dpd>90?"NPA":dpd>60?"SMA-2":dpd>30?"SMA-1":dpd>0?"SMA-0":"STD"; return TR([r,d,[String(dpd),"n"],pill(c,c==="NPA"?"err":c==="STD"?"ok":"warn"),"Y",c==="STD"?"-":"보고","정상"+(c==="NPA"?"→중단":"")]); })),0,"R-TF-10 · IRACP Directions 2025"); },
+  init(){ $("#bExe").addEventListener("click",()=>{ if(cur!=="tf81") return; const from=+val("fj"); this.jobs.forEach((j,i)=>{ if(i>=from) $("#js"+i).innerHTML=pill(val("mode")==="DRY"?"Dry Run OK":"완료","ok"); }); }, {once:true}); },
+  chk(){ return show([["ok",`${val("mode")==="DRY"?"Dry Run":"실행"} 준비 · Execute로 실행`]]); }};
+
+S.sf11 = {id:"SF11", t:"SFMS Message Execution", g:"무역금융", tag:"신규", d:"미지급금(A/P) 지급 전문을 작성해 Velocis 미들웨어로 SFMS(RTGS·NEFT)에 보냅니다. 송신 전 규칙 엔진이 IFSC·잔액·채널·중복·AML을 검사하고, 거절·반환·시한초과·미매칭 건은 재처리 큐에서 다룹니다.",
+  ap:[["BR-NOIDA-261031-001","Bill Discount","SEOUL PRECISION PARTS INDIA LTD",42827300.30,"HDFC0001234","00123456789"],["BR-NOIDA-260812-007","Bill Discount","Kaveri Agro Pvt Ltd",185000,"SBIN0004567","30987654321"],["SP2610290004","Inward Relay","KAVERI TEXTILES PVT LTD",4599400,"HDFC0001234","50200014410"],["TR-RXIL-260812-003","TReDS","Shree Tools MSME",4410000,"ICIC0002345","01234567890"]],
+  html(){ return SEC("1. A/P Items (GL 21100000 · TB_AP_ITEM)",TABLE(["","Ref","Type","Beneficiary",["A/P Balance (₹)","n"]],this.ap.map((r,i)=>TR([`<input type="radio" name="ap" value="${i}" ${i===0?"checked":""} aria-label="${r[0]}">`,r[0],r[1],r[2],[fmt(r[3]),"n"]]))),0,"할인 순지급·타발 중계 공용")+
+      SEC("2. Payment",F({l:"End-to-End ID",id:"e2e",ro:1})+F({l:"Amount (₹)",id:"pamt",t:"num"})+F({l:"Channel",id:"ch",t:"sel",o:["RTGS","NEFT"],v:"RTGS"})+F({l:"Beneficiary",id:"bn"})+F({l:"IFSC",id:"ifsc",max:11})+F({l:"Account",id:"acc"})+F({l:"Override Reason",id:"ovr",s:3}))+
+      `<section class="sec"><h3>3. Rule Validation <small>SFMS 요건 7.2</small></h3><div id="sfr"></div></section><section class="sec"><h3>4. pacs.008 Preview</h3><pre class="mt" id="sfx"></pre></section>`+
+      SEC("Exceptions",TABLE(["Msg ID","Channel","E2E","Status","Reason","Handling"],[TR(["NHIN26081300042","NEFT","BR-NOIDA-260812-007",pill("REJECTED","err"),"AC03 계좌오류","정정 재송신 (0/3) · R-EXC"]),TR(["NHIN26081300051","RTGS","BR-NOIDA-260810-004",pill("TIMEOUT","warn"),"38분 > 30분","상태조회 후에만 재송신 · R-EXC-002"]),TR(["IN260813RT00918","RTGS IN","BR-NOIDA-260515-009",pill("UNMATCHED","err"),"차액 -24,920","수작업 매칭 · R-MCH-002"]),TR(["IN260813IF00011","IFN 734","BR-NOIDA-260801-021",pill("RECEIVED","info"),"개설은행 거절","TF41 재평가 · R-IFN-001"])]),0); },
+  init(){ $$("input[name=ap]").forEach(e=>e.addEventListener("change",()=>this.pick())); ["pamt","ch","bn","ifsc","acc","ovr"].forEach(i=>$("#"+i).addEventListener("input",()=>this.calc())); this.pick(); },
+  pick(){ const r=this.ap[+($("input[name=ap]:checked")||{value:0}).value]; $("#e2e").value=r[0]; $("#pamt").value=fmt(r[3]); $("#bn").value=r[2]; $("#ifsc").value=r[4]; $("#acc").value=r[5]; $("#ch").value=r[3]>=2e5?"RTGS":"NEFT"; this.calc(); },
+  calc(){ const r=this.ap[+($("input[name=ap]:checked")||{value:0}).value], a=num("pamt"), ch=val("ch"), ifsc=val("ifsc").toUpperCase(), sug=a>=2e5?"RTGS":"NEFT", known=["HDFC0001234","SBIN0004567","ICIC0002345"];
+    const R=[["R-VAL-001",/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)?"ok":"err","IFSC 11자리 형식"],["R-VAL-002",known.includes(ifsc)?"ok":"err","IFSC 마스터 존재"],["R-VAL-003",a>0&&a<=r[3]+0.005?"ok":"err",`금액 ≤ A/P 잔액 (${fmt(r[3])})`],["R-VAL-004",/^[A-Za-z0-9 .,\-()\/]+$/.test(val("bn"))?"ok":"warn","수취인명 허용문자"],["R-RTE-002",ch==="RTGS"&&a<2e5?"err":"ok","RTGS 최소 ₹2 lakh"],["R-RTE-001",ch===sug||val("ovr")?"ok":"err",`권장 채널 ${sug}${ch!==sug?" · 변경 사유 필요":""}`],["R-CTL-002","ok","중복 없음 (멱등성 키 "+r[0]+"-1)"],["R-CTL-003","ok","AML 통과"]];
+    $("#sfr").innerHTML=TABLE(["Rule","Result","Check"],R.map(x=>TR([x[0],pill(x[1]==="ok"?"Pass":x[1]==="warn"?"Warning":"Error",x[1]),x[2]])))+`<div class="msg info">${ch==="RTGS"?"RTGS: 승인 시 A/P 차감":"NEFT: 가차감 → 배치 결제 시 A/P 차감"} · pacs.002 거절 시 A/P 복원, pacs.004 반환 시 자동 복원</div>`;
+    $("#sfx").textContent=`<AppHdr><Fr>[Branch IFSC]</Fr><To>${ch==="RTGS"?"RBIN0RTGS00":"(NEFT 값 - 벤더 확인)"}</To><MsgDefIdr>(설정테이블 버전)</MsgDefIdr></AppHdr>\n<FIToFICstmrCdtTrf>\n  <CdtTrfTxInf>\n    <PmtId><EndToEndId>${val("e2e")}</EndToEndId><TxId>(UTR)</TxId></PmtId>\n    <IntrBkSttlmAmt Ccy="INR">${a.toFixed(2)}</IntrBkSttlmAmt>\n    <IntrBkSttlmDt>${BIZ}</IntrBkSttlmDt>\n    <Dbtr><Nm>[BANK NAME]</Nm></Dbtr>\n    <CdtrAgt><FinInstnId><ClrSysMmbId><MmbId>${ifsc}</MmbId></ClrSysMmbId></FinInstnId></CdtrAgt>\n    <Cdtr><Nm>${val("bn")}</Nm></Cdtr><CdtrAcct><Id>${val("acc")}</Id></CdtrAcct>\n    <RmtInf><Ustrd>${r[1]} proceeds ${val("e2e")}</Ustrd></RmtInf>\n  </CdtTrfTxInf>\n</FIToFICstmrCdtTrf>`; },
+  chk(){ this.calc(); return show($("#sfr .p-err")?[["err","규칙 오류 → 송신 차단"]]:[["ok","PENDING_APPROVAL 등록 · Checker 승인 후 미들웨어 송신 (Maker≠Checker)"]]); }};
+
 /* ---------- 공통 검증 ---------- */
 function leiCheck(inr){ const c=CUST[val("cno")]||{}, m=[];
   if(!c.type || c.type==="IND"||c.type==="NRI") return m;
@@ -908,7 +1046,7 @@ function show(m){
 }
 
 /* ---------- 라우팅/메뉴 ---------- */
-const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","fx21","rt73","xp73","fd11","fd12","fd13","vs11","vs31","sw11","sw12","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
+const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","fx21","rt73","xp73","tf11","tf31","tf41","lc11","bg11","tf81","sf11","fd11","fd12","fd13","vs11","vs31","sw11","sw12","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
 function buildNav(){ let g="", h=""; order.forEach(k=>{ const s=S[k]; if(s.g!==g){ h+=`<h4>${s.g}</h4>`; g=s.g; } h+=`<a href="#${k}" data-k="${k}"><span>${s.id}</span>${s.t}${s.tag==="신규"?"<em>NEW</em>":""}</a>`; });
   h+=`<h4>서식</h4><a href="forms.html" target="_blank" rel="noopener"><span>FORM</span>Customer Forms ↗</a>`;
   $("#nav").innerHTML=h; $("#msel").innerHTML=order.map(k=>`<option value="${k}">${S[k].id} · ${S[k].t}</option>`).join(""); }

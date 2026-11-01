@@ -38,28 +38,30 @@ PARAMS = [
     ("LEI_THRESHOLD_INR", "LEI 필수 기준금액(비개인, 건별)", "500000000", "INR", "당발/타발",
      "RBI A.P.(DIR) Circular - LEI for cross-border transactions (2021)", "N",
      "INR 50 crore = 500,000,000. 기존 요청서의 'INR 50,000,000' 표기는 오기로 판단(검토의견 참조)"),
-    ("IMP_SETTLE_MONTHS", "수입대금 결제기한(선적일 기준)", "6", "개월", "수입",
-     "RBI MD - Import of Goods and Services", "Y", "초과 시 Trade Credit/연장승인 대상"),
-    ("IMP_ADV_IMPORT_MONTHS", "선수금 송금 후 물품 수입기한(일반재)", "6", "개월", "수입", "RBI MD - Import", "Y", ""),
-    ("IMP_ADV_IMPORT_MONTHS_CAP", "선수금 송금 후 물품 수입기한(자본재)", "36", "개월", "수입", "RBI MD - Import", "Y", ""),
-    ("IMP_ADV_EVIDENCE_GRACE_DAYS", "수입증빙(BoE) 제출 유예기간(수입기한 경과 후)", "15", "일", "수입", "RBI MD - Import", "Y", ""),
-    ("IMP_ADV_BG_THRESHOLD_USD", "선수금 송금 시 BG/SBLC 징구 기준금액", "200000", "USD", "수입", "RBI MD - Import", "Y", "공기업/정부부처 예외 규정 확인"),
+    ("IMP_SETTLE_MONTHS", "수입대금 결제 모니터링 기준(계약기한 미기재 시)", "6", "개월", "수입",
+     "지점 정책 (2026 규정: 계약상 기한 + AD 연장, 고정기한 폐지)", "N", "규정 기한 아님. 초과 시 계약·무역신용 검토"),
+    ("IMP_ADV_IMPORT_MONTHS", "선수금 송금 후 물품 수입기한(일반재)", "6", "개월", "수입", "FEM EXIM Regs/Directions 2026", "Y", ""),
+    ("IMP_ADV_IMPORT_MONTHS_CAP", "선수금 송금 후 물품 수입기한(자본재)", "36", "개월", "수입", "FEM EXIM Regs/Directions 2026", "Y", ""),
+    ("IMP_ADV_EVIDENCE_GRACE_DAYS", "수입증빙(BoE) 제출 유예기간(수입기한 경과 후)", "15", "일", "수입", "FEM EXIM Regs/Directions 2026", "Y", ""),
+    ("IMP_ADV_BG_THRESHOLD_USD", "선수금 송금 시 BG/SBLC 징구 기준금액(지점 정책)", "200000", "USD", "수입", "지점 정책 (2026 Directions: 금액 기준 폐지, AD 진정성 평가)", "N", "규정 기준 아님 - 지점 SOP 값"),
     ("BOE_REG_LIMIT_DAYS", "송금일 대비 BoE 등록일 허용 범위(시스템 검증)", "180", "일", "수입",
      "노이다지점 요청(RT13: +181일 이상 오류)", "N", "은행 내부통제 기준"),
     ("INV_PROFORMA_VALID_DAYS", "Proforma Invoice 기본 유효기간(별도 유효일 미기재 시)", "180", "일", "수입", "은행 내부정책", "N", "인보이스상 유효일 입력 시 해당일 우선"),
     ("INV_COMMERCIAL_STALE_DAYS", "Commercial Invoice 발행 후 송금 경고 기간", "180", "일", "수입", "은행 내부정책(선적일+6개월 결제기한 연계)", "N", "초과 시 Warning + 결제기한 검증"),
     ("EXP_REALIZE_MONTHS", "수출대금 회수기한(수출일 기준)", "9", "개월", "수출",
-     "RBI MD - Export of Goods and Services", "Y", "2025.11 RBI 한시완화(15개월, 2026.3.31 이전 선적분) 적용여부 확인 → 선적일별 이력 파라미터로 관리"),
-    ("EXP_REALIZE_MONTHS_WH", "해외창고 수출 대금회수기한", "15", "개월", "수출", "RBI MD - Export", "Y", ""),
-    ("EXP_DOC_SUBMIT_DAYS", "수출서류 AD 제출기한(선적일 기준)", "21", "일", "수출", "RBI MD - Export", "N", ""),
-    ("EXP_ADV_SHIP_MONTHS", "수출선수금 수취 후 선적기한", "12", "개월", "수출", "RBI MD - Export", "Y", "2025.11 한시완화(3년) 적용여부 확인"),
-    ("EXP_WRITEOFF_SELF_PCT", "수출미회수 자체상각 한도(전년도 회수액 대비)", "5", "%", "수출", "RBI MD - Export", "Y", ""),
-    ("EXP_WRITEOFF_AD_PCT", "수출미회수 AD 승인 상각 한도", "10", "%", "수출", "RBI MD - Export", "Y", ""),
+     "FEM (Export and Import of Goods and Services) Regulations, 2026 (FEMA 23(R)/2026-RB) as amended by FEMA 23(R)/(1)/2026-RB", "Y", "2026.10.1~ 9개월(물품 선적일·서비스 인보이스일). 이력: 2025.11~ 15개월, 2026.6.5~ 9개월. 선적일 기준 유효값 적용"),
+    ("EXP_REALIZE_MONTHS_INR", "INR 인보이스·결제 수출 회수기한", "12", "개월", "수출", "FEMA 23(R)/(1)/2026-RB", "Y", ""),
+    ("EXP_DECL_CLOSE_INR", "수출자 신고로 종결 가능한 감액·미회수(건당)", "1000000", "INR", "수출", "FEM EXIM Directions 2026", "Y", "SB·인보이스당 ₹10 lakh 이하, EDPMS·IDPMS 종결"),
+    ("EXP_SVC_EDF_DAYS", "서비스 수출 EDF 제출기한", "30", "일(인보이스 월말 후)", "수출", "FEM EXIM Regs 2026", "Y", ""),
+    ("EXP_REALIZE_MONTHS_WH", "해외창고 수출 대금회수기한", "15", "개월", "수출", "FEM EXIM Regs/Directions 2026", "Y", ""),
+    ("EXP_DOC_SUBMIT_DAYS", "수출서류 AD 제출기한(선적일 기준)", "21", "일", "수출", "FEM EXIM Regs/Directions 2026", "N", ""),
+    ("EXP_ADV_SHIP_MONTHS", "수출선수금 수취 후 선적기한", "36", "개월", "수출", "FEMA 23(R)/(7)/2025-RB → FEM EXIM Regs 2026", "Y", "3년"),
+    ("EXP_WRITEOFF_POLICY", "수출미회수 감액·상각", "AD 이사회 정책", "-", "수출", "FEM EXIM Regs/Directions 2026", "Y", "% 상한 폐지 (구 5%/10% 삭제)"),
     ("FDI_ALLOT_DAYS", "FDI 수취 후 주식 배정기한", "60", "일", "FDI", "FEMA (Non-Debt Instruments) Rules 2019", "N", ""),
     ("FDI_REFUND_DAYS", "배정기한 경과 후 반환송금 기한", "15", "일", "FDI", "FEMA (NDI) Rules 2019", "N", "수취일+75일"),
     ("FDI_FCGPR_DAYS", "배정 후 FC-GPR 신고기한(FIRMS)", "30", "일", "FDI", "FEMA (Mode of Payment and Reporting of NDI) Regulations 2019", "N", ""),
     ("FDI_KYC_FOLLOWUP_DAYS", "FDI 송금인 KYC 독촉 시점", "3,7", "영업일", "FDI", "은행 내부정책", "N", "최초 MT199 후 D+3 재요청, D+7 책임자 보고"),
-    ("FDI_BENE_EDD_INR", "FDI 수취인 추가실사(EDD) 기준금액", "100000000", "INR", "FDI", "은행 내부정책 / RBI MD - KYC (위험기반)", "N", "INR 10 crore 이상 또는 고위험 → 피투자법인 EDD"),
+    ("FDI_BENE_EDD_INR", "FDI 수취인 추가실사(EDD) 기준금액", "100000000", "INR", "FDI", "지점 확정(2026-11) / RBI (Commercial Banks – KYC) Directions, 2025 (위험기반)", "N", "INR 10 crore 이상 또는 고위험 → 피투자법인 EDD (지점 확정값)"),
     ("FDI_HOLD_UNTIL_KYC", "KYC 확인 전 입금 보류", "N", "Y/N", "FDI", "은행 내부정책", "N", "N: 입금하되 FIRC·배정확인 차단 / Y: 미지급금(RT22) 보류. 고위험국은 Y 강제"),
     ("KYC_BO_THRESHOLD_PCT", "실소유자 확인 지분 기준", "10", "%", "KYC", "PML (Maintenance of Records) Rules", "Y", "법인 실소유자 판정"),
     ("FDI_FCTRS_DAYS", "FC-TRS 신고기한(대금 수취/지급일 기준)", "60", "일", "FDI", "FEMA (Mode of Payment and Reporting of NDI) Regulations 2019", "N", ""),
@@ -96,7 +98,8 @@ PARAMS = [
     ("IO_PREF_LOOKBACK_DAYS", "을B 우대 - 이력 조회기간", "365", "일", "본지점 을B", "본점-지점 자금약정", "N", "차입 시작일 기준 과거 1년 이내 시작 거래"),
     ("IO_PREF_DEAL_TYPES", "을B 우대 - 인정 조달 거래", "TD,CALL_MONEY,CALL_LOAN,TERM_MONEY,NOTICE", "-", "본지점 을B", "본점-지점 자금약정", "N", "정기예금·콜머니·콜론·기간물·통지예금"),
     ("IO_PREF_AMT_RULE", "을B 우대 - 금액 기준", "≥ 차입금액 (동일 통화)", "-", "본지점 을B", "본점-지점 자금약정", "N", "'동일 금액'을 이상으로 해석. 정확히 같은 금액만 인정하려면 변경"),
-    ("SWIFT_MX_CUTOVER", "CBPR+ MT/MX 공존 종료일", "2025-11-22", "일자", "SWIFT", "SWIFT ISO 20022 programme", "Y", "이후 결제·은행이체·입출금 통지는 MX 송신. 보고·Cat3·Cat7은 MT 유지(SWIFT 일정 확인)"),
+    ("SWIFT_MX_CUTOVER", "CBPR+ MT/MX 공존 종료일", "2025-11-22", "일자", "SWIFT", "SWIFT ISO 20022 programme", "N", "지점 확인(2026-11): MX 전환 완료. 결제·은행이체·입출금 통지·조사는 MX 송신"),
+    ("KYC_REQ_FORMAT", "FDI 송금인 KYC 요청 형식", "MX", "MX/MT", "FDI KYC", "SWIFT ISO 20022 (MX 전환 완료)", "N", "MX = camt.110 요청 / camt.111 응답(기본), MT = MT199 (상대은행 사정 시)"),
     ("OBLIG_ALERT_DAYS", "기한관리 사전알림 시점", "30,15,7,0", "일전", "공통", "은행 내부정책", "N", "D-30/D-15/D-7/D-day"),
 ]
 
@@ -1005,7 +1008,7 @@ table("TB_FX_SUSPENSE", "미지급금(타발 보류) 원장", "타발중계(RT22
       "비계좌 수취인·지시대기·KYC대기 타발을 Remittance Payable(미지급금) GL에 보류. 통화별 잔액 관리.", [
     ("SUSP_NO", "보류번호", "VARCHAR2(16)", "PK", "", ""),
     ("REMIT_REF_NO", "송금참조번호", "VARCHAR2(16)", "FK,NN", "", ""),
-    ("GL_CODE", "미지급금 계정", "VARCHAR2(8)", "NN", "통화별 Remittance Payable GL(신규 채번)", "GL"),
+    ("GL_CODE", "미지급금 계정", "VARCHAR2(8)", "NN", "21100000 미지급금(A/P) - 무역금융 A/P와 공용, TB_AP_ITEM(INW_RELAY) 동시 생성", "GL"),
     ("CCY", "통화", "VARCHAR2(3)", "NN", "외화 보류 또는 INR(환전 후 지급대기)", ""),
     ("PARK_AMT", "보류금액", "NUMBER(18,2)", "NN", "", ""),
     ("BALANCE_AMT", "잔액", "NUMBER(18,2)", "NN", "= PARK - Σ환전/지급/반환", ""),
@@ -1342,7 +1345,7 @@ table("TB_FX_ADVICE_ISSUE", "확인서·증명서 발급이력", "서식(DC01)",
 # 처리: ERR=차단, WARN=경고 후 진행(승인기록), ALERT=사후알림, AUTO=자동처리
 # ---------------------------------------------------------------------------
 RULES = [
-    ("R-CM-01", "공통", "전체", "고객 KYC 유효성", "CH11 KYC 만료/AML 고위험 고객은 승인단계 책임자 승인 필수", "ERR", "RBI MD - KYC 2016", "", "N"),
+    ("R-CM-01", "공통", "전체", "고객 KYC 유효성", "CH11 KYC 만료/AML 고위험 고객은 승인단계 책임자 승인 필수", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025", "", "N"),
     ("R-CM-02", "공통", "전체", "IEC/LEI 직접입력 금지", "IEC·LEI는 CH11 등록값만 조회표시, 송금시점 스냅샷 저장", "AUTO", "기존 요청(RT13)", "", "N"),
     ("R-CM-03", "공통", "RT11/RT13/RT21", "LEI 필수 판정", "고객유형≠IND/NRI 이고 INR_AMT ≥ LEI_THRESHOLD_INR → LEI 유효 필수(만료 시 ERR)", "ERR", "RBI LEI circular", "LEI_THRESHOLD_INR", "N"),
     ("R-CM-04", "공통", "RT11/RT13/RT21", "LEI 만료 경고", "기준 미만 + LEI 만료 → 'Warning: LEI No. Expired but Less than INR 50 Crore. Proceed Y/N?' Y 시 LEI_WARN_ACK_YN=Y", "WARN", "기존 요청(RT13)", "LEI_THRESHOLD_INR", "N"),
@@ -1372,9 +1375,9 @@ RULES = [
     ("R-IMP-02", "수입", "RT13", "인보이스 잔액", "배분액 ≤ Invoice BALANCE_AMT (통화 동일), 승인 시 CONSUMED 증가/취소 시 원복", "ERR", "기존 요청(분할송금 잔액관리)", "", "N"),
     ("R-IMP-03", "수입", "RT13", "Proforma 유효기간", "선수금 송금일 > INV_VALID_TO_DT 이면 ERR", "ERR", "내부정책", "INV_PROFORMA_VALID_DAYS", "N"),
     ("R-IMP-04", "수입", "RT13", "Commercial 인보이스 경과", "송금일 - INV_DT > INV_COMMERCIAL_STALE_DAYS → 경고", "WARN", "내부정책", "INV_COMMERCIAL_STALE_DAYS", "N"),
-    ("R-IMP-05", "수입", "RT13", "수입결제기한", "Product 02/03: 송금일 > 선적일 + IMP_SETTLE_MONTHS → 연장승인/Trade Credit 근거 입력 필수", "ERR", "MD Import", "IMP_SETTLE_MONTHS", "Y"),
-    ("R-IMP-06", "수입", "RT13", "선수금 BG", "Product 01 & USD 환산 > IMP_ADV_BG_THRESHOLD_USD & 비PSU → BG/SBLC 정보 필수", "ERR", "MD Import", "IMP_ADV_BG_THRESHOLD_USD", "Y"),
-    ("R-IMP-07", "수입", "RT13", "선수금 기한생성", "Product 01 승인 시 TB_TRD_ADV_IMP + OBLIGATION(IMP_ADV_EVID) 생성", "AUTO", "MD Import", "IMP_ADV_*", "Y"),
+    ("R-IMP-05", "수입", "RT13", "수입결제기한", "Product 02/03: 계약상 결제기한(미기재 시 선적일+6개월 모니터링) 초과 → AD 연장 사유 기록 또는 무역신용 판정. 2026 규정상 고정기한 없음", "WARN", "FEM EXIM Regs/Directions 2026", "IMP_SETTLE_MONTHS", "Y"),
+    ("R-IMP-06", "수입", "RT13", "선수금 BG", "Product 01: 주문 진정성·선수금 필요성 평가 기록 필수. 지점 정책 기준(USD 환산 > IMP_ADV_BG_THRESHOLD_USD, 비PSU) 초과 시 BG/SBLC 요구. 금·은 수입 선수금 금지", "ERR", "RBI Directions on Export and Import 2026 / 지점 SOP", "IMP_ADV_BG_THRESHOLD_USD", "Y"),
+    ("R-IMP-07", "수입", "RT13", "선수금 기한생성", "Product 01 승인 시 TB_TRD_ADV_IMP + OBLIGATION(IMP_ADV_EVID) 생성", "AUTO", "FEM EXIM 2026", "IMP_ADV_*", "Y"),
     ("R-IMP-08", "수입", "RT13", "BoE 등록일", "BoE REG_DT > 송금일 + BOE_REG_LIMIT_DAYS → 'Bill of Entry should have registered within 6 months after the remittance transfer'", "ERR", "기존 요청", "BOE_REG_LIMIT_DAYS", "N"),
     ("R-IMP-09", "수입", "RT13", "BoE 상품코드 상이", "BoE PRODUCT_CODE ≠ RT13 Product Type → 차단하지 않음(정보표시). 현행 rto1300 Line 992 오류 제거", "AUTO", "기존 요청(테스트 결과)", "", "N"),
     ("R-IMP-10", "수입", "RT13", "BoE 잔액", "BoE 맵핑 시 배분액 ≤ OUTSTANDING_AMT. 한 BoE 다건 송금 허용", "ERR", "기존 요청", "", "N"),
@@ -1388,32 +1391,32 @@ RULES = [
     ("R-INV-04", "수출입", "RT73", "위탁국 결정", "COUNTRY_CONSIGN 입력 시 보고용 Country = 위탁국, 미입력 시 원산지", "AUTO", "기존 요청(XP73)", "", "N"),
     ("R-INV-05", "수출입", "RT73", "BoE 자동복사", "Invoice 탭 입력값(포트/국가/금액/IGST)을 BoE 탭 기본값으로 복사", "AUTO", "기존 요청", "", "N"),
     ("R-EXP-01", "수출", "XP73", "Lodgement 항목", "LODGE_CAT별 필수항목 상이(1:Inward Remit 다건, 2A:Dispatch POD, 2B:Deal/환율, 3:FOB/Freight/Insurance)", "ERR", "기존 요청(Sheet7)", "", "N"),
-    ("R-EXP-02", "수출", "XP73", "서류제출 기한", "서류접수일 > LEO + 21일 → 지연사유 입력", "WARN", "MD Export", "EXP_DOC_SUBMIT_DAYS", "N"),
+    ("R-EXP-02", "수출", "XP73", "서류제출 기한", "서류접수일 > LEO + 21일 → 지연사유 입력", "WARN", "FEM EXIM 2026", "EXP_DOC_SUBMIT_DAYS", "N"),
     ("R-EXP-03", "수출", "RT21/RT25", "IRM 생성", "수출관련 Purpose(P01xx) 타발 입금 시 IRM 자동생성, 송금인·국가·IEC 필수", "AUTO", "EDPMS 지침", "", "N"),
     ("R-EXP-04", "수출", "RT25", "SB-IRM 맵핑", "맵핑액 ≤ SB 미회수액 & ≤ IRM 잔액, 통화 상이 시 크로스레이트 기록", "ERR", "EDPMS 지침", "", "N"),
-    ("R-EXP-05", "수출", "배치", "회수기한 산출", "REALIZE_DUE_DT = LEO_DT + (선적일에 유효한 EXP_REALIZE_MONTHS)", "AUTO", "MD Export", "EXP_REALIZE_MONTHS", "Y"),
-    ("R-EXP-06", "수출", "배치", "선수금 선적이행", "IRM ADV_YN=Y & 잔액>0 & 오늘 > SHIP_DUE_DT → OVERDUE, 반환송금/연장 처리 대상", "ALERT", "MD Export", "EXP_ADV_SHIP_MONTHS", "Y"),
+    ("R-EXP-05", "수출", "배치", "회수기한 산출", "REALIZE_DUE_DT = 선적(LEO)일 + 선적일에 유효한 EXP_REALIZE_MONTHS (2026.10.1~ 9개월, INR 인보이스·결제 12개월, 서비스는 인보이스일 기산)", "AUTO", "FEM EXIM Regs 2026 (FEMA 23(R)/(1)/2026-RB)", "EXP_REALIZE_MONTHS", "Y"),
+    ("R-EXP-06", "수출", "배치", "선수금 선적이행", "IRM ADV_YN=Y & 잔액>0 & 오늘 > SHIP_DUE_DT → OVERDUE, 반환송금/연장 처리 대상", "ALERT", "FEM EXIM 2026", "EXP_ADV_SHIP_MONTHS", "Y"),
     ("R-FDI-01", "FDI", "FD11", "KYC/인접국", "송금인 KYC 검증(R-KYC-01~08) 필수, 투자자 국가 또는 실소유자가 인접국이면 ROUTE=GOVT + 승인번호 필수", "ERR", "NDI Rules / Press Note 3(2020)", "", "N"),
-    ("R-KYC-01", "FDI KYC", "FD11", "기본 의무 = 송금인", "모든 FDI 유입은 비거주 투자자(송금인) KYC를 송금은행으로부터 확보·검증해야 함. 수취인(피투자법인)은 당행 고객 CDD로 갈음하고 기준 이상만 EDD", "ERR", "RBI MD - KYC 2016 / FEMA NDI 보고(FC-GPR 첨부)", "", "N"),
-    ("R-KYC-02", "FDI KYC", "FD11/SW11", "MT199 자동요청", "RT21→FD11 이관 시 KYC 미첨부(KYC_STS=NONE)면 송금은행(DbtrAgt, 없으면 송신은행) 앞 MT199 초안 자동 생성: :20: KYC+FDI Ref, :21: 상대 Ref, :79: UETR·금액·송금인·요청항목(35줄×50자)", "AUTO", "SWIFT MT199 / 업무요건", "", "N"),
+    ("R-KYC-01", "FDI KYC", "FD11", "기본 의무 = 송금인", "모든 FDI 유입은 비거주 투자자(송금인) KYC를 송금은행으로부터 확보·검증해야 함. 수취인(피투자법인)은 당행 고객 CDD로 갈음하고 기준 이상만 EDD", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025 / FEMA NDI 보고(FC-GPR 첨부)", "", "N"),
+    ("R-KYC-02", "FDI KYC", "FD11/SW11", "KYC 자동요청", "RT21→FD11 이관 시 KYC 미첨부(KYC_STS=NONE)면 송금은행(DbtrAgt, 없으면 송신은행) 앞 요청 초안 자동 생성. 기본 camt.110(원거래 UETR·금액·송금인 참조, 요청항목 서술), KYC_REQ_FORMAT=MT면 MT199(:20: KYC+FDI Ref, :21: 상대 Ref, :79: 35줄×50자)", "AUTO", "SWIFT ISO 20022 / 업무요건", "KYC_REQ_FORMAT", "N"),
     ("R-KYC-03", "FDI KYC", "FD11", "독촉", "응답 없으면 D+3 영업일 재요청 MT199(FOLLOWUP), D+7 책임자 보고·MN01 경보", "ALERT", "내부정책", "FDI_KYC_FOLLOWUP_DAYS", "N"),
-    ("R-KYC-04", "FDI KYC", "SW11", "응답 매칭", "수신 MT199의 :21:이 요청 :20:과 일치하면 FD11 자동 연결(RECEIVED). 서면 보고서는 TB_FX_DOC(KYC) 등록", "AUTO", "업무요건", "", "N"),
-    ("R-KYC-05", "FDI KYC", "FD11", "검증 항목", "KYC 명칭·주소 = 전문 송금인 일치, 설립국·등록번호, 거래개시일, 실소유자(지분 10% 이상)·국적, 자금원천, PEP, 제재 스크리닝 CLEAR. 누락 시 INCOMPLETE → 보완 MT199", "ERR", "PML Rules / RBI MD - KYC", "KYC_BO_THRESHOLD_PCT", "Y"),
+    ("R-KYC-04", "FDI KYC", "SW11", "응답 매칭", "camt.111의 원요청 ID(또는 MT199 :21:)가 요청 참조와 일치하면 FD11 자동 연결(RECEIVED). 서면 보고서는 TB_FX_DOC(KYC) 등록", "AUTO", "업무요건", "", "N"),
+    ("R-KYC-05", "FDI KYC", "FD11", "검증 항목", "KYC 명칭·주소 = 전문 송금인 일치, 설립국·등록번호, 거래개시일, 실소유자(지분 10% 이상)·국적, 자금원천, PEP, 제재 스크리닝 CLEAR. 누락 시 INCOMPLETE → 보완 MT199", "ERR", "PML Rules / RBI (Commercial Banks – KYC) Directions, 2025", "KYC_BO_THRESHOLD_PCT", "Y"),
     ("R-KYC-06", "FDI KYC", "FD11/DC01", "검증 전 차단", "VERIFIED 전에는 FIRC(FM-FDI-01) 발급·배정 확인·FC-GPR 지원 불가. FDI_HOLD_UNTIL_KYC=Y 또는 고위험국이면 입금 대신 미지급금 보류", "ERR", "NDI Rules / 내부정책", "FDI_HOLD_UNTIL_KYC", "N"),
-    ("R-KYC-07", "FDI KYC", "FD11", "수취인 EDD", "INR ≥ FDI_BENE_EDD_INR 또는 고위험(인접국 BO·PEP·고위험국)이면 피투자법인 실소유자·투자자금 용도·사업 실체 추가 확인", "ERR", "RBI MD - KYC (위험기반)", "FDI_BENE_EDD_INR", "N"),
+    ("R-KYC-07", "FDI KYC", "FD11", "수취인 EDD", "INR ≥ FDI_BENE_EDD_INR 또는 고위험(인접국 BO·PEP·고위험국)이면 피투자법인 실소유자·투자자금 용도·사업 실체 추가 확인", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025 (위험기반)", "FDI_BENE_EDD_INR", "N"),
     ("R-KYC-08", "FDI KYC", "FD11/FD12", "실패·미수령", "제재 HIT·정보 불일치는 FAILED → 반환(FD12 REJECT) 및 STR 검토. 반환기한(+75일)까지 미검증이면 반환 대상", "ERR", "PMLA / NDI Rules", "", "N"),
     ("R-FDI-02", "FDI", "FD11", "기한생성", "수취 등록 시 ALLOT(+60), REFUND(+75) 기한 생성, 배정 등록 시 FCGPR(+30)", "AUTO", "NDI Rules", "FDI_*", "N"),
     ("R-FDI-03", "FDI", "FD12", "반환 한도", "REFUND_INR_AMT ≤ UNALLOC_INR_AMT, 반환통화=원통화 원칙", "ERR", "NDI Rules", "", "N"),
     ("R-FDI-04", "FDI", "FD12", "기한경과 반환", "반환일 > REFUND_DUE_DT → LATE_YN=Y, RBI 승인번호 입력 전 승인 불가", "ERR", "NDI Rules", "", "Y"),
     ("R-FDI-05", "FDI", "FD11/FD12", "INR 확정 환산", "INR_FIXED_YN=Y: FCY = ROUNDUP(TARGET_INR / RATE, 2), 실제 입금 INR ≥ TARGET_INR 검증, 끝전은 고객계좌/환차 처리", "AUTO", "업무요건", "", "N"),
     ("R-VS-01", "Vostro", "VS21", "잔액부족", "OD_ALLOWED_YN=N & 출금 후 잔액 < 0 → 차단", "ERR", "내부정책", "", "N"),
-    ("R-VS-02", "Vostro", "VS21", "계좌상태", "ACCT_STS≠A 또는 KYC 재심사 경과 시 거래 차단(입금은 Hold)", "ERR", "KYC MD", "", "N"),
+    ("R-VS-02", "Vostro", "VS21", "계좌상태", "ACCT_STS≠A 또는 KYC 재심사 경과 시 거래 차단(입금은 Hold)", "ERR", "KYC Directions 2025", "", "N"),
     ("R-VS-03", "Vostro", "VS31", "MT950 정합성", "OPEN_BAL ± Σ:61: = CLOSE_BAL, 첫 페이지 60F/마지막 62F, 중간 60M/62M, :28C: 연속", "ERR", "SWIFT MT950 Standard", "MT950_MAX_LINES", "N"),
     ("R-VS-04", "Vostro", "VS31", "자동발송", "EOD 마감 후 STMT_FREQ 대상 계좌 자동생성·발송, NAK 시 재발송 큐", "AUTO", "코레스 약정", "MT950_CUTOFF", "N"),
     ("R-SUS-01", "타발중계", "RT21", "미지급금 보류", "수취인 당행 계좌 없음·지시대기·KYC대기 → SETTLE_MODE=SUSP, Remittance Payable GL 입금, TB_FX_SUSPENSE 생성", "AUTO", "업무요건", "", "N"),
     ("R-SUS-02", "타발중계", "RT22", "부분환전", "Σ레그 FCY ≤ 보류 FCY 잔액. 레그별 환율·딜 Ref 필수. 잔여 외화는 계속 보류 또는 외화이체", "ERR", "업무요건", "", "N"),
     ("R-SUS-03", "타발중계", "RT22", "보관기한", "DUE_DT 경과 시 OVERDUE 알림, 책임자 연장 또는 송금인 반환(RT41). 장기 보류는 AML 검토", "ALERT", "내부정책", "SUSP_MAX_DAYS", "N"),
-    ("R-SUS-04", "타발중계", "RT22", "비계좌 KYC", "비계좌 수취인 지급 전 수취인 식별(PAN/CIN)·이름 일치 확인, 수출·FDI 목적이면 IEC/CIN 필수", "ERR", "RBI MD - KYC", "", "N"),
+    ("R-SUS-04", "타발중계", "RT22", "비계좌 KYC", "비계좌 수취인 지급 전 수취인 식별(PAN/CIN)·이름 일치 확인, 수출·FDI 목적이면 IEC/CIN 필수", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025", "", "N"),
     ("R-DOM-01", "국내이체", "RT22", "이체망 선택", "INR < RTGS_MIN_INR → NEFT만 가능. 이상은 RTGS 기본", "ERR", "RBI RTGS/NEFT", "RTGS_MIN_INR", "N"),
     ("R-DOM-02", "국내이체", "RT22", "IFSC·계좌", "IFSC 형식(^[A-Z]{4}0[A-Z0-9]{6}$)·은행지점 마스터 존재, 계좌번호 필수", "ERR", "NPCI/RBI", "", "N"),
     ("R-DOM-03", "국내이체", "RT22", "반송 처리", "NEFT/RTGS 반송 시 금액을 미지급금(RTN)으로 재보류, 원 확인서 정정(AMD)", "AUTO", "업무요건", "", "N"),
@@ -1437,7 +1440,7 @@ RULES = [
     ("R-FX-07", "환전", "FX11", "GST - 외화간", "INR 미개입 환전의 과세표준: 두 통화를 RBI 기준율로 INR 환산한 금액 중 작은 금액의 1% (방식 A) / 방식 B는 INR 환산액에 slab 적용", "AUTO", "CGST Rules 32(2)(a) 단서", "GST_FX_METHOD", "Y"),
     ("R-FX-08", "환전", "FX11", "지점 자기계정", "BRANCH 유형은 자금팀 딜·내부 GL(포지션) 지정·이중승인, 고객 확인서 미발급", "ERR", "내부통제", "", "N"),
     ("R-FX-09", "환전", "FX21", "현찰 시재", "판매 시 권종 재고 부족이면 차단, 일마감 CLOSE_QTY = 실사 수량 확인 후 마감", "ERR", "내부통제", "", "N"),
-    ("R-SW-01", "SWIFT", "SW12", "송신 형식", "CBPR+ 대상(MT103/200/202/202COV/210/900/910 대응)은 MX로 송신(pacs.008/009, camt.057/054). 보고(MT940/950)·Cat3(MT300/320)·Cat7(MT740/742/747/756)은 MT", "AUTO", "SWIFT ISO 20022", "SWIFT_MX_CUTOVER", "Y"),
+    ("R-SW-01", "SWIFT", "SW12", "송신 형식", "CBPR+ 대상(MT103/200/202/202COV/210/900/910 대응)은 MX로 송신(pacs.008/009, camt.057/054). 보고(MT940/950)·Cat3(MT300/320)·Cat7(MT740/742/747/756)은 MT", "AUTO", "SWIFT ISO 20022", "SWIFT_MX_CUTOVER", "N"),
     ("R-SW-02", "SWIFT", "SW12", "필드 검증", "MT: 태그 필수/형식(:20: 16x, :32A: YYMMDD+CCY+금액(쉼표)), 문자셋 X / MX: XSD·CBPR+ usage guideline", "ERR", "SWIFT Standards", "", "N"),
     ("R-SW-03", "SWIFT", "SW11", "Maker-Checker", "자동·수기 모두 작성자≠승인자, 수기 작성 MT950·MT n99는 책임자 2인 승인", "ERR", "내부통제", "", "N"),
     ("R-SW-04", "SWIFT", "SW11", "RMA·제재", "수신 BIC RMA 미보유 시 송신 불가, 당사자·BIC 제재 필터링 hit 시 Hold", "ERR", "SWIFT RMA / PMLA", "", "N"),
@@ -1488,11 +1491,11 @@ DEADLINES = [
     ("INV_VALID", "수입", "Proforma INV_DT", "INV_VALID_TO_DT (미입력 시 INV_DT+180일)", "D-15", "Balance=0 또는 상태 완결", "선수금 송금 차단", "-", "INV_PROFORMA_VALID_DAYS", "N"),
     ("IMP_ADV_EVID", "수입", "선수금 송금일", "송금일 + 6개월(자본재 36개월) + 15일", "D-30/15/7/0", "BoE 맵핑 증빙액 ≥ 송금액", "OVERDUE → 독촉, IDPMS 미결 ORM 보고, 신규 선수금 송금 경고", "IDPMS", "IMP_ADV_*", "Y"),
     ("IMP_BG_EXP", "수입", "BG 발행일", "BG_EXPIRY_DT", "D-30", "증빙완료 또는 BG 연장", "BG 청구 검토", "-", "", "N"),
-    ("IMP_SETTLE", "수입", "선적일(B/L/AWB)", "선적일 + 6개월", "D-30/15", "BoE OUTSTANDING=0", "Trade Credit/연장승인 필요, IDPMS 미결 BoE", "IDPMS", "IMP_SETTLE_MONTHS", "Y"),
+    ("IMP_SETTLE", "수입", "선적일 / 계약 결제기한", "계약상 결제기한 (미기재 시 선적 + 6개월 모니터링)", "D-30/15", "BoE OUTSTANDING=0", "AD 연장 사유 기록 또는 무역신용, IDPMS 미결 BoE", "IDPMS", "IMP_SETTLE_MONTHS", "Y"),
     ("BOE_REG", "수입", "송금일", "송금일 + 180일 내 BoE 등록", "-", "BoE 맵핑", "RT13 등록 오류(R-IMP-08)", "-", "BOE_REG_LIMIT_DAYS", "N"),
     ("EXP_DOC_SUB", "수출", "LEO(수출일)", "LEO + 21일", "D-7", "XP73 Lodgement 등록", "지연사유 입력", "EDPMS", "EXP_DOC_SUBMIT_DAYS", "N"),
-    ("EXP_REALIZE", "수출", "LEO(수출일)", "LEO + 9개월(해외창고 15개월, 한시완화 이력 반영)", "D-30/15/7/0", "SB OUTSTANDING=0 (회수/상각/상계)", "연장승인 또는 RBI 보고, Caution list 검토", "EDPMS", "EXP_REALIZE_MONTHS", "Y"),
-    ("EXP_ADV_SHIP", "수출", "선수금 수취일", "수취일 + 12개월(한시완화 이력 반영)", "D-30", "IRM 잔액=0 (SB 맵핑)", "반환송금 또는 연장", "EDPMS", "EXP_ADV_SHIP_MONTHS", "Y"),
+    ("EXP_REALIZE", "수출", "LEO(수출일)", "선적(LEO) + 9개월 (INR 인보이스·결제 12개월, 서비스 인보이스일 기산, 해외창고 별도 확인)", "D-30/15/7/0", "SB OUTSTANDING=0 (회수/상각/상계)", "AD 정책에 따른 연장·감액·상계(₹10 lakh 이하 신고 종결), Caution list 검토", "EDPMS", "EXP_REALIZE_MONTHS", "Y"),
+    ("EXP_ADV_SHIP", "수출", "선수금 수취일", "수취일 + 3년", "D-30", "IRM 잔액=0 (SB 맵핑)", "반환송금 또는 연장", "EDPMS", "EXP_ADV_SHIP_MONTHS", "Y"),
     ("FDI_KYC", "FDI", "FDI 수취일(KYC 요청일)", "요청 D+3 재요청, D+7 보고, 반환기한(+75일) 내 검증", "D+3/D+7", "KYC_STS=VERIFIED", "재요청·책임자 보고 → 미검증 시 반환", "FIRMS", "FDI_KYC_FOLLOWUP_DAYS", "N"),
     ("FDI_ALLOT", "FDI", "FDI 수취일", "수취일 + 60일", "D-15/7/0", "UNALLOC_INR_AMT=0", "반환송금 의무 발생", "FIRMS", "FDI_ALLOT_DAYS", "N"),
     ("FDI_REFUND", "FDI", "FDI 수취일", "수취일 + 75일", "D-7/0", "미배정분 반환완료", "RBI 승인/LSF, 컴플라이언스 보고", "FIRMS", "FDI_REFUND_DAYS", "N"),
@@ -1528,7 +1531,7 @@ INTERFACES = [
     ("IF-SWF-02", "SWIFT", "IN", "SWIFT Alliance (MX/MT)", "실시간", "타발송금 수신 → RT21 자동등록", "TB_FX_REMIT_MST", "N"),
     ("IF-SWF-03", "SWIFT", "OUT", "SWIFT FIN MT950 (향후 camt.053)", "EOD", "Vostro 명세서", "TB_VOSTRO_STMT", "N"),
     ("IF-SWF-04", "SWIFT", "IN", "SWIFT ACK/NAK", "실시간", "전문 송신결과", "TB_VOSTRO_STMT.SEND_STS", "N"),
-    ("IF-DOM-01", "NEFT / RTGS (SFMS)", "OUT", "은행 결제게이트웨이 (ISO 20022 pacs.008 국내)", "실시간", "타행 INR 지급", "TB_DOM_PAYOUT", "N"),
+    ("IF-DOM-01", "NEFT / RTGS (SFMS)", "OUT", "Velocis 미들웨어 경유 (IF-SFMS-01과 동일 경로)", "실시간", "타행 INR 지급 (타발 중계·에스크로·FDI)", "TB_DOM_PAYOUT → TB_SFMS_MSG", "N"),
     ("IF-DOM-02", "NEFT / RTGS (SFMS)", "IN", "결제게이트웨이", "실시간", "UTR·입금확인·반송", "TB_DOM_PAYOUT.PAYOUT_STS", "N"),
     ("IF-DOM-03", "IFSC 마스터", "IN", "RBI IFSC 파일", "주 1회", "은행·지점 IFSC 검증", "코드 마스터", "N"),
     ("IF-SWF-05", "SWIFT", "IN", "Alliance → 메시지 라우터", "실시간", "MT/MX 파싱 후 업무화면 연결(R-SW-05)", "TB_SWIFT_MSG", "N"),
@@ -1593,10 +1596,10 @@ GL = [
     ("타발 입금", "Nostro(FCY)", "고객 계좌(INR/EEFC)", "IRM 생성"),
     ("FDI 수취", "Nostro(FCY)", "피투자법인 Share Application Money 계좌", "배정 전 별도 관리"),
     ("FDI 반환", "피투자법인 계좌(INR)", "Nostro(FCY)", "환차손익 별도"),
-    ("타발 보류(비계좌)", "Nostro(FCY)", "Remittance Payable 미지급금(FCY, 신규 GL)", "RT21 SETTLE_MODE=SUSP"),
-    ("부분환전(레그)", "Remittance Payable(FCY)", "Remittance Payable(INR) 또는 지급계정", "레그별 환율·딜"),
-    ("NEFT/RTGS 지급", "Remittance Payable(INR)", "RBI 결제계정(RTGS Settlement)", "UTR"),
-    ("NEFT/RTGS 반송", "RBI 결제계정", "Remittance Payable(INR, RTN)", "재보류"),
+    ("타발 보류(비계좌)", "Nostro(FCY)", "21100000 미지급금(A/P, FCY 하위원장)", "RT21 SETTLE_MODE=SUSP"),
+    ("부분환전(레그)", "21100000 미지급금(FCY)", "21100000 미지급금(INR) 또는 지급계정", "레그별 환율·딜"),
+    ("NEFT/RTGS 지급", "21100000 미지급금(INR)", "10211000 RBI 당좌예금 (RTGS Settlement)", "SFMS UTR"),
+    ("NEFT/RTGS 반송", "10211000 RBI 당좌예금", "21100000 미지급금(INR, RTN)", "pacs.004 → A/P 복원"),
     ("환전 GST", "고객 계좌(별도징수)", "20990017/18 또는 20990016", "32(2)(b) 과세표준×18%"),
     ("FDI 에스크로 예치/지급", "Nostro 또는 Escrow(부채)", "Escrow(부채) 또는 수취인 계좌/RTGS", "무이자"),
     ("환전(계좌 EEFC→INR)", "EEFC 계좌(FCY)", "고객 INR 계좌 + 환전이익(포지션)", "Rate Card/딜"),
@@ -1670,7 +1673,7 @@ TRACE = [
     ("2026.10 추가요청", "RA 대지급 후 본점 정산, 기준환율·스프레드 금리 관리, 자동정산·정산주기", "RA11, IO11, IO21, TB_IO_*, R-RA-*, R-IO-*", "건수·금액·주기 트리거, CUTOFF 기준 정산범위"),
     ("2026.10 추가요청", "인도·미국·한국 휴일 차이 처리", "CM21, TB_HOLIDAY, TB_IO_FLOAT_ADJ, R-HOL-*, R-IO-07/08", "제안대로 고객 개별청구 없이 소액 자체흡수 / 초과분 본지점 이자정산"),
     ("2026.10 추가요청", "본지점 금리 목적별 구분 (갑기금 무이자 / 을A 거래성 / 을B 여신성)", "IO_FUND 코드, TB_IO_RATE(기금·기간구간·우대 스프레드), TB_IO_FUNDING, IO31, R-IO-10~16", "을B 우대: 과거 1년 내 동일통화·금액 이상·30일 이상 조달이력(정기예금·콜머니·콜론 등)"),
-    ("2026.10 추가요청", "FDI KYC 의무 = 송금인, MT199 KYC 요청", "TB_FDI_KYC, R-KYC-01~08, FD11 Remitter KYC, MT199 자동요청·독촉·응답매칭", "수취인은 금액 기준(INR 10 crore, 내부 가정)·고위험 시 EDD"),
+    ("2026.10 추가요청", "FDI KYC 의무 = 송금인, MT199 KYC 요청", "TB_FDI_KYC, R-KYC-01~08, FD11 Remitter KYC, MT199 자동요청·독촉·응답매칭", "수취인은 INR 10 crore(지점 확정) 이상·고위험 시 EDD. MX 전환 완료로 기본 camt.110/111, MT199 병행"),
     ("2026.10 추가요청", "FDI 송금 시 사용 화면", "FDI_FLOW 가이드 (RT21→FD11→FD12, ODI는 RT13-05)", "기존 설계의 'FD13' 표기 오류 정정 → FD11/FD12"),
 ]
 
@@ -1708,8 +1711,9 @@ FDI_FLOW = [
 # ---------------------------------------------------------------------------
 SWIFT_TYPES = [
     ("MT103", "MT", "1", "Single Customer Credit Transfer", "pacs.008", "MX", "BOTH", "RT11/12/13/14, FD12", "RT21", "N"),
-    ("MT199", "MT", "1", "Free Format (customer payments)", "camt.110/111 (조사, 일부)", "MT", "BOTH", "FD11 FDI 송금인 KYC 요청·재요청 자동, SW12 수기", "FD11 KYC 응답 매칭(:21:)", "Y"),
-    ("camt.110", "MX", "camt", "Investigation Request", "MT n95/n99 (조사)", "MX", "BOTH", "조사·정보요청 (MT199 대체 검토)", "SW11", "Y"),
+    ("MT199", "MT", "1", "Free Format (customer payments)", "camt.110/111", "MT", "BOTH", "KYC_REQ_FORMAT=MT일 때 FD11 KYC 요청, SW12 수기", "FD11 KYC 응답 매칭(:21:)", "N"),
+    ("camt.110", "MX", "camt", "Investigation Request", "MT n95/n99", "MX", "OUT", "FD11 FDI 송금인 KYC 요청·재요청 (기본)", "-", "N"),
+    ("camt.111", "MX", "camt", "Investigation Response", "MT n96/n99", "MX", "IN", "-", "FD11 KYC 응답 매칭(원요청 ID)", "N"),
     ("MT200", "MT", "2", "FI Transfer for its Own Account", "pacs.009", "MX", "BOTH", "본지점 자금이동, Nostro 간 이체", "Nostro 대사", "N"),
     ("MT202", "MT", "2", "General FI Transfer", "pacs.009", "MX", "BOTH", "RA 대지급, 정산배치, Vostro", "VS21 / IO21", "N"),
     ("MT202COV", "MT", "2", "General FI Transfer - Cover", "pacs.009COV", "MX", "BOTH", "커버 송금", "Nostro 대사", "N"),
@@ -1736,6 +1740,19 @@ SWIFT_TYPES = [
 ]
 
 from forms_model import FORMS, SAMPLES, BRANCH  # noqa: E402  고객 서식 정의
+import tf_model as TF  # noqa: E402  무역금융(여신) 모듈
+
+T.extend(TF.TABLES)
+CODES += TF.CODES
+PARAMS += TF.PARAMS
+RULES += TF.RULES
+DEADLINES += TF.DEADLINES
+SCREENS += TF.SCREENS
+INTERFACES += TF.INTERFACES
+GL += TF.GL
+TRACE += TF.TRACE
+RBI_REVIEW = TF.RBI_REVIEW
+TF_FLOW = TF.FLOW
 
 
 def fy_of(d):
@@ -1748,7 +1765,8 @@ def as_dict():
     return {"META": META, "PARAMS": PARAMS, "CODES": CODES, "PURPOSE_CODES": PURPOSE_CODES,
             "TABLES": T, "RULES": RULES, "DEADLINES": DEADLINES, "INTERFACES": INTERFACES,
             "SCREENS": SCREENS, "GL": GL, "TRACE": TRACE, "FDI_FLOW": FDI_FLOW,
-            "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES}
+            "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES,
+            "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW}
 
 
 if __name__ == "__main__":
