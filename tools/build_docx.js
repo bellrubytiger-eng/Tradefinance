@@ -278,6 +278,35 @@ flow("3.15 송금·환전 전 환율 시뮬레이션 (SM11)", [
   ["견적 저장(15분 또는 고시 회차 변경 시 만료) → 실거래 전환 시 금액·통화 동일 검증, 원거래에 견적번호 기록", "R-SIM-02/03"],
 ]);
 
+flow("3.16 당발송금 결제경로·전문 결정 (RT11~14 · FD12 ④단계)", [
+  ["③ 수취은행 BIC 입력(또는 BIC 없으면 청산코드) → 디렉터리 조회: 은행명·국가와 당행 관계 배지(Nostro·본점·RMA·SSI·Vostro·고위험) 표시", "TB_BIC_DIR, TB_BANK_SSI, TB_SWIFT_RMA"],
+  ["판정 Q1: INR이면 수취은행의 당행 Vostro(SRVA 등) 입금(INGA). Vostro가 없으면 해외 SWIFT 불가(국내 INR은 SF11)", "R-RTG-01"],
+  ["Q2·Q3: 수취은행 = 통화별 Nostro → DIRECT, 본점·당행 점포 → DIRECT 본지점(을A 결제)", "R-RTG-01, R-RTG-07"],
+  ["Q4~Q6: RMA(지급전문) 있음 + 통화별 SSI 있음 + SSI 코레스 ≠ 당행 Nostro + 고위험국 아님 → Cover 가능. 하나라도 아니면 Serial", "R-RTG-02/03"],
+  ["Q7: Cover 가능하고 USD 환산 ≥ 100,000(ROUTE_COVER_MIN_USD) 또는 긴급 → Cover 권장, 아니면 Serial 권장(비용)", "ROUTE_COVER_MIN_USD"],
+  ["조작자는 경로 카드에서 권장안을 확인. 불가 경로는 비활성(사유 표시), 권장과 다른 경로는 사유코드 + Checker 승인", "R-RTG-05, TB_REMIT_ROUTE"],
+  ["결제일: Nostro 마감(IST) 경과 또는 IN·통화국 휴일이면 양쪽 영업일로 이동", "R-RTG-06, CM21"],
+  ["전문 생성: Direct·Serial·Vostro는 pacs.008 1건, Cover는 pacs.009 COV(먼저) + pacs.008, 같은 UETR. SW11 큐 등록", "R-RTG-04, TB_SWIFT_MSG"],
+  ["회계: 경로에 따라 결제(대변) 계정만 다름 - Nostro 10105020000 / 을A 21010000000 / Vostro 20150200100·200", "R-RTG-07, 18.업무별분개 OUT-04/05"],
+]);
+C.push(H3("경로별 전문과 주요 요소 (MX ↔ MT)"));
+C.push(TBL(["경로", "보내는 전문 (수신은행)", "SttlmMtd", "주요 요소 (MT 태그)", "언제"], [
+  ["Direct", "pacs.008 → 수취은행(=Nostro)", "INDA", "InstdAgt=CdtrAgt (57a 생략)", "수취인 계좌가 당행 Nostro 은행에 있음"],
+  ["Direct 본지점", "pacs.008 → 본점", "INDA", "결제는 을A 본지점 계정", "수취인 계좌가 본점(또는 KRW: 본점이 Nostro)"],
+  ["Vostro (INR)", "pacs.008 → 수취은행", "INGA", "SttlmAcct = 수취은행 Vostro (53B)", "INR 무역결제(SRVA)"],
+  ["Serial", "pacs.008 → Nostro → (중계) → 수취은행", "INDA", "IntrmyAgt1 (56A) = 수취은행 코레스, CdtrAgt (57A)", "RMA 없음, 소액, 고위험국, 코레스 = 당행 Nostro"],
+  ["Cover", "① pacs.009 COV → Nostro, ② pacs.008 → 수취은행", "COVE", "InstgRmbrsmntAgt (53A) = 당행 Nostro, InstdRmbrsmntAgt (54A) = 수취은행 코레스 / COV: CdtrAgt (57A) 코레스, Cdtr (58A) 수취은행, UndrlygCstmrCdtTrf (Seq B)", "RMA·SSI 있음, 고액·긴급"],
+], [0.9, 1.6, 0.6, 2.6, 1.3], { size: 14 }));
+C.push(H3("조작자 화면 구성 (④ Payment Route & SWIFT Messages)"));
+[
+  "상단 단계 표시줄: ① 고객·계좌 ② 금액·목적 ③ 수취인·수취은행 ④ 결제경로·전문 ⑤ 수수료/딜. 단계별 상태(정상·경고·오류) 색으로 표시, 클릭 시 이동",
+  "권장 배너: '시스템 권장: Cover · pacs.009 COV → Nostro + pacs.008 → 수취은행 · 결제일' 한 줄 요약",
+  "경로 카드 4개(Direct·Direct 본지점·Cover·Serial, INR이면 Vostro): 가능/불가와 그 이유를 카드 안에 표시",
+  "탭: 흐름도(전문 흐름과 자금 흐름을 두 줄로 그림) / 판정 근거(Q1~Q7 표) / 전문 미리보기(MX 주요 요소 + MT 대응문) / 회계·수수료 / 방식 안내",
+  "수취은행 예시 목록으로 경로별 결과를 바로 확인할 수 있음(교육·테스트용)",
+].forEach((t) => C.push(B(t)));
+C.push(NOTE("Cover 기준금액(USD 100,000)과 고위험국 Cover 금지는 은행 정책 파라미터입니다. 운영 Nostro·SSI·RMA는 SWIFTRef와 SWIFT RMA 데이터로 매일 갱신해야 합니다(VERIFY)."));
+
 // ---------------- 4. 화면 ----------------
 C.push(H1("4. 화면 설계"));
 C.push(P("화면 시안은 screens/index.html 에서 확인할 수 있으며(현행 GBS 레이아웃 유지), 주요 검증 로직(LRS 한도·TCS, LEI 판정, Invoice 잔액, BoE 등록일, FDI 기한, MT950 생성)이 동작하도록 구현되어 있다."));
@@ -292,8 +321,8 @@ C.push(H2("4.1 공통 컴포넌트"));
 ].forEach((t) => C.push(B(t)));
 C.push(H2("4.2 화면별 핵심 변경"));
 C.push(H3("RT13 Remittance (Trade Finance)"));
-["탭 구성: Default / Product Type / Amount Limit / Dealing Information", "Amount Limit: Total Remittance(Fiscal Year) + Invoice별 Total/Consumed/Balance + Bill of Entry(Ref No, Registration Date, Value)",
-  "BoE Product Code ≠ Product Type 오류(현행 rto1300 Line 992) 제거, 정보표시로 변경", "수수료 그리드: Commission(현행 42020601 → 통합 CoA 40570010000) + GST, TCS Y/N, Commission 수기입력(CCY/Amount) 허용", "Reim Bank(Nostro) 통화별 자동세팅, 명칭 'Receiver's Correspondent' / 'Reimbursement Bank(Nostro)'"].forEach((t) => C.push(B(t)));
+["탭 구성: Product Type / Amount Limit / Dealing Information (수취인은 ③ 섹션)", "Amount Limit: Total Remittance(Fiscal Year) + Invoice별 Total/Consumed/Balance + Bill of Entry(Ref No, Registration Date, Value)",
+  "BoE Product Code ≠ Product Type 오류(현행 rto1300 Line 992) 제거, 정보표시로 변경", "수수료 그리드: Commission(현행 42020601 → 통합 CoA 40570010000) + GST, TCS Y/N, Commission 수기입력(CCY/Amount) 허용", "Reim Bank(Nostro) 통화별 자동세팅 → 결제경로 판정(3.16)으로 통합: 'Receiver's Correspondent'·'Reimbursement Bank' 수기 필드 대신 ④단계에서 Serial 수신은행·Cover 상환은행을 자동 결정", "Default 탭의 수취인 항목은 ③ Beneficiary & Beneficiary Bank 섹션으로 이동"].forEach((t) => C.push(B(t)));
 C.push(H3("RT73 Invoice / Bill of Entry Mgmt"));
 ["Invoice Category, Amount/IGST Rate/IGST Amount/Total Amount, Total/Consumed/Balance", "Shipping Date 미래일자 → Packing List 생략 허용(현행 rto7300 Line 989 오류 원인 해소)", "Vessel Name(Flight No)/Voyage No 20자, Port of Shipment/Country of Origin/Consignment/Port of Discharge/Port Code/Place of Destination", "BoE 탭: Home Consumption/Warehousing/Ex-bond, Invoice 값 자동복사, IDPMS 수신 BoE 조회·매칭"].forEach((t) => C.push(B(t)));
 C.push(H3("XP73 Doc of Export Management"));

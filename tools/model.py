@@ -105,12 +105,30 @@ PARAMS = [
     ("SWIFT_MX_CUTOVER", "CBPR+ MT/MX 공존 종료일", "2025-11-22", "일자", "SWIFT", "SWIFT ISO 20022 programme", "N", "지점 확인(2026-11): MX 전환 완료. 결제·은행이체·입출금 통지·조사는 MX 송신"),
     ("KYC_REQ_FORMAT", "FDI 송금인 KYC 요청 형식", "MX", "MX/MT", "FDI KYC", "SWIFT ISO 20022 (MX 전환 완료)", "N", "MX = camt.110 요청 / camt.111 응답(기본), MT = MT199 (상대은행 사정 시)"),
     ("OBLIG_ALERT_DAYS", "기한관리 사전알림 시점", "30,15,7,0", "일전", "공통", "은행 내부정책", "N", "D-30/D-15/D-7/D-day"),
+    ("ROUTE_COVER_ENABLED", "당발 Cover 방식 사용", "Y", "Y/N", "당발 경로", "은행 내부정책", "N", "N이면 RMA가 있어도 Serial"),
+    ("ROUTE_COVER_MIN_USD", "Cover 권장 최소금액", "100000", "USD", "당발 경로", "은행 내부정책", "N", "미만은 비용상 Serial 권장(긴급 지정 시 예외)"),
+    ("ROUTE_COVER_HIGH_RISK_BLOCK", "고위험국 수취은행 Cover 금지", "Y", "Y/N", "당발 경로", "FATF R.16 / Wolfsberg 지급투명성", "N", "FATF 고위험·제재 관련국은 Serial만"),
+    ("ROUTE_COVER_RELEASE", "Cover 송신 순서", "COV_FIRST", "-", "당발 경로", "CBPR+ Cover 지침", "N", "pacs.009 COV를 먼저(또는 동시) 송신, 같은 UETR"),
+    ("ROUTE_OVERRIDE_APPROVAL", "경로 수동변경 승인", "CHECKER", "-", "당발 경로", "은행 내부정책", "N", "권장 경로와 다르면 사유 + Checker 승인"),
 ]
 
 # ---------------------------------------------------------------------------
 # 2. 코드 정의 (code_group, code, name, desc, VERIFY)
 # ---------------------------------------------------------------------------
 CODES = [
+    ("ROUTE_METHOD", "VOSTRO", "Direct - 수취은행 Vostro 입금 (INGA)", "INR 송금, 수취은행이 당행에 INR Vostro(SRVA 등) 보유. pacs.008 1건", "N"),
+    ("ROUTE_METHOD", "DIRECT", "Direct - 수취은행 = 당행 Nostro (INDA)", "수취인 계좌가 당행 Nostro 은행에 있음. pacs.008 1건", "N"),
+    ("ROUTE_METHOD", "DIRECT_HO", "Direct - 수취은행 = 본점/당행 점포 (INDA, 본지점)", "본점 앞 pacs.008 1건, 결제는 을A 본지점 계정", "N"),
+    ("ROUTE_METHOD", "COVER", "Cover - pacs.008 직접 + pacs.009 COV (MT103 + MT202 COV)", "RMA·SSI 보유 수취은행. 정보는 직접, 자금은 Nostro→수취은행 코레스", "N"),
+    ("ROUTE_METHOD", "SERIAL", "Serial - pacs.008 연쇄 (MT103 Serial)", "Nostro → (중계은행) → 수취은행 순서로 같은 전문 전달", "N"),
+    ("STTLM_MTD", "INDA", "Instructed Agent (수신은행이 당행 계좌 보유)", "Serial·Direct: Nostro/본점이 당행 계좌 차기", "N"),
+    ("STTLM_MTD", "INGA", "Instructing Agent (당행이 수신은행 계좌 보유)", "Vostro 입금", "N"),
+    ("STTLM_MTD", "COVE", "Cover method", "pacs.009 COV로 별도 결제", "N"),
+    ("ROUTE_OVR_RSN", "CUST", "고객 지정 경로", "", "N"),
+    ("ROUTE_OVR_RSN", "SPEED", "긴급·당일 도착", "", "N"),
+    ("ROUTE_OVR_RSN", "COST", "중계수수료 절감", "", "N"),
+    ("ROUTE_OVR_RSN", "CORR", "코레스·수취은행 지시(SSI 변경 등)", "", "N"),
+    ("ROUTE_OVR_RSN", "OTH", "기타(서술)", "", "N"),
     # 고객
     ("CUST_TYPE", "IND", "개인(Resident Individual)", "LRS 대상", "N"),
     ("CUST_TYPE", "NRI", "비거주 개인(NRI/OCI)", "NRE/NRO 계좌 기준 송금, LRS 비대상", "N"),
@@ -1339,6 +1357,66 @@ table("TB_IO_FLOAT_ADJ", "휴일 차이 조정", "본지점(IO21/CM21)", "본점
     ("CUST_CLAIM_YN", "고객 청구", "VARCHAR2(1)", "NN", "기본 N (휴일 차이는 고객에게 청구하지 않음)", ""),
 ] + AUD)
 
+table("TB_NOSTRO_ACCT", "Nostro 계좌(통화별)", "당발 경로", "통화별 당행 결제계좌. 당발 경로 판정의 기준(Serial 수신은행, Cover의 InstgRmbrsmntAgt).", [
+    ("CCY", "통화", "VARCHAR2(3)", "PK", "", ""),
+    ("NOSTRO_SEQ", "순번", "NUMBER(2)", "PK", "1=기본", ""),
+    ("NOSTRO_BIC", "Nostro BIC", "VARCHAR2(11)", "NN", "", "SWIFT"),
+    ("NOSTRO_ACCT", "당행 계좌번호", "VARCHAR2(34)", "NN", "예: 4001", ""),
+    ("HO_YN", "본점 계좌 여부", "VARCHAR2(1)", "NN", "Y면 결제계정 21010000000(을A)", ""),
+    ("GL_CODE", "계정", "VARCHAR2(11)", "NN", "10105020000 (본점이면 21010000000)", "GL"),
+    ("CUTOFF_IST", "당일결제 마감(IST)", "VARCHAR2(5)", "NN", "예: USD 16:30", ""),
+    ("SETTLE_CAL", "결제통화 캘린더", "VARCHAR2(4)", "NN", "US/KR/TGT2 등 + IN", ""),
+    ("DEFAULT_YN", "기본", "VARCHAR2(1)", "NN", "", ""),
+] + AUD)
+
+table("TB_BIC_DIR", "은행 디렉터리·관계", "당발 경로", "BIC별 은행 정보와 당행과의 관계(Nostro·본점·Vostro·RMA·고위험). SWIFTRef 일배치 + 지점 관계 속성.", [
+    ("BIC", "BIC", "VARCHAR2(11)", "PK", "", "SWIFT"),
+    ("BANK_NAME", "은행명", "VARCHAR2(140)", "NN", "", ""),
+    ("TOWN", "도시", "VARCHAR2(35)", "", "", ""),
+    ("CTRY", "국가", "VARCHAR2(2)", "NN", "", ""),
+    ("OWN_BANK_YN", "당행(본점·점포)", "VARCHAR2(1)", "NN", "Y면 DIRECT_HO 후보", ""),
+    ("NOSTRO_CCY", "당행 Nostro 통화", "VARCHAR2(20)", "", "TB_NOSTRO_ACCT 역참조", ""),
+    ("VOSTRO_ACCT_NO", "당행 보유 Vostro", "VARCHAR2(20)", "FK", "있으면 INR VOSTRO 후보", ""),
+    ("RMA_PAY_YN", "RMA(지급전문 송신) 승인", "VARCHAR2(1)", "NN", "TB_SWIFT_RMA 요약. N이면 직접 송신 불가", "SWIFT"),
+    ("HIGH_RISK_YN", "고위험국", "VARCHAR2(1)", "NN", "FATF·내부 국가위험", ""),
+    ("CLR_CODE", "청산코드", "VARCHAR2(20)", "", "USABA/GBDSC/AUBSB 등 (BIC 없을 때)", ""),
+    ("SRC", "출처", "VARCHAR2(10)", "", "SWIFTREF/MANUAL", ""),
+] + AUD)
+
+table("TB_BANK_SSI", "수취은행 결제지시(SSI)", "당발 경로", "수취은행이 통화별로 자금을 받는 코레스 은행·계좌. Cover의 InstdRmbrsmntAgt, Serial의 IntrmyAgt1.", [
+    ("BIC", "수취은행 BIC", "VARCHAR2(11)", "PK", "", ""),
+    ("CCY", "통화", "VARCHAR2(3)", "PK", "", ""),
+    ("CORR_BIC", "코레스 BIC", "VARCHAR2(11)", "NN", "우리 Nostro와 같으면 Nostro 내 대체(중계 없음)", "SWIFT"),
+    ("CORR_ACCT", "수취은행 계좌(코레스)", "VARCHAR2(34)", "", "", ""),
+    ("VALID_FROM", "적용시작", "DATE", "NN", "", ""),
+    ("SRC", "출처", "VARCHAR2(12)", "NN", "SWIFTREF_SSI/BILATERAL", ""),
+] + AUD)
+
+table("TB_REMIT_ROUTE", "당발 결제경로·전문 판정", "당발 경로", "송금별 경로 판정 결과(시스템 권장·최종·수동변경)와 생성 전문. SW11 송신 순서·대사의 기준.", [
+    ("REMIT_REF_NO", "송금참조번호", "VARCHAR2(16)", "PK,FK", "", ""),
+    ("SYS_METHOD", "시스템 권장", "VARCHAR2(10)", "NN", "CODE:ROUTE_METHOD", ""),
+    ("FINAL_METHOD", "최종 경로", "VARCHAR2(10)", "NN", "CODE:ROUTE_METHOD", "SWIFT"),
+    ("OVERRIDE_YN", "수동변경", "VARCHAR2(1)", "NN", "", ""),
+    ("OVERRIDE_RSN", "변경사유", "VARCHAR2(5)", "", "CODE:ROUTE_OVR_RSN, Y면 필수", ""),
+    ("OVERRIDE_APPR_ID", "변경 승인자", "VARCHAR2(10)", "", "Checker", ""),
+    ("DECISION_PATH", "판정 경로", "VARCHAR2(400)", "NN", "Q1~Q6 답과 근거 스냅샷", ""),
+    ("STTLM_MTD", "결제방식", "VARCHAR2(4)", "NN", "CODE:STTLM_MTD", "SWIFT"),
+    ("NOSTRO_BIC", "사용 Nostro", "VARCHAR2(11)", "", "", ""),
+    ("INSTD_AGT", "pacs.008 수신은행", "VARCHAR2(11)", "NN", "MT103 {2:} 수신", "SWIFT"),
+    ("INTRMY_AGT1", "중계은행", "VARCHAR2(11)", "", ":56a", "SWIFT"),
+    ("CDTR_AGT", "수취은행", "VARCHAR2(11)", "", ":57a (BIC 또는 청산코드)", "SWIFT"),
+    ("CDTR_AGT_CLR", "수취은행 청산코드", "VARCHAR2(20)", "", "", ""),
+    ("INSTG_RMB_AGT", "InstgRmbrsmntAgt", "VARCHAR2(11)", "", "Cover :53a = 당행 Nostro", "SWIFT"),
+    ("INSTD_RMB_AGT", "InstdRmbrsmntAgt", "VARCHAR2(11)", "", "Cover :54a = 수취은행 코레스", "SWIFT"),
+    ("CHRG_BR", "수수료부담", "VARCHAR2(4)", "NN", "DEBT/SHAR/CRED (:71A OUR/SHA/BEN)", "SWIFT"),
+    ("MSG_CUST_ID", "고객송금 전문", "VARCHAR2(20)", "FK", "pacs.008", ""),
+    ("MSG_COV_ID", "Cover 전문", "VARCHAR2(20)", "FK", "pacs.009 COV (같은 UETR)", ""),
+    ("UETR", "UETR", "VARCHAR2(36)", "NN", "gpi 추적, Cover와 공유", "SWIFT"),
+    ("SETTLE_GL", "결제계정", "VARCHAR2(11)", "NN", "10105020000 / 21010000000 / 20150200100·200", "GL"),
+    ("VALUE_DT", "결제일", "DATE", "NN", "마감시각·IN+통화 캘린더 반영", ""),
+    ("CUTOFF_MISS_YN", "마감 경과", "VARCHAR2(1)", "NN", "Y면 익영업일", ""),
+] + AUD)
+
 table("TB_COA_ACCT", "계정과목(통합 표준 CoA)", "회계공통", "차세대 GBS 통합 표준 CoA(0930) + 인도지점 적용 상태. 모든 GL_CODE의 참조 마스터. 신규 계정은 본점 채번 전 임시코드.", [
     ("ACCT_CD", "계정코드", "VARCHAR2(11)", "PK", "11자리 Level1~6", ""),
     ("ACCT_LVL", "레벨", "NUMBER(1)", "NN", "1~6", ""),
@@ -1453,7 +1531,7 @@ RULES = [
     ("R-IMP-11", "수입", "RT13", "ORM 생성", "IDPMS 대상 Purpose(S0101/S0102 등) 승인 시 ORM(A) 생성, 취소 시 ORM(C)", "AUTO", "IDPMS 운영지침", "", "N"),
     ("R-IMP-12", "수입", "RT13", "Direct Import 수수료", "Product 03 → Commission INR 750 정액 + GST 18%. 수기 override 시 사유입력", "AUTO", "기존 요청", "DIRECT_IMP_FLAT_COMM_INR", "N"),
     ("R-IMP-13", "수입", "RT13", "EEFC 출금", "SRC_ACCT_TYPE=EEFC → 환전 없음, In lieu of Exchange 수수료 인식", "AUTO", "기존 요청", "", "N"),
-    ("R-IMP-14", "수입", "RT13", "Reim Bank 자동세팅", "통화별 기본 Nostro(예: USD→4001) 자동설정, 변경가능", "AUTO", "기존 요청", "", "N"),
+    ("R-IMP-14", "수입", "RT13", "Reim Bank 자동세팅", "통화별 기본 Nostro(예: USD→4001) 자동설정. 결제경로 판정(R-RTG-01)에서 Serial 수신은행·Cover InstgRmbrsmntAgt로 사용", "AUTO", "기존 요청", "", "N"),
     ("R-INV-01", "수출입", "RT73", "인보이스 중복", "CUST_NO+INV_NO+INV_DT 중복 등록 불가", "ERR", "중복송금 방지", "", "N"),
     ("R-INV-02", "수출입", "RT73", "미래 선적일", "SHIPPING_DT > 오늘 → Packing List 미입력 허용, 그 외 Packing List 1건 이상", "ERR", "기존 요청", "", "N"),
     ("R-INV-03", "수출입", "RT73", "금액 정합성", "TOTAL_AMT = AMT + IGST_AMT, Σ품목 LINE_AMT ≤ AMT(차이 시 경고)", "WARN", "", "", "N"),
@@ -1473,6 +1551,14 @@ RULES = [
     ("R-SIM-02", "시뮬레이션", "SM11", "유효시간", "생성 후 15분 또는 고시환율 회차 변경 시 만료. 만료 견적으로 실거래 전환 불가", "ERR", "지점 정책", "SIM_QUOTE_VALID_MIN", "N"),
     ("R-SIM-03", "시뮬레이션", "SM11", "실거래 전환", "견적 전환 시 금액·통화·유형 동일 여부 검증, 딜 환율은 자금팀 딜 Ref 연결, 원거래에 QUOTE_ID 기록", "AUTO", "지점 정책", "", "N"),
     ("R-SIM-04", "시뮬레이션", "SM11", "민감도", "환율 ±0.10/0.25/0.50 INR 변동 시 총 출금·순 입금 변화를 함께 표시", "AUTO", "지점 정책", "", "N"),
+    ("R-RTG-01", "당발 경로", "RT11~14/FD12", "판정 순서", "① INR이면 수취은행 Vostro 보유 시 VOSTRO(INGA), 없으면 해외 SWIFT 송금 불가(국내 INR은 SF11) ② 수취은행 = 통화별 Nostro → DIRECT ③ 수취은행 = 본점·당행 점포 → DIRECT_HO ④ Cover 가능(RMA·SSI·비고위험·코레스≠Nostro)이고 USD 환산 ≥ ROUTE_COVER_MIN_USD 또는 긴급 → COVER ⑤ 그 외 SERIAL", "AUTO", "SWIFT CBPR+ / 은행 정책", "ROUTE_COVER_MIN_USD", "N"),
+    ("R-RTG-02", "당발 경로", "RT11~14", "Cover 요건", "수취은행 RMA(지급전문) 승인, 통화별 SSI 존재, 고위험국 아님, ROUTE_COVER_ENABLED=Y. 하나라도 불충족 시 COVER 선택 불가(사유 표시)", "ERR", "SWIFT RMA / FATF R.16", "ROUTE_COVER_HIGH_RISK_BLOCK", "N"),
+    ("R-RTG-03", "당발 경로", "RT11~14", "Serial 중계은행", "SSI 코레스 ≠ 당행 Nostro면 IntrmyAgt1(:56a)=코레스, 같으면 Nostro 내 대체(중계 없음). BIC 없는 수취은행은 청산코드(USABA 등)로 CdtrAgt 지정", "AUTO", "CBPR+", "", "N"),
+    ("R-RTG-04", "당발 경로", "SW11", "Cover 송신 순서", "pacs.009 COV를 pacs.008보다 먼저(또는 동시) 송신. 두 전문은 같은 UETR, pacs.009 COV에는 원 고객정보(UndrlygCstmrCdtTrf) 필수", "ERR", "CBPR+ / 지급투명성", "ROUTE_COVER_RELEASE", "N"),
+    ("R-RTG-05", "당발 경로", "RT11~14", "수동 변경", "권장 경로와 다른 경로 선택 시 사유코드 필수 + Checker 승인. 불가 경로는 선택 자체 차단", "ERR", "은행 내부정책", "ROUTE_OVERRIDE_APPROVAL", "N"),
+    ("R-RTG-06", "당발 경로", "RT11~14", "결제일·마감", "Nostro 통화별 마감(IST) 이후 또는 IN·통화국 휴일이면 결제일을 양쪽 영업일로 이동, 고객에게 표시", "AUTO", "CM21", "", "N"),
+    ("R-RTG-07", "당발 경로", "RT11~14", "결제계정", "SERIAL·COVER·DIRECT = Nostro 10105020000, DIRECT_HO(또는 본점 Nostro) = 을A 21010000000(IO21 정산 대상), VOSTRO = 20150200100(SRVA)/20150200200", "AUTO", "통합 CoA", "", "N"),
+    ("R-RTG-08", "당발 경로", "RT11~14", "수수료부담 매핑", "OUR→DEBT, SHA→SHAR, BEN→CRED. OUR + Serial은 중계·수취은행 청구(camt.106/MT191) 예상 표시", "AUTO", "CBPR+", "", "N"),
     ("R-ACC-01", "회계", "공통", "CoA 참조", "모든 분개 계정은 TB_COA_ACCT에 존재하고 POSTABLE_YN=Y. 상위(L4)에 L5가 있으면 직접 기장 금지(예: 20150100000, 20510500000)", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-02", "회계", "공통", "비활성 계정", "BR_STATUS=INACT 계정(NAPAS·AOB·TOKEN·갑기금 이자) 기장 차단", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-03", "회계", "공통", "통화별 대차", "전표 단위로 통화별 차변합 = 대변합. 환전은 11200000000 포지션으로 통화 간 연결(난외 OB+/OB- 제외)", "ERR", "회계원칙", "", "N"),
@@ -1640,10 +1726,10 @@ INTERFACES = [
 # ---------------------------------------------------------------------------
 SCREENS = [
     ("CH11", "Customer FX Profile", "개인/기업", "변경", "PAN/IEC/LEI(+만료일)/GSTIN/거주성/EEFC 등록, 외부검증(GLEIF/DGFT/PAN)", "TB_CUST_FX_PROFILE", "ch11"),
-    ("RT11", "Outward Remittance (General)", "기업", "변경", "무역외 일반 당발송금(서비스·기타), 15CA/CB, LEI, 딜링맵핑", "TB_FX_REMIT_*", "rt11"),
+    ("RT11", "Outward Remittance (General)", "기업", "변경", "무역외 일반 당발송금(서비스·기타), 15CA/CB, LEI, 딜링맵핑, 결제경로(Direct/Serial/Cover) 자동판정·전문 미리보기", "TB_FX_REMIT_*", "rt11"),
     ("RT12", "LRS Outward Remittance", "개인", "신규", "LRS 한도·Form A2·TCS 자동계산, FY 누적 표시, CIMS 보고", "TB_LRS_*", "rt12"),
-    ("RT14", "Non-Resident Outward Remittance", "비거주자", "신규", "NRE/NRO/FCNR 해외송금, NRO FY USD 1M·경상소득 구분, 15CA/CB", "TB_NR_REPAT_SUM", "rt14"),
-    ("RT13", "Remittance (Trade Finance)", "개인사업자/기업", "변경", "수입선수금/수입대금/Direct Import/서비스/ODI, Invoice·BoE 잔액, Amount Limit, Dealing 탭", "TB_FX_REMIT_*, TB_TRD_PAY_ALLOC", "rt13"),
+    ("RT14", "Non-Resident Outward Remittance", "비거주자", "신규", "NRE/NRO/FCNR 해외송금, NRO FY USD 1M·경상소득 구분, 15CA/CB, 결제경로 판정", "TB_NR_REPAT_SUM", "rt14"),
+    ("RT13", "Remittance (Trade Finance)", "개인사업자/기업", "변경", "수입선수금/수입대금/Direct Import/서비스/ODI, Invoice·BoE 잔액, Amount Limit, Dealing 탭, 결제경로 판정(Reim Bank 자동)", "TB_FX_REMIT_*, TB_TRD_PAY_ALLOC", "rt13"),
     ("RT73", "Invoice / Bill of Entry Mgmt", "개인사업자/기업", "변경", "Invoice·Packing list·BoE 등록, Total/Consumed/Balance, IDPMS BoE 매칭", "TB_TRD_INVOICE*, TB_TRD_BOE", "rt73"),
     ("RT21", "Inward Remittance Registry", "개인/기업", "변경", "타발 등록·Purpose·IRM 자동생성·FDI 분기·Vostro 입금", "TB_FX_REMIT_*, TB_TRD_IRM", "rt21"),
     ("RT22", "Settle of Pending (Suspense)", "비계좌/보류", "변경", "미지급금 보류건 부분환전·INR 확정 환전·NEFT/RTGS 지급·외화이체·반환", "TB_FX_SUSPENSE, TB_FX_CONV_LEG, TB_DOM_PAYOUT", "rt22"),

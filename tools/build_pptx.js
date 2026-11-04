@@ -177,6 +177,18 @@ ext(s, "SWIFT pacs.008 (MX)", 9.8, 4.55, 1.75);
 arrow(s, sw, "b", { x: 9.8, y: 4.55, w: 1.75, h: 0.6 }, "l", "", { dash: false });
 note(s, "RT12 LRS: 회계연도 USD 250,000 한도·TCS 자동계산 / RT13: 인보이스·BoE 잔액 안에서 분할송금, IDPMS ORM 생성 / RT14: NRO 연 USD 1M", 0.5, 5.75, 12.2, 0.75);
 
+// 4-1. 당발 결제경로 판정
+s = addContent("당발송금: 결제경로 판정 (Direct · Serial · Cover)", "업무별 흐름", "RT11~RT14·FD12의 ④단계에서 수취은행과 당행의 관계로 경로를 자동 판정합니다. 아래 화살표가 결과, 오른쪽 화살표는 다음 질문입니다.");
+let bicIn = ext(s, "③ 수취은행 BIC\n(없으면 청산코드)", 0.3, 1.5, 1.6, 0.8);
+const qs = [["INR 송금?", 2.15], ["수취은행 =\n당행 Nostro?", 4.35], ["수취은행 =\n본점·당행?", 6.55], ["Cover 요건\nRMA·SSI·비고위험?", 8.75], ["USD 10만 이상\n또는 긴급?", 10.95]];
+const dq = qs.map(([t, x]) => decision(s, t, x, 1.3, 2.0, 1.2));
+arrow(s, bicIn, "r", dq[0], "l");
+for (let i = 0; i < dq.length - 1; i++) arrow(s, dq[i], "r", dq[i + 1], "l");
+const outs4 = [["Vostro 입금 (INGA)\npacs.008 1건 · SRVA", 2.15, "예"], ["Direct (INDA)\npacs.008 1건", 4.35, "예"], ["Direct 본지점\npacs.008 1건 · 을A 결제", 6.55, "예"], ["Serial\npacs.008 → Nostro → 중계 → 수취은행", 8.75, "아니오"], ["Cover\n① pacs.009 COV → Nostro\n② pacs.008 → 수취은행", 10.95, "예"]];
+const ob = outs4.map(([t, x, l], i) => { const e = ext(s, t, x - 0.05, 3.85, 2.1, 1.0); arrow(s, dq[i], "b", e, "t", l, { dx: 0.35, dy: 0.15 }); return e; });
+arrow(s, dq[4], "b", ob[3], "r", "아니오(소액)", { dash: true, dx: -0.75, dy: 0.05 });
+note(s, "가로 화살표 = '아니오' 후 다음 질문. Cover는 수취은행에 고객정보를 직접 보내 빠르고 중계 공제가 없지만, pacs.009 COV를 먼저(또는 동시) 같은 UETR로 보내야 합니다. 수취은행 코레스가 당행 Nostro와 같으면 Nostro 안에서 대체되므로 Serial 1건으로 충분합니다. 권장과 다른 경로를 고르면 사유 + Checker 승인. 결제계정: Nostro 10105020000 / 본지점 을A 21010000000 / Vostro 20150200100.", 0.3, 5.35, 12.75, 1.2);
+
 // 5. 타발
 s = addContent("타발송금: 결제방식별 분기", "업무별 흐름", "RT21에서 Purpose Code와 결제방식(SETTLE_MODE)에 따라 다음 화면이 정해집니다.");
 let swi = node(s, "sw11", 0.4, 3.05, 1.75, 0.72, { label: "수신 pacs.008" });
