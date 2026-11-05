@@ -173,9 +173,15 @@ rv("비활성", "20180000000", 3, "20100000000", "AOB DEPOSITS", "AOB 예금",
    "(4차) AOB 의미: 사용자 의견 'Any Other Business'. 0930 본점 매핑명은 '올원뱅크(국외정산대금)'·'올원뱅크(국외이용)'·'기타지급수수료(올원뱅크)' → 본점 정의 확인 요청(결정 A1). "
    "어느 쪽이든 인도지점 미사용. 현행 적금(20124001·002)이 여기에 잘못 대응돼 있으며 적금은 별도 L3 신설", "")
 
-rv("비활성", "10700000000", 2, "", "RIGHT OF USE ASSETS TOTAL", "사용권자산(ROU)",
-   "(4차) 인도 법정 장부는 AS 19(운용리스료 비용, Sch.16 II) — 은행은 Ind AS 미적용. ROU·리스부채(20600000000)·ROU 상각은 본점 IFRS 보고용 조정분개로만(결정 F2)", "Sch.10·16", "Y")
-rv("비활성", "20600000000", 2, "", "LEASE LIABILITIES TOTAL", "리스부채", "(4차) 위와 같음", "Sch.5", "Y")
+rv("변경", "10700000000", 2, "", "RIGHT OF USE ASSETS TOTAL", "사용권자산(ROU)",
+   "(12차) IFRS 장부 전용(book_code=IFRS), 인도 법정 장부는 AS 19. Ind AS 116 적용 시 법정 장부도 사용 — 4차 '비활성' 의견 수정(결정 F2, 시트 19)", "IFRS 16·Ind AS 116", prev="4차 비활성 → 장부 구분")
+rv("변경", "20600000000", 2, "", "LEASE LIABILITIES TOTAL", "리스부채", "(12차) 위와 같음. 리스부채 이자 50320500000", "IFRS 16", prev="4차 비활성 → 장부 구분")
+rv("비활성", "50920200100", 5, "50920200000", "DEPRECIATION - RIGHT-OF-USE ASSETS (REAL ESTATE)", "ROU 상각(부동산) — 이동", "(12차) 신설 L4 50920300000 아래 50920300100으로 이동, 0930에서 삭제", "")
+rv("비활성", "50920200200", 5, "50920200000", "DEPRECIATION - RIGHT-OF-USE ASSETS (VIHICLE)", "ROU 상각(차량) — 이동", "(12차) 50920300200으로 이동", "")
+rv("비활성", "50920209900", 5, "50920200000", "DEPRECIATION - RIGHT-OF-USE ASSETS (OTHER)", "ROU 상각(기타) — 이동", "(12차) 50920300900으로 이동", "")
+rv("철회", "50920200400", 5, "50920200000", "DEPRECIATION - LEASEHOLD IMPROVEMENTS", "임차개량 상각 L5", "(12차) ROU L5 이동으로 50920200000이 leaf가 되어 불필요", "", prev="4차 신설 철회")
+rv("비활성", "50940021402", 6, "50940021400", "VAT ON RENTAL", "리스료 부가세", "(12차) 인도 GST 불공제는 50940010300", "")
+rv("변경", "50940021401", 6, "50940021400", "VARIABLE LEASE PAYMENTS", "변동리스료", "(12차) 오탈자 VARIAVLE 정정. IFRS 변동리스료만 — 현행 리스료는 50940021405(AS 19)", "")
 rv("변경", "50930170100", 5, "50930170000", "GRATUITY (AS 15) - LOCAL STAFF", "Gratuity(퇴직급여, AS 15)",
    "(4차) 현행 Salary(Retirement-Local) — Payment of Gratuity Act 1972 의무, 보험수리 평가. Sch.16 I", "Sch.16 I, 주석(AS 15)")
 
@@ -453,6 +459,7 @@ ATTRS = [
     ("ECL·자본", "collateral_type / value / maturity / currency / revaluation_freq", "담보 원장", "담보", "CRM 헤어컷, LGD 30%", "SA Dir. para 35~37", "RWA 명세 9", "N"),
     ("ECL·자본", "guarantor_id / guarantor_rating / cover_amount", "보증인 원장", "담보", "위험가중치 대체", "SA Dir. para 39", "RWA 명세 9", "N"),
     ("ECL·자본", "s11_2b_deposit_flag", "Y·N", "계정(10104010200)", "본점 익스포저 경감 + 자본 제외(이중계상 방지)", "BR Act s.11(2)(b)(i)", "RWA 명세 9", "Y"),
+    *__import__("lease_model").LEASE_ATTRS,
     # 본지점
     ("본지점", "ho_flag / io_purpose", "Y/N, CAPITAL·FUNDING·SETTLEMENT·RA·VOSTRO", "계좌/거래", "Sch.5/11 순액, FLA, LEF 예외, Form A", "-", "송금모델(TB_IO_TXN)", "N"),
     # 세무

@@ -12,6 +12,7 @@ import lcr_model as L
 import tax_fa_model as TF
 import sheet_doc_model as SD
 import glossary_model as GL
+import lease_model as LM
 import re as _re
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "../docs/05_CoA검토_RBI보고속성.xlsx"
@@ -98,7 +99,7 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "11차 (2026-11-05) — 관리비 예치금(현행 10990003) 반영 / 10차 — 결정사항 전 항목 확정(모범안 54건) / 9차 — 본점 양식(0930 계정상태표) 그대로 인도 반영 시트 18·별도 파일 06 / 8차 — 모든 표에 「인도 용어 정의」 열, 시트 17 용어 정의 / 7차 — 6단계 재분류, 중계은행 회수 과세, 시트별 변경 근거(FY25-26 결산 증거) / 6차 — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "12차 (2026-11-05) — 리스 회계(IFRS 16·Ind AS 116 대비) 시트 19 / 11차 — 관리비 예치금(현행 10990003) 반영 / 10차 — 결정사항 전 항목 확정(모범안 54건) / 9차 — 본점 양식(0930 계정상태표) 그대로 인도 반영 시트 18·별도 파일 06 / 8차 — 모든 표에 「인도 용어 정의」 열, 시트 17 용어 정의 / 7차 — 6단계 재분류, 중계은행 회수 과세, 시트별 변경 근거(FY25-26 결산 증거) / 6차 — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
@@ -135,6 +136,8 @@ summary = [
      "신설 계정은 코드 순서 위치에 삽입. 검토서 시트 18 + 본점 회신용 별도 파일 docs/06_통합표준CoA_0930_인도지점반영.xlsx"),
     ("10차 (모범안)", "권고·미결·확인 요청을 모두 없애고 54건을 확정안으로 정리(시트 08). 새로 정한 것: EIR 조정계정 신설 안 함(LOF·LOC 상각), ECL 범위에 은행 예치·콜론·HTM 포함, "
      "저축예금 이자 TDS 비대상, CSR 적용(FY25-26 말 순자산 ≥ ₹500 crore), Share Expense는 기타분담금 유지, 0930 L3 20501000000 재채번 요청, 각주(6) 단식·비망 L2"),
+    ("12차 (리스)", "계정은 IFRS 16 기준으로 지금 모두 갖추고 장부 구분(LOCAL_AS·IFRS). 신설: 운용리스료(AS 19)·단기리스료·ROU 상각 L4(0930 L5 3개 이동)·보증금 할인차금·할인 상각 이자수익·복구충당부채·리스 해지 손실·리스 이연법인세. "
+     "삭제·비활성: 임차개량 상각 아래 ROU L5 3개, VAT ON RENTAL. 철회: 50920200400. 현행 RENTAL EXPENSE는 '변동리스료'가 아니라 운용리스료로 이행 (시트 19)"),
     ("다음 단계", "본점 조치 요청(재채번·명칭 변경·GBS열 정정·명세서 정정) 전달 → 회신 반영 후 coa_model.py·분개·DDL·설계서 재생성"),
 ]
 ws = wb.create_sheet("00 요약")
@@ -418,7 +421,7 @@ ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP;
 r = 4
 r = section(ws, r, "① Sch.16 줄", ["줄", "명칭"], list(TF.SCH16_LINES.items()))
 mig_by = {m["code"]: m for m in MIG}
-_lv = {a["code"]: a["lv"] for a in CM.BASE}
+_lv = {a["code"]: a["lv"] for a in CM.BASE if a["code"] not in ("50920200100", "50920200200", "50920209900")}  # ROU 상각 L5는 50920300000으로 이동(F2)
 _lv.update({n[0]: n[1] for n in TF.NEW3}); _lv.update({n[0]: n[1] for n in MG.NEW2})
 
 
@@ -429,7 +432,7 @@ def _is_parent(c):
 
 
 opex = []
-for a in CM.BASE + [dict(code=n[0], name=n[3], lv=n[1]) for n in TF.NEW3 if n[6] in ("비용", "고정자산")] + [dict(code=n[0], name=n[3], lv=n[1]) for n in MG.NEW2 if n[0].startswith("509")]:
+for a in CM.BASE + [dict(code=n[0], name=n[3], lv=n[1]) for n in TF.NEW3 if n[6] in ("비용", "고정자산", "리스")] + [dict(code=n[0], name=n[3], lv=n[1]) for n in MG.NEW2 if n[0].startswith("509")]:
     c = a["code"]
     if (c.startswith(("509", "5101", "51204", "51211"))) and a.get("lv", 0) >= 4 and not c.startswith(("509202001", "509202002", "509202099", "5101004")) and not _is_parent(c):
         line = TF.sch16_of(c)
@@ -488,6 +491,22 @@ r = section(ws, 4, "결산 증거 20건", ["결산 자료", "내용", "금액(IN
 for i, w in enumerate([22, 50, 16, 40, 46, 8], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
 
+wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
+
+# ---- 19 리스 회계 ------------------------------------------------------------------
+ws = wb.create_sheet("19 리스회계")
+ws["A1"] = "리스 회계 — 인도 AS 19(법정 장부) / IFRS 16·Ind AS 116(본점 보고, RBI 수렴 대비)"
+ws["A1"].font = Font(name=F, size=14, bold=True)
+ws["A2"] = ("계정은 지금 IFRS 16 기준으로 모두 갖추고 장부 구분(book_code: LOCAL_AS / IFRS)으로 처리. Ind AS가 은행에 적용되면 book_code만 전환. "
+            "현행 리스 6건(사무실 1·주재원 사택 5), FY25-26 리스료 ₹3.89 crore. 분개 예시는 사무실(월 ₹16,01,036, 잔여 36개월, IBR 9%)")
+ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:F2"); ws.row_dimensions[2].height = 42
+r = section(ws, 4, "① 생성·수정·삭제", ["구분", "코드", "계정", "LOCAL_AS (인도 AS 19)", "IFRS / Ind AS 116", "사유"], LM.LEASE_CHANGES)
+r = section(ws, r, "② 신설 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"], [n[:6] for n in LM.NEW_LEASE])
+r = section(ws, r, "③ 분개 (사무실 리스 예시: 리스부채 최초 ₹5,03,47,467 / 1개월 이자 ₹3,77,606 + 상각 ₹13,98,541 = ₹17,76,147 > AS 19 리스료 ₹16,01,036)",
+            ["ID", "장부", "사건", "차변", "대변", "비고"], LM.LEASE_JE)
+r = section(ws, r, "④ 리스 원장 속성", ["영역", "속성", "값", "수준", "용도", "근거", "현재 설계", "VERIFY"], LM.LEASE_ATTRS)
+for i, w in enumerate([14, 30, 40, 44, 44, 60, 12, 8], 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
 wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
 
 # ---- 18 본점 양식 반영 --------------------------------------------------------------
