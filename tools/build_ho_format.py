@@ -23,7 +23,7 @@ ST_FILL = {"신규": "FCE4D6", "변경": "FFF2CC", "용도지정": "E2EFDA", "�
 
 HO_COLS = [("구분", 12), ("업무영역", 18), ("코드", 14), ("Level", 9), ("계정과목(영문/한글)", 60), ("원화계정명", 12),
            ("본점 통합계정코드", 18), ("본점 통합계정과목명", 26), ("비화폐성 여부", 10), ("GBS코드", 12)]
-IN_COLS = [("인도 상태", 10), ("인도 표시명 / 신규 계정명", 44), ("현행 인도 GBS(8자리)", 22), ("현행 잔액 INR(2026-07-07, 차변+)", 18),
+IN_COLS = [("인도 상태", 10), ("인도 원장 기장", 14), ("인도 표시명 / 신규 계정명", 44), ("현행 인도 GBS(8자리)", 22), ("현행 잔액 INR(2026-07-07, 차변+)", 18),
            ("변경 사유·근거", 70), ("인도 재무제표 줄(참고)", 22), ("0930 정정 권고", 30), ("인도 용어 정의 (본점 참고)", 70)]
 
 
@@ -47,18 +47,20 @@ def write_status_sheet(ws, rs=None):
     ws.row_dimensions[3].height = 32
     for r, x in enumerate(rs, 4):
         vals = [x["grp"], x["area"], x["code"], f'Level {x["lv"]}', x["name"], x["krw"], x["ho"], x["ho_name"], x["nonmon"], x["gbs"],
-                x["status"] if x["status"] != "유지" else "", x["india_name"], x["live"], x["amt"], x["why"], x["sch"], x["fix"], x["gloss"]]
+                x["status"] if x["status"] != "유지" else "", x["ledger"], x["india_name"], x["live"], x["amt"], x["why"], x["sch"], x["fix"], x["gloss"]]
         fill = PatternFill("solid", fgColor=ST_FILL[x["status"]]) if x["status"] in ST_FILL else None
         for i, v in enumerate(vals, 1):
             c = ws.cell(row=r, column=i, value=v if v != "" else None)
-            c.font = Font(name=FN, size=9 if i != 18 else 8, bold=(x["lv"] <= 2 and i <= n_ho),
-                          strike=(x["status"] == "철회" and i in (5, 12)), color="404040" if i == 18 else "000000")
+            c.font = Font(name=FN, size=9 if i != 19 else 8, bold=(x["lv"] <= 2 and i <= n_ho),
+                          strike=(x["status"] == "철회" and i in (5, 13)), color=("404040" if i == 19 else "1F4E79" if (i == 12 and v == "본점 IFRS 조정 전용") else "000000"))
             c.border = BOX
-            c.alignment = Alignment(vertical="top", wrap_text=i in (12, 15, 17, 18),
-                                    horizontal="center" if i in (1, 2, 3, 4, 9, 10, 11) else None)
-            if fill and (x["status"] in ("신규", "철회") or i in (5, 11, 12)):
+            c.alignment = Alignment(vertical="top", wrap_text=i in (12, 13, 16, 18, 19),
+                                    horizontal="center" if i in (1, 2, 3, 4, 9, 10, 11, 12) else None)
+            if fill and (x["status"] in ("신규", "철회") or i in (5, 11, 13)):
                 c.fill = fill
-            if i == 14:
+            if i == 12 and v == "본점 IFRS 조정 전용":
+                c.fill = PatternFill("solid", fgColor="DDEBF7")
+            if i == 15:
                 c.number_format = '#,##0;[Red]-#,##0'
     ws.freeze_panes = "F4"
     ws.auto_filter.ref = f"A3:{get_column_letter(n_ho + n_in)}{3 + len(rs)}"
@@ -95,7 +97,8 @@ def write_summary(ws, rs):
             if 2 <= i <= 6 and sts[i - 2] in ST_FILL:
                 c.fill = PatternFill("solid", fgColor=ST_FILL[sts[i - 2]])
     legend = [
-        ("열 구성", "A~J열은 본점 0930 원안 그대로(값·순서 불변). K~R열(주황 머리)이 인도지점 검토 결과"),
+        ("열 구성", "A~J열은 본점 0930 원안 그대로(값·순서 불변). K~S열(주황 머리)이 인도지점 검토 결과"),
+        ("인도 원장 기장", "사용 / 미사용(비활성·철회) / 본점 IFRS 조정 전용(파랑). 인도 원장은 인도 GAAP(AS + RBI 지침) — IFRS 전용 계정은 인도 원장 기장 차단, 본점 K-IFRS 조정에서만 사용(결정 G9·F2). Ind AS 적용 시 차단 해제"),
         ("신규", "인도에 필요해 신설 요청하는 계정. 코드는 본점 채번 전 임시코드, GBS코드 '채번요청', 본점 통합계정은 같은 상위·같은 레벨 계정 기준 '(안)'"),
         ("변경", "인도 표시명·용도·직접기장 금지 등 변경. 계정과목 열은 본점명 유지, 인도 표시명은 L열"),
         ("용도지정", "인도 업무를 이 기존 계정에 기장하도록 지정(예: CC/OD 이자 → INT. ON OVERDRAFT)"),

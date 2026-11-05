@@ -11,6 +11,7 @@ import coa_review_model as RM
 import coa_migration_model as MG
 import tax_fa_model as TF
 import glossary_model as GL
+import gaap_model as GA
 
 BASE_BY = {a["code"]: a for a in CM.BASE}
 
@@ -167,7 +168,7 @@ def rows():
         text = " ".join([name, india_name, why])
         out.append(dict(
             grp=grp, area=area, code=c, lv=lv, name=("  " * (lv - 1)) + name, krw=krw, ho=ho, ho_name=ho_name, nonmon=nonmon, gbs=gbs,
-            status=status, india_name=india_name, live=", ".join(e["codes"][:6]) + (" 외" if len(e["codes"]) > 6 else ""),
+            status=status, ledger=GA.ledger_use(c, status), india_name=india_name, live=", ".join(e["codes"][:6]) + (" 외" if len(e["codes"]) > 6 else ""),
             amt=round(e["amt"], 2) if e["amt"] else None, why=why, sch=sch_line(c), fix=" / ".join(fix.get(c, [])),
             gloss="\n".join(GL.terms_in(text)), src=(v["src"] if v else "")))
     return out
