@@ -185,7 +185,7 @@ rv("신규", "20150300700", 5, "20150300000", "NRE CA (INR)", "NRE 당좌", "예
 rv("신규", "20150300800", 5, "20150300000", "NRO CA (INR)", "NRO 당좌",
    "예금명세서 NRO-02·FN-02. 외국인 비거주자(FN) 계좌는 FEMA상 NRO → 같은 GL + nr_subtype=FN", "Sch.3 I, NRD-CSR")
 rv("변경", "20150300300", 5, "20150300000", "NRO SB A/C (INR) - INCL. FOREIGN NATIONAL", "NRO 저축(외국인 비거주자 포함)",
-   "예금명세서 FN-01(현행 20121002)을 NRO로 통합. 별도 GL 유지가 필요하면 본점 결정 사항", "NRD-CSR", prev="이전안 ADD 설명 보강")
+   "(2차 권고 확정) 외국인 비거주자(FN)는 NRO의 부분집합 → GL 통합, nr_subtype=FN으로 부분합(시트 07)", "NRD-CSR", prev="이전안 ADD 설명 보강")
 rv("신규", "20150100500", 5, "20150100000", "CA - LIAISON OFFICE (INR)", "연락사무소 당좌",
    "FEMA 22(R): 비거주 법인의 인도 사무소, UIN·AAC 관리. 예금명세서 CA-03(20125021*)", "Sch.3 I, AAC 연차보고, FLA")
 rv("신규", "20150100600", 5, "20150100000", "CA - BRANCH OFFICE (INR)", "지점사무소 당좌", "예금명세서 CA-06(20125023*). 이익송금 증빙 관리", "Sch.3 I, AAC")
@@ -255,14 +255,14 @@ rv("신규", "31110700000", 4, "31110000000", "REMITTABLE SURPLUS RETAINED IN IN
    "외국은행 지점 Tier 1 구성항목", "Sch.2, CRAR", "Y")
 rv("변경", "31130000000", 3, "31100000000", "AFS RESERVE (UNREALISED GAIN/LOSS)", "AFS 평가손익",
    "RBI 투자 지침(2023): AFS 평가손익은 AFS Reserve. FVOCI 계정을 매핑", "Sch.2", "Y")
-rv("신규", "20990100000", 4, "20990000000", "PROVISION - UNHEDGED FOREIGN CURRENCY EXPOSURE", "미헤지 외화익스포저 충당금",
-   "차주 UFCE 비율에 따른 추가 충당금. 주석 별도 공시", "UFCE 분기, 주석", "Y")
-rv("신규", "20990200000", 4, "20990000000", "PROVISION - COUNTRY RISK", "국가위험 충당금", "해외 익스포저(Nostro 제외 여부 확인)", "주석", "Y")
-rv("신규", "20990300000", 4, "20990000000", "PROVISION - STANDARD ASSETS (STAGE 1·2) IF PRESENTED IN SCH.5", "정상자산 충당금(부채표시분)",
-   "현행 IRAC은 정상자산 충당금을 Sch.5에 표시. ACPIR(ECL) 적용 후 대출 차감 표시이면 불필요 → 표시 방식 확정 후 선택", "Sch.5/Sch.9, CRAR(Tier 2)", "Y")
-rv("변경", "10380101000", 5, "10380100000", "ALLOWANCE FOR LOAN LOSSES - STAGE 1·2 (GENERAL)", "대손충당금(Stage 1·2)",
-   "Stage는 계좌 속성, GL은 일반(1·2)/특정(3) 두 개면 충분(ACPIR §75 자본처리 구분)", "CRAR, 주석")
-rv("변경", "10380102000", 5, "10380100000", "ALLOWANCE FOR LOAN LOSSES - STAGE 3 (SPECIFIC)", "대손충당금(Stage 3)", "", "")
+rv("철회", "20990100000", 4, "20990000000", "PROVISION - UNHEDGED FOREIGN CURRENCY EXPOSURE", "미헤지 외화익스포저 충당금",
+   "(2차) ECL 명세서 결론 수용: UFCE는 Stage 충당금(10380103000/104000)의 floor 가산으로 흡수, UFCE_BP·RATIO·COMPONENT 태그로 추적", "UFCE 분기, 주석", prev="1차 제안 철회")
+rv("철회", "20990200000", 4, "20990000000", "PROVISION - COUNTRY RISK", "국가위험 충당금", "(2차) ECL para 125: 국가위험은 PD·LGD 오버레이로 Stage 충당금에 반영 → 별도 GL 불필요, country_risk_grade 속성", "주석", prev="1차 제안 철회")
+rv("철회", "20990300000", 4, "20990000000", "PROVISION - STANDARD ASSETS (STAGE 1·2) IF PRESENTED IN SCH.5", "정상자산 충당금(부채표시분)",
+   "(2차) ECL 도입으로 Stage 1·2도 대출 차감 충당금(10380103000/104000). 부외 ECL만 부채(20910000000~20930000000)", "Sch.9, CRAR(Tier 2)", "Y", prev="1차 제안 철회")
+rv("비활성", "10380101000", 5, "10380100000", "ALLOWANCE FOR LOAN LOSSES - GENERAL", "대손충당금(일반)",
+   "(2차) ECL 명세서 요청대로 Stage별 L5(10380103000~105000) 신설. 2027-03-31까지 사용 후 이관·병행대사 → 비활성", "CRAR, 주석", prev="1차 의견(일반/특정 2개 유지) 변경")
+rv("비활성", "10380102000", 5, "10380100000", "ALLOWANCE FOR LOAN LOSSES - SPECIFIC", "대손충당금(특정)", "(2차) 10380105000(Stage 3)로 이관 후 비활성", "")
 
 # ---- 3-7 난외·메모 ------------------------------------------------------------
 rv("신규", "60300000000", 2, "", "MEMORANDUM ACCOUNTS (INDIA)", "비망계정(인도)", "대차 영향 없음, 보고·추적용", "")
@@ -407,6 +407,18 @@ ATTRS = [
     ("난외·외환", "lc_scope / tenor_type", "INLAND·IMPORT / SIGHT·USANCE", "계좌", "CEOBE, IDPMS", "-", "이전안(GL L4)", "N"),
     ("난외·외환", "counter_guarantee", "HO·BANK·NONE, 보증은행", "계좌", "신용위험 경감(CRM), LEF", "Basel III", "신규", "Y"),
     ("난외·외환", "fx_deal_cpty_type / hedge_basis", "MERCHANT·INTERBANK / 실수요 증빙(underlying ref)", "거래", "Sch.12 선물환, NOP·AGL, 외환 위험관리 지침", "FEMA Risk Mgmt Facilities", "부분", "Y"),
+    # ECL·자본(RWA) — ECL 명세·RWA 명세에서 요구, GL 아님
+    ("ECL·자본", "stage_tag / sicr_rule_hit / low_credit_risk", "1·2·3 / Q1~QL6 / Y·N", "계좌(부외 포함)", "Stage별 충당금 집계, 주석", "ECL Dir. 2026 para 25~37", "ECL 명세 9", "N"),
+    ("ECL·자본", "poci_flag / credit_adj_eir", "Y·N / 율", "계좌", "POCI 이자·충당", "ECL Dir. 2026 para 24", "ECL 명세 9", "N"),
+    ("ECL·자본", "pd_12m / pd_lifetime / lgd / ead / scenario_weight", "모델값·백스톱(PD 0.03%, LGD 65/70/30%)", "계좌", "ECL 산출, 감사추적", "para 42~100", "ECL 명세 3", "N"),
+    ("ECL·자본", "ufce_bp / ufce_ratio / ufce_component", "0·20·40·60·80bp / 비율 / 금액", "고객·계좌", "Floor 가산, RWA +25%p, 공시", "para 126, CRM Dir. Ch.VII", "ECL 명세 9·11", "N"),
+    ("ECL·자본", "country_risk_grade / korea_linked_flag", "ECGC 등급 / Y·N", "고객", "SICR(QL5), PD 오버레이", "para 125", "ECL 명세 8", "N"),
+    ("ECL·자본", "external_rating / rating_agency / rating_date / rating_scope / inc_flag", "등급·기관·일자·발행/발행자·INC", "고객/한도", "위험가중치, ODR 조정", "SA Dir. 2026 para 25~32", "RWA 명세 9", "N"),
+    ("ECL·자본", "ucc_flag / original_maturity / agg_wc_limit_system", "무조건 취소 가능 / 개월 / ₹150crore", "한도", "미사용약정 CCF(5·30·40%·20%)", "SA Dir. Table 19", "RWA 명세 9·13", "N"),
+    ("ECL·자본", "guarantee_purpose_code", "금융(100%)·이행(50%)·무역LC(20%) 판정코드", "계좌", "CCF·bg_nature 산출", "SA Dir. 시트13 D", "RWA 명세 13", "N"),
+    ("ECL·자본", "collateral_type / value / maturity / currency / revaluation_freq", "담보 원장", "담보", "CRM 헤어컷, LGD 30%", "SA Dir. para 35~37", "RWA 명세 9", "N"),
+    ("ECL·자본", "guarantor_id / guarantor_rating / cover_amount", "보증인 원장", "담보", "위험가중치 대체", "SA Dir. para 39", "RWA 명세 9", "N"),
+    ("ECL·자본", "s11_2b_deposit_flag", "Y·N", "계정(10104010200)", "본점 익스포저 경감 + 자본 제외(이중계상 방지)", "BR Act s.11(2)(b)(i)", "RWA 명세 9", "Y"),
     # 본지점
     ("본지점", "ho_flag / io_purpose", "Y/N, CAPITAL·FUNDING·SETTLEMENT·RA·VOSTRO", "계좌/거래", "Sch.5/11 순액, FLA, LEF 예외, Form A", "-", "송금모델(TB_IO_TXN)", "N"),
     # 세무
@@ -451,6 +463,7 @@ RETURNS = [
 # 7. 주제별 상세 — PSL, INR Nostro
 # ---------------------------------------------------------------------------
 TOPICS = [
+    *[("FN·NRO", a, b + " — " + c) for a, b, c in __import__("coa_migration_model").FN_NRO],
     ("PSL", "왜 GL이 아닌가",
      "같은 운전자금대출이 차주 Udyam 재분류, 투자·매출 변경, 용도(수출·국내)에 따라 PSL 여부와 범주가 바뀐다. GL로 나누면 재분류마다 원금·미수이자·충당금·선수수익 계정을 "
      "모두 대체 분개해야 하고 기간 손익이 왜곡된다. 반면 PSL 보고는 분기 말 잔액 기준이므로 속성으로 충분하다."),
@@ -484,15 +497,19 @@ TOPICS = [
 # 8. 결정 필요 (번호, 결정 사항, 선택지, 권고, 결정 주체)
 # ---------------------------------------------------------------------------
 DECISIONS = [
-    ("D1", "GBS 8자리 코드 기준", "① 0930 CoA GBS코드 열 ② 예금명세서 '현행 GBS(2026.6.30)' 코드",
-     "11자리 통합코드를 기준키로 하고 8자리는 본점이 재채번해 한 번만 매핑. 예금팀은 8자리 직접 참조를 중단", "본점 CoA 담당·HQ IT"),
-    ("D2", "예금 GL 결정키", "① 상품×거주성×통화(예금명세서) ② 상품×거주성×고객유형군(통합 L4)",
-     "② (통합 L4가 고객유형 축). 통화는 제외(P5)", "본점 CoA 담당·재무"),
-    ("D3", "외국인 비거주자(FN) 계좌", "① NRO GL 통합 + nr_subtype ② 별도 GL 유지", "①(FEMA상 NRO)", "재무·컴플라이언스"),
-    ("D4", "금융/이행보증·내국LC", "① 속성 ② 이전안대로 GL L5/L4", "① (Sch.12에 구분 없음). 본점이 GL을 원하면 유지 가능", "본점 CoA 담당"),
-    ("D5", "정상자산 충당금 표시", "① Sch.5 부채 ② 대출 차감(ECL)", "ACPIR 적용 시점·서식 확인 후 결정(20990300000 선택)", "재무"),
-    ("D6", "INR 결제계좌 L5", "① L5 신설 ② 통화+속성만", "① (하위원장 대사·Form A 차감 근거 명확)", "재무·자금"),
-    ("D7", "규정 확인(VERIFY=Y)", "-", "PSL 목표·하위목표, Form A 은행시스템 범위, LBS 대상, 법정준비금·IFR, PSLC 손익 표시, RBI 기타계좌 범위", "컴플라이언스"),
+    ("D1", "기준 계정코드", "① 11자리 통합코드 ② 8자리", "11자리 기준. 8자리는 이행 원천코드(시트 09)로만 사용", "결정(2026-11-05)"),
+    ("D2", "예금 GL 결정키", "① 상품×거주성×통화 ② 상품×거주성×고객유형군(통합 L4)",
+     "② (통합 L4가 고객유형 축). 현행 거주자 정기·당좌·EEFC는 이행 시 법인/개인 분할(시트 09 '분할')", "권고"),
+    ("D3", "외국인 비거주자(FN) vs NRO", "① NRO GL 하나 + nr_subtype 부분합 ② FN 별도 GL ③ NRO 아래 L6",
+     "① — FN은 NRO의 부분집합(FEMA). 재무제표·RBI 보고·세율이 같고, GL을 바꾸는 사건은 거주성 변경뿐(시트 07)", "권고"),
+    ("D4", "금융/이행보증·내국LC", "① 속성 ② GL L5/L4", "① — RWA 명세(시트13 D)도 보증 목적코드로 CCF를 판정 → 속성과 일치", "권고"),
+    ("D5", "정상자산 충당금", "ECL Directions 2026(2027-04-01) 기준 Stage별", "Stage별 L5 3개 + 부외 ECL은 0930 기존 계정 + 전환조정 자본(시트 10)", "결정(2026-11-05)"),
+    ("D6", "INR 결제계좌 L5", "① L5 신설 ② 통화+속성만", "① (하위원장 대사·Form A 차감 근거 명확)", "권고"),
+    ("D7", "규정 확인(VERIFY=Y)", "-", "PSL 목표, Form A 은행시스템 범위, LBS, 법정준비금·IFR, PSLC 손익 표시, s.11(2)(b) 예치 계좌, ECL 적용 범위(은행예치·HTM)", "미결"),
+    ("E1", "은행 정기예치 ₹208.9 crore 계정", "① DUE FROM BANKS ON TIME(10106010000) ② 0930대로 CD PURCHASE", "① — Sch.7 '기타예금'. 이자·미수이자도 같이 재매핑", "권고"),
+    ("E2", "0930 GBS코드 열 정정", "-", "시트 09 '수정' 57건을 본점 CoA 담당에 전달(8자리→11자리 이행표의 원본)", "요청"),
+    ("E3", "ECL 명세서 신규코드", "① 11자리로 신설 ② 8자리 10690003~5", "① — 8자리 10690003~5는 현행 증권·사모사채·콜론 충당금이 이미 사용 중", "권고"),
+    ("E4", "EIR 조정계정(10370300000)", "① 신설 ② LOF·LOC 상각만", "LOF·LOC 잔액이 0이면 ②로 시작 가능. ECL팀 확인", "미결"),
 ]
 
 
@@ -528,7 +545,7 @@ def validate():
     errs = []
     for r in R:
         c = r["code"]
-        if c == "-":
+        if c == "-" or r["kind"] == "철회":
             continue
         if r["kind"] == "신규":
             if c in known:
