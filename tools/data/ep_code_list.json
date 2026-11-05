@@ -1,0 +1,826 @@
+[
+{
+"gl": "",
+"ep": "210000",
+"name": "TRAVEL EXPENSES",
+"budget": 1020750.45,
+"dr": 631829.12,
+"cr": 98370.29
+},
+{
+"gl": "52032001",
+"ep": "210001",
+"name": "Travel Expense ( Domestic )",
+"budget": 0,
+"dr": 448352.12,
+"cr": 37163.29
+},
+{
+"gl": "52032002",
+"ep": "210002",
+"name": "Travel Expense ( Oversea )",
+"budget": 0,
+"dr": 183477,
+"cr": 61207
+},
+{
+"gl": "52032003",
+"ep": "210003",
+"name": "Travel Expense ( Education )",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032004",
+"ep": "210004",
+"name": "Travel Expense ( Incoming )",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "220000",
+"name": "LATE NIGHT MEAL EXPENSES",
+"budget": 108526,
+"dr": 48392.04,
+"cr": 0
+},
+{
+"gl": "52032012",
+"ep": "220001",
+"name": "Late Night Meal Expense",
+"budget": 0,
+"dr": 48392.04,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "221000",
+"name": "LUNCH EXPENSE",
+"budget": 2000000,
+"dr": 1322753.88,
+"cr": 0
+},
+{
+"gl": "52032011",
+"ep": "221001",
+"name": "Lunch Expense",
+"budget": 0,
+"dr": 1322753.88,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "222000",
+"name": "MEAL EXPENSE",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032013",
+"ep": "222001",
+"name": "Meal Expense (Other)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "230000",
+"name": "WELFARE EXPENSES",
+"budget": 11409000,
+"dr": 8825864.66,
+"cr": 693117.11
+},
+{
+"gl": "52032101",
+"ep": "230001",
+"name": "Welfare Expense(Fidelitybond)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032102",
+"ep": "230002",
+"name": "Welfare Expense(Worker'S Compensation)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032103",
+"ep": "230003",
+"name": "Welfare Expense(Health Insurance)",
+"budget": 0,
+"dr": 427416.18,
+"cr": 0
+},
+{
+"gl": "52032104",
+"ep": "230004",
+"name": "Welfare Expense(Scholaship)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032105",
+"ep": "230005",
+"name": "Welfare Expense(Accident Insurance)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032106",
+"ep": "230006",
+"name": "Welfare Expense(National Pension)",
+"budget": 0,
+"dr": 812345.4,
+"cr": 0
+},
+{
+"gl": "52032107",
+"ep": "230007",
+"name": "Welfare Expense(Congratulation And Condolences)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032108",
+"ep": "230008",
+"name": "Welfare Expense(Transport)",
+"budget": 0,
+"dr": 13760.94,
+"cr": 0
+},
+{
+"gl": "52032109",
+"ep": "230009",
+"name": "Welfare Expense(Health & Physical)",
+"budget": 0,
+"dr": 74110,
+"cr": 0
+},
+{
+"gl": "52032110",
+"ep": "230010",
+"name": "Welfare Expense(Unemployment Insurance)",
+"budget": 0,
+"dr": 989722.28,
+"cr": 0
+},
+{
+"gl": "52032111",
+"ep": "230011",
+"name": "Welfare Expense(Other For Salay)",
+"budget": 0,
+"dr": 437408,
+"cr": 0
+},
+{
+"gl": "52032112",
+"ep": "230012",
+"name": "Welfare Expense(Clothing)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032113",
+"ep": "230013",
+"name": "Welfare Expense(Welfare Pension)",
+"budget": 0,
+"dr": 2571948.39,
+"cr": 693117.11
+},
+{
+"gl": "52032114",
+"ep": "230014",
+"name": "Welfare Expense(Accident Compensation)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032115",
+"ep": "230015",
+"name": "Welfare Expense(DISABLED KIDS)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032116",
+"ep": "230016",
+"name": "Welfare Expense(Self Development)",
+"budget": 0,
+"dr": 1262707.49,
+"cr": 0
+},
+{
+"gl": "52032117",
+"ep": "230017",
+"name": "Welfare Expense(Longterm Care Insurance For The Ag",
+"budget": 0,
+"dr": 55977.13,
+"cr": 0
+},
+{
+"gl": "52032118",
+"ep": "230018",
+"name": "Welfare Expense(Other)",
+"budget": 0,
+"dr": 2180468.85,
+"cr": 0
+},
+{
+"gl": "52032119",
+"ep": "230019",
+"name": "Welfare Expense(Transport For Ny)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032120",
+"ep": "230020",
+"name": "Welfare Expense(Welfare Point)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032401",
+"ep": "230021",
+"name": "Welfare Expense(Benevolent Fee)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240100",
+"name": "COMMUNICATION & TRANSPORT EXPENSES",
+"budget": 31432000,
+"dr": 18554554.83,
+"cr": 1813983.77
+},
+{
+"gl": "52032201",
+"ep": "240101",
+"name": "Communication & Transport Expense",
+"budget": 0,
+"dr": 18554554.83,
+"cr": 1813983.77
+},
+{
+"gl": "",
+"ep": "240200",
+"name": "OFFICE SUPPLIES EXPENSES",
+"budget": 498614.89,
+"dr": 365011.27,
+"cr": 79
+},
+{
+"gl": "52032221",
+"ep": "240201",
+"name": "Office Supplies Expense",
+"budget": 0,
+"dr": 365011.27,
+"cr": 79
+},
+{
+"gl": "",
+"ep": "240300",
+"name": "PRINTING EXPENSES",
+"budget": 187854,
+"dr": 110986.6,
+"cr": 0
+},
+{
+"gl": "52032241",
+"ep": "240301",
+"name": "Printing Expense",
+"budget": 0,
+"dr": 110986.6,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240400",
+"name": "SUNDRY OFFICE RENTAL EXPENSES",
+"budget": 10000000,
+"dr": 2880673.47,
+"cr": 0
+},
+{
+"gl": "52032261",
+"ep": "240401",
+"name": "Sundry Office Rental Expense",
+"budget": 0,
+"dr": 2880673.47,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240500",
+"name": "ADVERTISING EXPENSES",
+"budget": 1285161.82,
+"dr": 785887,
+"cr": 0
+},
+{
+"gl": "52032281",
+"ep": "240501",
+"name": "Advertising Expense",
+"budget": 0,
+"dr": 785887,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240600",
+"name": "REGISTERED MAIL & LAWSUIT EXPENSES",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032301",
+"ep": "240601",
+"name": "Registered Mail & Lawsuit Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240700",
+"name": "REGULARITY DEVELOPMENT EXPENSES",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032321",
+"ep": "240701",
+"name": "Regular Development Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240800",
+"name": "BUSINESS EXPENSES",
+"budget": 681787.95,
+"dr": 526555.93,
+"cr": 0
+},
+{
+"gl": "52032341",
+"ep": "240801",
+"name": "Business Expense",
+"budget": 0,
+"dr": 526555.93,
+"cr": 0
+},
+{
+"gl": "52032341",
+"ep": "240802",
+"name": "Gift / Advertisement Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032341",
+"ep": "240803",
+"name": "Marketing expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "240900",
+"name": "REPAIR EXPENSES",
+"budget": 1094644.11,
+"dr": 1036690.98,
+"cr": 12390
+},
+{
+"gl": "52032361",
+"ep": "240901",
+"name": "Repair Expense",
+"budget": 0,
+"dr": 1036690.98,
+"cr": 12390
+},
+{
+"gl": "",
+"ep": "241000",
+"name": "WATER & ELECTRIC EXPENSES",
+"budget": 1017000,
+"dr": 929401.46,
+"cr": 1385.32
+},
+{
+"gl": "52032381",
+"ep": "241001",
+"name": "Water & Electric Expense",
+"budget": 0,
+"dr": 929401.46,
+"cr": 1385.32
+},
+{
+"gl": "",
+"ep": "241100",
+"name": "INSURANCE FEES",
+"budget": 82600,
+"dr": 82600,
+"cr": 0
+},
+{
+"gl": "52032603",
+"ep": "241101",
+"name": "Insurance Fee",
+"budget": 0,
+"dr": 82600,
+"cr": 0
+},
+{
+"gl": "52032601",
+"ep": "241102",
+"name": "Deposit Insurance",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032602",
+"ep": "241103",
+"name": "Deposit Insurance(Special)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241200",
+"name": "RENTAL EXPENSES",
+"budget": 41257000,
+"dr": 38856555.2,
+"cr": 0
+},
+{
+"gl": "52032421",
+"ep": "241201",
+"name": "Rental Expense",
+"budget": 0,
+"dr": 38856555.2,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241300",
+"name": "VEHICLE MAINTENANCE EXPENSES",
+"budget": 5860.98,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032441",
+"ep": "241301",
+"name": "Vehicle Maintenance Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241400",
+"name": "TRAINING EXPENSES",
+"budget": 60809,
+"dr": 69109,
+"cr": 8300
+},
+{
+"gl": "52032461",
+"ep": "241401",
+"name": "Training Expense",
+"budget": 0,
+"dr": 69109,
+"cr": 8300
+},
+{
+"gl": "",
+"ep": "241500",
+"name": "SERVICE COMMISSION EXPENSE",
+"budget": 45024375.37,
+"dr": 39186536.16,
+"cr": 76600
+},
+{
+"gl": "52032481",
+"ep": "241501",
+"name": "Service Commission Expense",
+"budget": 0,
+"dr": 39120456.16,
+"cr": 76600
+},
+{
+"gl": "52032481",
+"ep": "241502",
+"name": "Audit Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032481",
+"ep": "241503",
+"name": "Legal Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032481",
+"ep": "241504",
+"name": "Professional Expense",
+"budget": 0,
+"dr": 66080,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241600",
+"name": "MEETING EXPENSES",
+"budget": 459344.14,
+"dr": 291649.68,
+"cr": 934.1
+},
+{
+"gl": "52032501",
+"ep": "241601",
+"name": "Meeting Expense",
+"budget": 0,
+"dr": 291649.68,
+"cr": 934.1
+},
+{
+"gl": "",
+"ep": "241700",
+"name": "MISC. TAXS",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032521",
+"ep": "241701",
+"name": "Misc. Tax",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241800",
+"name": "OTHER EXPENSES",
+"budget": 322201.06,
+"dr": 258029.34,
+"cr": 0
+},
+{
+"gl": "52032541",
+"ep": "241801",
+"name": "Other Expense",
+"budget": 0,
+"dr": 258029.34,
+"cr": 0
+},
+{
+"gl": "50232541",
+"ep": "241802",
+"name": "Contribution & Donation",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "241900",
+"name": "SHARE EXPENSE (OTHER)",
+"budget": 894000,
+"dr": 893260,
+"cr": 0
+},
+{
+"gl": "52032014",
+"ep": "241901",
+"name": "Share Expense (Other)",
+"budget": 0,
+"dr": 893260,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "242100",
+"name": "OTHER ADVERTISING EXPENSE",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032282",
+"ep": "242101",
+"name": "Other Advertising Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "242200",
+"name": "DEPOSIT INSURANCE",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032601",
+"ep": "242201",
+"name": "Deposit Insurance",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032602",
+"ep": "242202",
+"name": "Deposit Insurance(Special)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "242300",
+"name": "REWARD EXPENSE",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52032491",
+"ep": "242301",
+"name": "Reward Expense",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "",
+"ep": "310000",
+"name": "SALARY EXPENSES",
+"budget": 77100000,
+"dr": 86636952.74,
+"cr": 9599174.2
+},
+{
+"gl": "52031001",
+"ep": "310001",
+"name": "Salary(Base)",
+"budget": 0,
+"dr": 7019104.02,
+"cr": 0
+},
+{
+"gl": "52031003",
+"ep": "310002",
+"name": "Salary(Qualifiication)",
+"budget": 0,
+"dr": 2395598.06,
+"cr": 0
+},
+{
+"gl": "52031004",
+"ep": "310003",
+"name": "Salary(Post Attached)",
+"budget": 0,
+"dr": 5790276.69,
+"cr": 0
+},
+{
+"gl": "52031005",
+"ep": "310004",
+"name": "Salary(Local)",
+"budget": 0,
+"dr": 9770500.59,
+"cr": 0
+},
+{
+"gl": "52031006",
+"ep": "310005",
+"name": "Salary(Overtime-Local)",
+"budget": 0,
+"dr": 1527846.65,
+"cr": 0
+},
+{
+"gl": "52031011",
+"ep": "310006",
+"name": "Sundry Allowances(Overtime)",
+"budget": 0,
+"dr": 35160.81,
+"cr": 0
+},
+{
+"gl": "52031013",
+"ep": "310007",
+"name": "Sundry Allowances(Annual Paid Vacation)",
+"budget": 0,
+"dr": 1237253.46,
+"cr": 0
+},
+{
+"gl": "52031014",
+"ep": "310008",
+"name": "Sundry Allowances(Overseas Bonus)",
+"budget": 0,
+"dr": 0,
+"cr": 0
+},
+{
+"gl": "52031015",
+"ep": "310009",
+"name": "Sundry Allowances(Overseas Adjust)",
+"budget": 0,
+"dr": 23175303,
+"cr": 9555861.56
+},
+{
+"gl": "52031016",
+"ep": "310010",
+"name": "Sundry Allowances(Others)",
+"budget": 0,
+"dr": 10134598.98,
+"cr": 20883.31
+},
+{
+"gl": "52031018",
+"ep": "310011",
+"name": "Sundry Allowances(Fixed Bonus)",
+"budget": 0,
+"dr": 4610231.89,
+"cr": 0
+},
+{
+"gl": "52031019",
+"ep": "310012",
+"name": "Sundry Allowances(Flat Bonus)",
+"budget": 0,
+"dr": 4535055.91,
+"cr": 0
+},
+{
+"gl": "52031020",
+"ep": "310013",
+"name": "Sundry Allowances(Special Bonus)",
+"budget": 0,
+"dr": 7519199.58,
+"cr": 0
+},
+{
+"gl": "52031021",
+"ep": "310014",
+"name": "Sundry Allowances(Overseas Send)",
+"budget": 0,
+"dr": 6085662.1,
+"cr": 0
+},
+{
+"gl": "52031022",
+"ep": "310015",
+"name": "Salary(Retirement-Local)",
+"budget": 0,
+"dr": 1172460.12,
+"cr": 0
+},
+{
+"gl": "52031012",
+"ep": "310016",
+"name": "Sundry Allowances(Bonus-Local)",
+"budget": 0,
+"dr": 1628700.88,
+"cr": 22429.33
+}
+]

@@ -1,0 +1,248 @@
+[
+{
+"code": "1100000",
+"name": "TANGIBLE TOOLS AND EQUIPMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1101000",
+"name": "TANGIBLE TOOLS AND EQUIPMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1200000",
+"name": "INTANGIBLE TOOLS AND EQUIPMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1201000",
+"name": "INTANGIBLE TOOLS AND EQUIPMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1400000",
+"name": "SOFTWARE",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1401000",
+"name": "SOFTWARE",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1500000",
+"name": "HARDWARE",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1501000",
+"name": "COMPUTER",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1503000",
+"name": "PRINTER",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1504000",
+"name": "SERVER",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1509000",
+"name": "OTHER HARDWARES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1600000",
+"name": "OFFICE MACHINES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1601000",
+"name": "OFFICE MACHINES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1700000",
+"name": "VEHICLE",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1701000",
+"name": "CAR",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1800000",
+"name": "FURNITURE / OFFICE SUPPLIES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1801000",
+"name": "CABINET & PARTITION",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1802000",
+"name": "TABLE",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1803000",
+"name": "SEAT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1804000",
+"name": "TELEPHON",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1805000",
+"name": "CAMERA",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1806000",
+"name": "BOXES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1807000",
+"name": "ELECTRONIC",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1808000",
+"name": "DECORATION",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1809000",
+"name": "OTHERS FURNITURE / OFFICE SUPPLIES",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1900000",
+"name": "LEASHOLD IMPROVEMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "1901000",
+"name": "LEASHOLD IMPROVEMENT",
+"life": "0",
+"rate": 0
+},
+{
+"code": "3100000",
+"name": "VEHICLES",
+"life": "",
+"rate": 0
+},
+{
+"code": "3101000",
+"name": "VEHICLES",
+"life": "",
+"rate": 0
+},
+{
+"code": "3400000",
+"name": "INTANGIBLE ASSETS",
+"life": "",
+"rate": 0
+},
+{
+"code": "3401000",
+"name": "SOFTWARES",
+"life": "",
+"rate": 0
+},
+{
+"code": "3500000",
+"name": "COMPUTERS",
+"life": "",
+"rate": 0
+},
+{
+"code": "3501000",
+"name": "END-USER DEVICES",
+"life": "",
+"rate": 0
+},
+{
+"code": "3502000",
+"name": "SERVERS AND NETWORKS",
+"life": "",
+"rate": 0
+},
+{
+"code": "3600000",
+"name": "OFFICE EQUIPMENTS",
+"life": "",
+"rate": 0
+},
+{
+"code": "3601000",
+"name": "OFFICE SUPPLIES",
+"life": "",
+"rate": 0
+},
+{
+"code": "3800000",
+"name": "FURNITURE & FIXTURE",
+"life": "",
+"rate": 0
+},
+{
+"code": "3801000",
+"name": "FURNITURE & FIXTURE",
+"life": "",
+"rate": 0
+},
+{
+"code": "3900000",
+"name": "BUILDINGS (LEASED PREMISES)",
+"life": "",
+"rate": 0
+},
+{
+"code": "3901000",
+"name": "BUILDINGS (LEASED PREMISES)",
+"life": "",
+"rate": 0
+},
+{
+"code": "3902000",
+"name": "PROPERTIES",
+"life": "",
+"rate": 0
+}
+]

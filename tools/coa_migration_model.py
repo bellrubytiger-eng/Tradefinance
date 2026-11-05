@@ -189,6 +189,10 @@ OVR = {
     "62030002": ("60170000000", "확인", ""), "62000009": ("60140100000", "AUTO", ""),
 }
 
+# 4차 덮어쓰기 (적금 L3, TDS·TCS·GST L6, 고정자산, 비용)
+import tax_fa_model as _TF
+OVR.update(_TF.OVR3)
+
 # 투자: 현행 (분류 1031=AFS/1032=TRADE/1033=HTM) × (발행자 01~19)
 _INV_BS = {"1031": ("10201010100", "10201010200", "10201020100", "10201010400", "10201020200", "10201010600"),
            "1032": ("10202010100", "10202010200", "10202020100", "10202010400", "10202020200", "10202010600"),
@@ -281,7 +285,7 @@ def targets_of(t):
 
 
 def validate():
-    known = set(CM.ALL) | {n[0] for n in NEW2}
+    known = set(CM.ALL) | {n[0] for n in NEW2} | {n[0] for n in _TF.NEW3}
     import coa_review_model as RM
     known |= {r["code"] for r in RM.R if r["kind"] == "신규"}
     errs = []
