@@ -1451,6 +1451,16 @@
 {
 "stmt": "BS",
 "side": "ASSET",
+"code": "10990003",
+"name": "Maintenance Charges Deposit (관리비 예치금)",
+"depth": 3,
+"amt": 0.0,
+"leaf": true,
+"added": "2026-11 현행 신설(사용자 통보), 2026-07-07 잔액 없음"
+},
+{
+"stmt": "BS",
+"side": "ASSET",
 "code": "12100000",
 "name": "FIXED ASSETS",
 "depth": 0,
