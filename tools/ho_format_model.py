@@ -153,8 +153,9 @@ def rows():
             name, krw = v["name"], ""
             src_ho = anc if anc.get("ho_name") else (_sibling_ho(c, lvl[c]) or {})
             if not src_ho.get("ho_name") and c[:4] in ("2019", "5017"):  # 적금 = 정기예금과 같은 본점 매핑(결정 P3)
-                twin = BASE_BY.get({"2019": "2016", "5017": "5012"}[c[:4]] + c[4:]) or _sibling_ho({"2019": "2016", "5017": "5012"}[c[:4]] + c[4:], lvl[c])
-                src_ho = twin or {}
+                tc = {"2019": "2016", "5017": "5012"}[c[:4]] + c[4:]
+                twin = BASE_BY.get(tc) or _sibling_ho(tc, lvl[c]) or _ancestor(tc)
+                src_ho = twin if twin and twin.get("ho_name") else {}
             ho, ho_name = src_ho.get("ho", ""), (src_ho.get("ho_name", "") + " (안)") if src_ho.get("ho_name") else "(본점 매핑 요청)"
             nonmon, gbs = anc.get("nonmon", ""), "채번요청"
         india_name = (v["name"] if v and a and v["name"] and v["name"].strip() != name else "")
