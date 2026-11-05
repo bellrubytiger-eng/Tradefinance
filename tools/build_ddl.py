@@ -58,18 +58,24 @@ def main(out):
         L.append(f"INSERT INTO TB_FX_PARAM (PARAM_ID, EFF_FROM_DT, EFF_TO_DT, PARAM_NAME, PARAM_VALUE, UNIT, REG_SOURCE, REG_USER_ID, REG_TS) "
                  f"VALUES ('{p[0]}', DATE '2000-01-01', DATE '9999-12-31', '{p[1]}', '{v}', '{p[3]}', '{p[5]}', 'SYSTEM', SYSTIMESTAMP);")
     L.append("")
-    L.append("-- 통합 표준 CoA + 인도지점 상태 초기적재 (BR_STATUS: NEW=신규 임시코드, MOD=변경, INACT=비활성)")
+    L.append("-- 통합 표준 CoA (06 인도 반영본) 초기적재. BR_STATUS: NEW/MOD/DESIG/INACT/WDRN/TEMP, BR_POSTING: USE/NOUSE/IFRS")
     import coa_model as COA
-    q = lambda v: "NULL" if v in (None, "") else "'" + str(v).replace("'", "''") + "'"
-    st = {"신규": "NEW", "변경": "MOD", "비활성": "INACT"}
-    parents = {r["code"][: 1 + 2 * (r["lv"] - 1)] for r in COA.coa_rows()}
+    q = lambda v: "NULL" if v in (None, "") else "'" + str(v).replace("'", "''")[:400] + "'"
+    st = {"신규": "NEW", "변경": "MOD", "용도지정": "DESIG", "비활성": "INACT", "철회": "WDRN", "기한부": "TEMP"}
+    pst = lambda p: "IFRS" if "IFRS" in p else ("NOUSE" if p == "미사용" else "USE")
     for r in COA.coa_rows():
-        par = r["code"][: 1 + 2 * (r["lv"] - 2)].ljust(11, "0") if r["lv"] > 1 else ""
-        has_child = any(x["code"] != r["code"] and x["code"].startswith(r["code"][: 1 + 2 * (r["lv"] - 1)]) and x["lv"] > r["lv"] for x in COA.coa_rows()) if r["lv"] >= 3 else True
-        L.append("INSERT INTO TB_COA_ACCT (ACCT_CD, ACCT_LVL, PARENT_CD, ACCT_NM_EN, ACCT_NM_BR, BS_PL, HO_ACCT_CD, GBS_CD, NONMON_YN, POSTABLE_YN, BR_STATUS, TEMP_CD_YN, BR_MEMO, REG_USER_ID, REG_TS) VALUES ("
-                 f"{q(r['code'])}, {r['lv']}, {q(par)}, {q(r['name'])}, {q(r.get('br_name') or (r['krw'] if r['status'] == '신규' else ''))}, {q(r['grp'])}, "
-                 f"{q(r['ho'])}, {q(r['gbs'] if r['gbs'] != '채번요청' else '')}, {q('Y' if r['nonmon'] else 'N')}, {q('N' if has_child else 'Y')}, "
-                 f"{q(st.get(r['status'], ''))}, {q('Y' if r['status'] == '신규' else 'N')}, {q(r['memo'])}, 'SYSTEM', SYSTIMESTAMP);")
+        par = COA.parent_of(r["code"]) or ""
+        until = COA.TEMP_USE.get(r["code"])
+        L.append("INSERT INTO TB_COA_ACCT (ACCT_CD, ACCT_LVL, PARENT_CD, ACCT_NM_EN, ACCT_NM_BR, BS_PL, HO_ACCT_CD, GBS_CD, NONMON_YN, POSTABLE_YN, BR_STATUS, BR_POSTING, USE_UNTIL_DT, SCH_LINE, TEMP_CD_YN, BR_MEMO, REG_USER_ID, REG_TS) VALUES ("
+                 f"{q(r['code'])}, {r['lv']}, {q(par)}, {q(r['name'])}, {q(r['br_name'])}, {q(r['grp'])}, "
+                 f"{q(r['ho'])}, {q(r['gbs'] if r['gbs'] not in ('채번요청', 'None') else '')}, {q('Y' if r['nonmon'] else 'N')}, {q('Y' if r['leaf'] else 'N')}, "
+                 f"{q(st.get(r['status'], ''))}, {q(pst(r['post']))}, {('DATE ' + q(until)) if until else 'NULL'}, {q(r['sch'])}, {q('Y' if r['status'] == '신규' else 'N')}, {q(r['memo'])}, 'SYSTEM', SYSTIMESTAMP);")
+    L.append("")
+    L.append("-- 현행 8자리 → 차세대 11자리 이행 맵핑 (06 파일 + 검토 결과)")
+    for m in COA.MAPPING:
+        L.append("INSERT INTO TB_COA_MIGR_MAP (CUR_GBS_CD, ACCT_CD, MAP_TYPE, SPLIT_RULE, BAL_INR_BASE, REVIEW_STS, REVIEW_NOTE, REG_USER_ID, REG_TS) VALUES ("
+                 f"{q(m['cur'])}, {q(m['target'] if m['target'] != '이행 제외' else m['code'])}, {q(m['kind'])}, {q(COA.SPLIT_RULE.get(m['cur'], ''))}, {m['bal'] if m['bal'] not in (None, '') else 'NULL'}, "
+                 f"{q(m['sev'] if m['target'] != '이행 제외' else '이행제외')}, {q(m['issue'])}, 'SYSTEM', SYSTIMESTAMP);")
     L.append("")
     L.append("-- 업무별 분개 규칙 초기적재 (tools/coa_model.py 예시 분개에서 생성)")
     for ev, seq, dc, acct, cb, ab, scr, desc in COA.rule_rows():

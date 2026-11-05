@@ -83,8 +83,10 @@ def main(out):
              ("14.SWIFT카탈로그", "MT1xx~9xx ↔ MX 대응, 송신 형식, 자동생성·수신 연결 화면"),
              ("15.RBI기준검토", "업로드 무역금융 자료·기존 설계의 RBI 최신 기준 대조 결과"),
              ("16.규정근거색인", "규정별 번호·고시일·시행일·관련 파라미터·규칙·출처"),
-             ("17.CoA(인도지점)", "차세대 GBS 통합 표준 CoA + 인도지점 신규(주황)·변경(연주황)·비활성(회색)·정정권고(노랑), 메모"),
-             ("18.업무별분개", "업무별 예시 분개(통화별 대차 검증 수식 포함). 금액은 고객 서식 샘플과 일치")]
+             ("17.CoA(인도지점)", "06 인도 반영 CoA 전체 1,360계정: 신규(주황)·변경/용도지정/기한부(연주황)·비활성/철회(회색)·IFRS 전용(하늘)·0930 정정권고(노랑), 현행 8자리·잔액"),
+             ("18.업무별분개", "업무별 예시 분개(통화별 대차 검증 수식 포함). 금액은 고객 서식 샘플과 일치"),
+             ("19.계정이행맵핑", "현행 인도 GBS 8자리 → 차세대 11자리 이행표, 분할 기준·검토 결과·시스템 사용"),
+             ("20.CoA검토의견", "06 인도 반영 CoA 검토 의견(추가·수정·삭제)")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -94,9 +96,10 @@ def main(out):
     ws.cell(r, 2, "").fill = INPUT_FILL
     ws.cell(r, 3, "입력 셀 (7.기한계산기)").font = f(); r += 1
     for fill, txt in [(NEW_FILL, "17·18번 시트: 인도지점 신규 계정 (본점 채번 전 임시코드, 메모 참조)"),
-                      (MOD_FILL, "17번 시트: 인도지점 적용 변경 (표시명·직접기장 금지 등)"),
-                      (INACT_FILL, "17번 시트: 인도지점 비활성 (통합 CoA에서 삭제하지 않음)"),
-                      (FIX_FILL, "17번 시트 '통합 CoA 정정 권고' 열: 본점 CoA 담당 전달 사항")]:
+                      (MOD_FILL, "17번 시트: 변경·용도지정·기한부 / 19번 시트: 분할규칙 필요"),
+                      (INACT_FILL, "17번 시트: 비활성·철회 (통합 CoA에서 삭제하지 않음)"),
+                      (IFRS_FILL, "17번 시트: 본점 IFRS 조정 전용 (인도 원장 기장 차단)"),
+                      (FIX_FILL, "17번 시트 0930 정정 권고 / 19번 시트 대상 정정(수정)")]:
         ws.cell(r, 2, "").fill = fill; ws.cell(r, 3, txt).font = f(); r += 1
     r += 1
     ws.cell(r, 2, "기반 자료").font = f(bold=True, size=12); r += 1
@@ -172,6 +175,8 @@ def main(out):
           note="설계에 쓰인 모든 규정·국제규칙의 번호·일자·적용 범위와, 해당 규정을 근거로 하는 파라미터(6번 시트)·업무규칙(4번 시트) 색인")
     build_coa(wb)
     build_journal(wb)
+    build_map(wb)
+    build_review(wb)
     wb.save(out)
     print("saved", out)
 
@@ -288,42 +293,99 @@ def build_calc(wb):
 
 
 
+IFRS_FILL = PatternFill("solid", fgColor="DDEBF7")   # 하늘: 본점 IFRS 조정 전용(인도 원장 차단)
+ERR_FILL = PatternFill("solid", fgColor="F8CBAD")
+
+
+def _hdr(ws, r, hdr):
+    for c, h in enumerate(hdr, 1):
+        x = ws.cell(r, c, h); x.font = Font(name=FONT, bold=True, color="FFFFFF", size=10); x.fill = HDR_FILL
+        x.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True); x.border = BORDER
+
+
 def build_coa(wb):
     ws = wb.create_sheet("17.CoA(인도지점)")
     rows = M.as_dict()["COA"]
-    n = {k: sum(1 for r in rows if r["status"] == k) for k in ("신규", "변경", "비활성")}
-    nf = sum(1 for r in rows if r.get("fix"))
-    ws.cell(1, 1, f"차세대 GBS 통합 표준 CoA(0930) · 인도(Noida) 지점 적용본 — 전체 {len(rows)}개 / 신규 {n['신규']} (주황) · "
-                  f"변경 {n['변경']} (연주황) · 비활성 {n['비활성']} (회색) · 정정권고 {nf} (노랑)").font = Font(name=FONT, bold=True, size=11, color="1F4E79")
-    ws.cell(2, 1, "신규 계정 코드는 통합 CoA 번호체계(L1 1 + L2~L6 각 2자리)를 따른 임시코드이며 본점 채번 후 교체(R-ACC-08). "
-                  "본점 매핑 '(안)'은 상위·유사 계정 기준 제안값. 계정코드 셀의 메모(코멘트)에 사유 기재.").font = Font(name=FONT, italic=True, size=9, color="595959")
-    hdr = ["계정코드", "Lv", "구분", "업무영역", "계정과목(영문)", "인도지점 표시명 / 한글명", "본점 통합계정", "본점 통합계정명",
-           "비화폐성", "현행 GBS코드", "인도지점 상태", "메모", "통합 CoA 정정 권고"]
-    for c, h in enumerate(hdr, 1):
-        x = ws.cell(4, c, h); x.font = Font(name=FONT, bold=True, color="FFFFFF", size=10); x.fill = HDR_FILL
-        x.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True); x.border = BORDER
+    cnt = lambda k: sum(1 for r in rows if r["status"] == k)
+    ws.cell(1, 1, f"차세대 GBS 통합 표준 CoA(0930) · 인도(노이다) 반영본(06 파일) — {len(rows)}계정 / 신규 {cnt('신규')} (주황) · 변경 {cnt('변경')}·용도지정 {cnt('용도지정')} (연주황) · "
+                  f"비활성 {cnt('비활성')}·철회 {cnt('철회')} (회색) · 기한부 {cnt('기한부')} · IFRS 전용 {sum(1 for r in rows if 'IFRS' in r['post'])} (하늘)").font = Font(name=FONT, bold=True, size=11, color="1F4E79")
+    ws.cell(2, 1, "A~J 본점 0930 원안, K열부터 인도 검토(06 파일). 기장은 leaf·사용 계정만(결정 G2). '기한부'는 이번 검토로 06 파일 상태를 정정한 계정(결정 L3). 계정코드 셀 메모에 사유.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    hdr = ["계정코드", "Lv", "구분", "업무영역", "계정과목(영문)", "인도 표시명", "본점 통합계정", "본점 통합계정명", "비화폐성", "GBS코드(0930)",
+           "인도 상태", "인도 원장 기장", "leaf", "현행 인도 GBS(8자리)", "현행 잔액 INR(2026-07-07)", "변경 사유·근거", "인도 재무제표 줄", "0930 정정 권고"]
+    _hdr(ws, 4, hdr)
     for i, a in enumerate(rows, 5):
-        disp = a.get("br_name") or (a["krw"] if a["status"] == "신규" else "")
-        vals = [a["code"], a["lv"], a["grp"], a["area"], "  " * (a["lv"] - 1) + a["name"], disp, a["ho"], a["ho_name"],
-                a["nonmon"], a["gbs"], a["status"], a["memo"], a.get("fix", "")]
-        fill = {"신규": NEW_FILL, "변경": MOD_FILL, "비활성": INACT_FILL}.get(a["status"])
+        vals = [a["code"], a["lv"], a["grp"], a["area"], "  " * (a["lv"] - 1) + a["name"], a["br_name"], a["ho"], a["ho_name"], a["nonmon"], a["gbs"],
+                a["status"], a["post"], "Y" if a["leaf"] else "", a["cur"], a["bal"], a["memo"], a["sch"], a["fix"]]
+        st = a["status"]
+        fill = NEW_FILL if st == "신규" else MOD_FILL if st in ("변경", "용도지정", "기한부") else INACT_FILL if st in ("비활성", "철회") else IFRS_FILL if "IFRS" in a["post"] else None
         for c, v in enumerate(vals, 1):
             x = ws.cell(i, c, v); x.border = BORDER
-            x.font = Font(name=FONT, size=9, bold=(a["lv"] <= 2 or a["status"] == "신규"),
-                          color="7F7F7F" if a["status"] == "비활성" else "000000")
-            x.alignment = Alignment(vertical="top", wrap_text=c in (5, 6, 8, 12, 13))
+            x.font = Font(name=FONT, size=9, bold=(a["lv"] <= 2 or st == "신규"), color="7F7F7F" if st in ("비활성", "철회") else "000000", strike=(st == "철회"))
+            x.alignment = Alignment(vertical="top", wrap_text=c in (5, 6, 8, 16, 17, 18))
+            if c == 15:
+                x.number_format = "#,##0.00"
             if fill:
                 x.fill = fill
-        if a.get("fix"):
-            ws.cell(i, 13).fill = FIX_FILL
-        if a["status"] in ("신규", "변경", "비활성"):
-            cm = Comment(f"[인도지점 {a['status']}] {a['memo']}", "CBS 설계")
-            cm.width, cm.height = 320, 110
+        if a["fix"]:
+            ws.cell(i, 18).fill = FIX_FILL
+        if st:
+            cm = Comment(f"[{st}] {a['memo'] or ''}"[:600], "CBS 설계"); cm.width, cm.height = 340, 120
             ws.cell(i, 1).comment = cm
-    for c, w in enumerate([13, 4, 9, 14, 50, 34, 15, 22, 7, 11, 9, 52, 44], 1):
+    for c, w in enumerate([13, 4, 9, 13, 44, 30, 15, 20, 7, 10, 9, 12, 5, 16, 15, 46, 22, 30], 1):
         ws.column_dimensions[get_column_letter(c)].width = w
     ws.freeze_panes = "B5"
-    ws.auto_filter.ref = f"A4:M{4 + len(rows)}"
+    ws.auto_filter.ref = f"A4:R{4 + len(rows)}"
+    r = 6 + len(rows)
+    ws.cell(r, 1, "잔액 합계 검증 (차변+, 0이면 현행 잔액 전체가 이관)").font = Font(name=FONT, bold=True, size=9)
+    ws.cell(r, 15, f"=SUM(O5:O{4 + len(rows)})").number_format = "#,##0.00"
+
+
+def build_map(wb):
+    ws = wb.create_sheet("19.계정이행맵핑")
+    d = M.as_dict()
+    rows = d["COA_MAP"]
+    ws.cell(1, 1, "현행 인도 GBS 8자리 → 차세대 11자리 이행 맵핑 (06 파일 기준 + 검토)").font = Font(name=FONT, bold=True, size=13, color="1F4E79")
+    sev = {k: sum(1 for m in rows if m["sev"] == k) for k in ("OK", "분할규칙", "수정", "오류")}
+    ws.cell(2, 1, f"현행 계정 {len({m['cur'] for m in rows})}개 · 연결 {len(rows)}행 — OK {sev['OK']} / 분할규칙 {sev['분할규칙']} / 수정 {sev['수정']} / 오류 {sev['오류']}. "
+                  "'권고 대상'이 06 파일 대상과 다르면 정정 제안. 시스템 사용 열은 당 설계의 화면·분개가 기장하는 계정.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    used = {}
+    for jr in d["JOURNAL"]:
+        if jr[7]:
+            used.setdefault(jr[7], set()).add(jr[1])
+    hdr = ["현행 계정(8자리)", "유형", "06 대상(11자리)", "대상 계정명", "Lv", "인도 상태", "인도 원장 기장", "기준일 잔액(INR, 차변+)", "검토", "권고 대상", "검토 의견·분할 기준", "시스템 사용(분개 ID)"]
+    _hdr(ws, 4, hdr)
+    for i, m in enumerate(rows, 5):
+        vals = [m["cur"], m["kind"], m["code"], m["name"], m["lv"], m["status"], m["post"], m["bal"], m["sev"], m["target"], m["issue"],
+                ", ".join(sorted(used.get(m["target"], set()) | used.get(m["code"], set())))]
+        f = {"수정": FIX_FILL, "분할규칙": MOD_FILL, "오류": ERR_FILL}.get(m["sev"])
+        for c, v in enumerate(vals, 1):
+            x = ws.cell(i, c, v); x.border = BORDER; x.font = Font(name=FONT, size=9, bold=(c == 9 and m["sev"] != "OK"))
+            x.alignment = Alignment(vertical="top", wrap_text=c in (4, 11, 12))
+            if c == 8:
+                x.number_format = "#,##0.00"
+            if f and c in (9, 10, 11):
+                x.fill = f
+    last = 4 + len(rows)
+    ws.cell(last + 2, 1, "잔액 합계 (중복 대상 제외 전, 참고)").font = Font(name=FONT, bold=True, size=9)
+    ws.cell(last + 2, 8, f"=SUM(H5:H{last})").number_format = "#,##0.00"
+    for c, w in enumerate([12, 14, 13, 34, 4, 9, 12, 16, 9, 13, 64, 18], 1):
+        ws.column_dimensions[get_column_letter(c)].width = w
+    ws.freeze_panes = "B5"
+    ws.auto_filter.ref = f"A4:L{last}"
+
+
+def build_review(wb):
+    ws = wb.create_sheet("20.CoA검토의견")
+    ws.cell(1, 1, "06 통합표준 CoA(인도 반영본) 검토 의견 — 추가·수정·삭제").font = Font(name=FONT, bold=True, size=13, color="1F4E79")
+    ws.cell(2, 1, "결정 열은 06 파일 '결정사항_모범안' ID. '반영'은 당 설계(화면·분개)에 이미 적용한 사항.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    _hdr(ws, 4, ["구분", "중요도", "대상", "내용", "권고", "관련 결정"])
+    for i, r in enumerate(M.as_dict()["COA_REVIEW"], 5):
+        for c, v in enumerate(r, 1):
+            x = ws.cell(i, c, v); x.border = BORDER; x.font = Font(name=FONT, size=9, bold=c in (1, 2)); x.alignment = WRAP
+        ws.cell(i, 2).fill = {"높음": ERR_FILL, "중간": FIX_FILL}.get(r[1], PatternFill())
+    for c, w in enumerate([7, 7, 30, 70, 60, 12], 1):
+        ws.column_dimensions[get_column_letter(c)].width = w
+    ws.freeze_panes = "A5"
 
 
 def build_journal(wb):

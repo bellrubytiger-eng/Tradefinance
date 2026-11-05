@@ -211,8 +211,11 @@ function gstCalc(charges, convInr, rcpt, state){
   if(rcpt==="NR_NONACCT"){ rows.push(["-","GST 영세율 (수출용역 · LUT)",0]); pos="96 (국외)"; why="해외 비계좌 수령자 → s.13(2) 국외 공급"; }
   else { const intra = rcpt==="R_ACCT" ? (state||BR_STATE)===BR_STATE : true;
     why = rcpt==="R_ACCT" ? "거주자 계좌고객 → 은행 기록상 고객 주 (s.12(12))" : rcpt==="NR_ACCT" ? "비거주 계좌고객 → 공급자 소재지 (s.13(8)(a))" : "비계좌 거주자 → 공급자 소재지 (s.12(12))";
-    if(intra){ const c=r2(gst/2); rows.push(["20510500100",`CGST 9% on ${fmt(base)}`,c],["20510500200",`SGST 9% on ${fmt(base)}`,r2(gst-c)]); pos=`${BR_STATE} (주내)`; }
-    else { rows.push(["20510500300",`IGST 18% on ${fmt(base)}`,gst]); pos=`${state} (주간)`; } }
+    // 세액은 과세표준 합계로 계산하고 GL은 L6(수수료분 x01 / 환전분 x02)로 배분 (06 CoA 결정 T7)
+    const split=(h,rate,amt,gl)=>{ const fx=base?r2(amt*cv/base):0, fee=r2(amt-fx);
+      if(fee) rows.push([gl+"01",`${h} ${rate} on ${fmt(base)}${fx?" · 수수료분":""}`,fee]); if(fx) rows.push([gl+"02",`${h} ${rate} on ${fmt(base)} · 환전분`,fx]); };
+    if(intra){ const c=r2(gst/2); split("CGST","9%",c,"205105001"); split("SGST","9%",r2(gst-c),"205105002"); pos=`${BR_STATE} (주내)`; }
+    else { split("IGST","18%",gst,"205105003"); pos=`${state} (주간)`; } }
   return {rows, pos, why, base, cv, total:r2(rows.reduce((a,r)=>a+(r[2]||0),0))};
 }
 function feeTable(g, extra=[]){ const rows=g.rows.concat(extra);

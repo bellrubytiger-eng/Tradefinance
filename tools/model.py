@@ -246,10 +246,10 @@ CODES = [
     ("SRC_ACCT_TYPE", "CASH", "현금", "LRS 현금 지급한도 확인", "Y"),
     ("FEE_TYPE", "COMM", "Remittance Commission (40570010000 당발 / 40570020000 타발)", "", "N"),
     ("FEE_TYPE", "CABLE", "Cable Charge (40570030000)", "", "N"),
-    ("FEE_TYPE", "CGST", "CGST 9% (20510500100)", "", "N"),
-    ("FEE_TYPE", "SGST", "SGST 9% (20510500200)", "", "N"),
-    ("FEE_TYPE", "IGST", "IGST 18% (20510500300)", "", "N"),
-    ("FEE_TYPE", "TCS", "TCS (20510400200)", "LRS", "N"),
+    ("FEE_TYPE", "CGST", "CGST 9% (수수료분 20510500101 / 환전분 20510500102)", "", "N"),
+    ("FEE_TYPE", "SGST", "SGST 9% (수수료분 20510500201 / 환전분 20510500202)", "", "N"),
+    ("FEE_TYPE", "IGST", "IGST 18% (수수료분 20510500301 / 환전분 20510500302)", "", "N"),
+    ("FEE_TYPE", "TCS", "TCS (LRS 교육·의료 20510400201 / LRS 기타 20510400202 / 여행 20510400203)", "LRS", "N"),
     ("FEE_TYPE", "INLIEU", "In lieu of exchange (40570100000)", "무환전 송금", "N"),
     ("FEE_TYPE", "RTGS", "NEFT/RTGS charge (40570070000)", "", "N"),
     ("FEE_TYPE", "ILOE", "In lieu of Exchange", "EEFC/외화계좌 출금 시", "N"),
@@ -511,7 +511,7 @@ table("TB_FX_REMIT_PARTY", "송금 당사자", "송금공통", "송금인/수취
 ] + AUD)
 
 table("TB_FX_REMIT_FEE", "송금 수수료/세금", "송금공통",
-      "수수료 체계: 통합 CoA 수수료 계정(40570010000 등) + GST 세목별(20510500100/200/300). Direct Import 정액 INR 750. 수기입력 시 MANUAL_YN=Y.", [
+      "수수료 체계: 통합 CoA 수수료 계정(40570010000 등) + GST 세목 L5 × L6(수수료 x01 / 환전 x02). Direct Import 정액 INR 750. 수기입력 시 MANUAL_YN=Y.", [
     ("REMIT_REF_NO", "송금참조번호", "VARCHAR2(16)", "PK,FK", "", ""),
     ("FEE_SEQ", "순번", "NUMBER(3)", "PK", "", ""),
     ("FEE_TYPE", "수수료유형", "VARCHAR2(6)", "NN", "CODE:FEE_TYPE", ""),
@@ -1476,9 +1476,22 @@ table("TB_COA_ACCT", "계정과목(통합 표준 CoA)", "회계공통", "차세�
     ("GBS_CD", "현행 GBS 코드", "VARCHAR2(8)", "", "이행 매핑", ""),
     ("NONMON_YN", "비화폐성", "VARCHAR2(1)", "", "외화환산 제외", ""),
     ("POSTABLE_YN", "기장 가능", "VARCHAR2(1)", "NN", "하위 L5가 있는 계정은 N(직접 기장 금지)", ""),
-    ("BR_STATUS", "인도지점 상태", "VARCHAR2(6)", "", "NEW(신규·임시코드)/MOD(변경)/INACT(비활성)", ""),
+    ("BR_STATUS", "인도지점 상태", "VARCHAR2(6)", "", "NEW 신규 / MOD 변경 / DESIG 용도지정 / INACT 비활성 / WDRN 철회 / TEMP 기한부", ""),
+    ("BR_POSTING", "인도 원장 기장", "VARCHAR2(8)", "NN", "USE 사용 / NOUSE 미사용 / IFRS 본점 IFRS 조정 전용(인도 원장 차단)", ""),
+    ("USE_UNTIL_DT", "사용 종료일", "DATE", "", "기한부 계정(예: 충당금 2027-03-31)", ""),
+    ("SCH_LINE", "인도 재무제표 줄", "VARCHAR2(60)", "", "BR Act Third Schedule 참고 줄", ""),
     ("TEMP_CD_YN", "임시코드", "VARCHAR2(1)", "", "본점 채번 후 ACCT_CD 교체, 이력은 TB_ACCT_RULE 동시 갱신", ""),
     ("BR_MEMO", "메모", "VARCHAR2(400)", "", "", ""),
+] + AUD)
+
+table("TB_COA_MIGR_MAP", "현행→차세대 계정 이행 맵핑", "회계공통", "현행 인도 GBS 8자리 → 차세대 11자리 이행표(06 CoA 파일 기준). 1:N 분할 기준과 검토 결과 포함.", [
+    ("CUR_GBS_CD", "현행 계정(8자리)", "VARCHAR2(8)", "PK", "", ""),
+    ("ACCT_CD", "차세대 계정(11자리)", "VARCHAR2(11)", "PK,FK", "TB_COA_ACCT. leaf·사용 계정만", "GL"),
+    ("MAP_TYPE", "유형", "VARCHAR2(12)", "NN", "1:1 / 1:N 분할 / N:1 통합", ""),
+    ("SPLIT_RULE", "분할 기준", "VARCHAR2(200)", "", "1:N이면 필수 (고객유형·FAR 분류·거주성·TCS 유형·EP 코드)", ""),
+    ("BAL_INR_BASE", "기준일 잔액", "NUMBER(18,2)", "", "2026-07-07 BS/PL, 차변+", ""),
+    ("REVIEW_STS", "검토", "VARCHAR2(8)", "NN", "OK/수정/분할규칙/오류/이행제외", ""),
+    ("REVIEW_NOTE", "검토 의견", "VARCHAR2(400)", "", "", ""),
 ] + AUD)
 
 table("TB_ACCT_RULE", "업무별 분개 규칙", "회계공통", "업무 이벤트별 차대 계정과 금액기준. 송금·환전·FDI·Vostro·본지점·무역금융 화면은 이 규칙으로 분개를 생성(CM-CMGL 연동).", [
@@ -1616,13 +1629,15 @@ RULES = [
     ("R-ADR-03", "주소", "RT11~14/FD12", "Hybrid", "ADDR_TYPE=HYBR일 때만 AdrLine 최대 2줄(70자), STRD는 AdrLine 입력 불가", "ERR", "SWIFT CBPR+", "", "Y"),
     ("R-ADR-04", "주소", "RT11~14/FD12", "주(州) 권장", "US·CA·AU·IN·AE·CN·BR·MX는 CtrySubDvsn 권장, 도로명 또는 사서함 권장", "WARN", "은행 정책", "", "N"),
     ("R-ADR-05", "주소", "SW11", "MT 대응", "MT 송신·대조 시 option F(:50F:/:59F: 1/이름 2/주소 3/국가/도시)로 변환", "AUTO", "SWIFT MT 표준", "", "N"),
+    ("R-ACC-08A", "회계", "이행", "현행→차세대 이행", "현행 8자리 계정은 TB_COA_MIGR_MAP으로만 11자리에 이관(결정 G1). 1:N은 분할 기준(고객유형·FAR 자산분류·거주성·TCS 유형·EP 코드) 필수, 대상은 leaf·사용 계정만, 이행 전후 잔액 합계 일치(차변+ 합 0)", "ERR", "06 CoA 결정 G1·G2", "", "N"),
+    ("R-ACC-09", "회계", "공통", "기한부 사용 계정", "일반·특정 충당금(10380101000/102000)은 2027-03-31까지 사용, 이후 기장 차단하고 ECL Stage 1~3(10380103000~105000)으로 이관(결정 L3)", "ERR", "06 CoA 결정 L3", "", "Y"),
     ("R-ACC-01", "회계", "공통", "CoA 참조", "모든 분개 계정은 TB_COA_ACCT에 존재하고 POSTABLE_YN=Y. 상위(L4)에 L5가 있으면 직접 기장 금지(예: 20150100000, 20510500000)", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-02", "회계", "공통", "비활성 계정", "BR_STATUS=INACT 계정(NAPAS·AOB·TOKEN·갑기금 이자) 기장 차단", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-03", "회계", "공통", "통화별 대차", "전표 단위로 통화별 차변합 = 대변합. 환전은 11200000000 포지션으로 통화 간 연결(난외 OB+/OB- 제외)", "ERR", "회계원칙", "", "N"),
     ("R-ACC-04", "회계", "공통", "예금 규제구분", "예금 계정은 계좌 상품(거주자·EEFC·SNRR·NRE·NRO·RFC·FCNR(B)·SRVA)에 맞는 L5로 자동 결정, 상품-계정 불일치 시 오류", "ERR", "FEM(Deposit) Regs", "", "N"),
     ("R-ACC-05", "회계", "공통", "본점 Vostro 분리", "본점 명의 INR 계좌는 21040000000(본지점)으로만 기장. 예금(201502xxxxx) 기장 금지, 을A 정산배치·이자 제외, 수수료 미부과", "ERR", "지점 정책", "", "N"),
     ("R-ACC-06", "회계", "공통", "미지급 분리", "비계좌 타발 20181100100, FDI 초과 20181100200, 반송 20181100300, 무역금융 순지급 20440800000. 하위원장 TB_AP_ITEM과 일별 잔액 대사", "ERR", "통합 CoA", "", "N"),
-    ("R-ACC-07", "회계", "공통", "GST 세목", "GST는 세목별 계정(CGST/SGST/IGST 20510500100~300), TCS 20510400200, TDS 20510400100. VAT 상위계정 직접 기장 금지", "ERR", "CGST Act", "", "N"),
+    ("R-ACC-07", "회계", "공통", "GST 세목", "GST는 세목 L5 × L6(수수료분 x01·환전분 x02, 예: CGST 20510500101/102), 세액은 과세표준 합계로 계산 후 배분. TCS는 유형별 L6(20510400201~203·299), TDS는 조문별 L6(20510400101~199). VAT 상위계정 직접 기장 금지", "ERR", "CGST Act", "", "N"),
     ("R-ACC-08", "회계", "공통", "임시코드 교체", "TEMP_CD_YN=Y 계정은 본점 채번 시 코드 일괄 교체(TB_COA_ACCT·TB_ACCT_RULE·잔액 이관), 교체 전 결산 보고는 본점 매핑(안) 사용", "WARN", "지점 정책", "", "N"),
     ("R-KYC-01", "FDI KYC", "FD11", "기본 의무 = 송금인", "모든 FDI 유입은 비거주 투자자(송금인) KYC를 송금은행으로부터 확보·검증해야 함. 수취인(피투자법인)은 당행 고객 CDD로 갈음하고 기준 이상만 EDD", "ERR", "RBI (Commercial Banks – KYC) Directions, 2025 / FEMA NDI 보고(FC-GPR 첨부)", "", "N"),
     ("R-KYC-02", "FDI KYC", "FD11/SW11", "KYC 자동요청", "RT21→FD11 이관 시 KYC 미첨부(KYC_STS=NONE)면 송금은행(DbtrAgt, 없으면 송신은행) 앞 요청 초안 자동 생성. 기본 camt.110(원거래 UETR·금액·송금인 참조, 요청항목 서술), KYC_REQ_FORMAT=MT면 MT199(:20: KYC+FDI Ref, :21: 상대 Ref, :79: 35줄×50자)", "AUTO", "SWIFT ISO 20022 / 업무요건", "KYC_REQ_FORMAT", "N"),
@@ -2004,7 +2019,7 @@ def as_dict():
             "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES,
             "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX,
             "COA": COA.coa_rows(), "JOURNAL": COA.journal_rows(), "ACCT_RULE": COA.rule_rows(),
-            "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX}
+            "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX, "COA_MAP": COA.MAPPING, "COA_REVIEW": COA.REVIEW}
 
 
 if __name__ == "__main__":
