@@ -11,6 +11,7 @@ import coa_migration_model as MG
 import lcr_model as L
 import tax_fa_model as TF
 import sheet_doc_model as SD
+import glossary_model as GL
 import re as _re
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "../docs/05_CoA검토_RBI보고속성.xlsx"
@@ -97,7 +98,7 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "7차 (2026-11-05) — 6단계 재분류, 중계은행 회수 과세, 시트별 변경 근거(FY25-26 결산 증거) / 6차 — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "8차 (2026-11-05) — 모든 표에 「인도 용어 정의」 열, 시트 17 용어 정의 / 7차 — 6단계 재분류, 중계은행 회수 과세, 시트별 변경 근거(FY25-26 결산 증거) / 6차 — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
@@ -129,6 +130,7 @@ summary = [
     ("6차 (TDS·수수료)", "3/31 미경과 예금이자 TDS: 이자비용 차변, 미지급이자(순액)·TDS 예금이자 대변 → 4/30까지 RBI 계좌로 납부. 신규 계정 불필요. "
      "현행 'Prepaid TDS on Accrued Interest'(10920014)는 고객 몫 선급 TDS → 4차의 'TDS 미수' 매핑을 정정, 순액법 전환 시 미지급이자와 상계(시트 12 ④). "
      "수수료: 취급·SWIFT 전신료는 0930 상품별 L4 사용, 중계은행 실비는 pure agent 통과계정 20441100000 또는 과세 수익 40570110000 (시트 15)"),
+    ("8차 (용어 정의)", "본점 검토자용으로 각 시트 표 오른쪽에 「인도 용어 정의」 열 추가 — 행에 나오는 PSL·NRO·TDS·GST·Sch.·CRR 등 인도 특수 용어를 자동으로 찾아 정의·근거를 표시. 전체 목록은 시트 17"),
     ("다음 단계", "시트 08 결정사항 중 '권고'·'미결' 확정 → coa_model.py 반영, 이행표(시트 09)를 본점 CoA 담당에 전달, ECL·RWA 개발명세의 계정코드를 11자리로 교체"),
 ]
 ws = wb.create_sheet("00 요약")
@@ -481,6 +483,51 @@ r = section(ws, 4, "결산 증거 20건", ["결산 자료", "내용", "금액(IN
 for i, w in enumerate([22, 50, 16, 40, 46, 8], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
 
+wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
+
+# ---- 인도 용어 정의 열 (본점 참고) -----------------------------------------------------
+GL_HDR = "인도 용어 정의 (본점 참고)"
+used = {}
+
+
+def add_glossary(ws):
+    hdr_rows = [r for r in range(1, ws.max_row + 1)
+                if any(c.fill is not None and c.fill.fgColor is not None and c.fill.fgColor.rgb in ("001F3864", "FF1F3864") for c in ws[r])]
+    if not hdr_rows:
+        return
+    col = ws.max_column + 1
+    for h in hdr_rows:
+        last = max(c.column for c in ws[h] if c.value is not None)
+        hc = ws.cell(row=h, column=col, value=GL_HDR)
+        hc.font = Font(name=F, size=10, bold=True, color="FFFFFF"); hc.fill = HDR; hc.border = BOX
+        hc.alignment = Alignment(wrap_text=True, vertical="center")
+        r = h + 1
+        while r <= ws.max_row and any(ws.cell(row=r, column=k).value is not None for k in range(1, last + 1)):
+            text = " ".join(str(ws.cell(row=r, column=k).value) for k in range(1, last + 1) if ws.cell(row=r, column=k).value is not None)
+            defs = GL.terms_in(text)
+            if defs:
+                c = ws.cell(row=r, column=col, value="\n".join(defs))
+                c.font = Font(name=F, size=8, color="404040"); c.alignment = WRAP; c.border = BOX
+                c.fill = PatternFill("solid", fgColor="FFFBEA")
+                for d in defs:
+                    used.setdefault(d.split(":")[0][2:], set()).add(ws.title.split(" ")[0])
+            r += 1
+    ws.column_dimensions[get_column_letter(col)].width = 70
+
+
+for _ws in wb.worksheets:
+    if _ws.title not in ("00 요약",):
+        add_glossary(_ws)
+
+ws = wb.create_sheet("17 인도용어정의")
+ws["A1"] = "인도 특수 용어 정의 — 본점 검토자 참고"
+ws["A1"].font = Font(name=F, size=14, bold=True)
+ws["A2"] = "각 시트 표 오른쪽 '인도 용어 정의' 열은 그 행에 나오는 용어를 이 목록에서 자동으로 찾아 붙인 것. 규정 수치는 기준일 현재 일반값이며 변경 시 근거 규정을 확인."
+ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:E2"); ws.row_dimensions[2].height = 30
+section(ws, 4, f"용어 {len(GL.G)}개", ["분류", "용어", "정의", "근거", "나오는 시트"],
+        [(c, t, d, b, ", ".join(sorted(used.get(t, [])))) for t, c, d, b, _p in GL.G])
+for i, w in enumerate([10, 30, 90, 32, 30], 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
 wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
 
 # ---- 시트별 변경 근거 블록 (상단 삽입) ------------------------------------------------
