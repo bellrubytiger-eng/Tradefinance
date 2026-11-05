@@ -85,7 +85,7 @@ def main(out):
              ("16.규정근거색인", "규정별 번호·고시일·시행일·관련 파라미터·규칙·출처"),
              ("17.CoA(인도지점)", "06 인도 반영 CoA 전체 1,360계정: 신규(주황)·변경/용도지정/기한부(연주황)·비활성/철회(회색)·IFRS 전용(하늘)·0930 정정권고(노랑), 현행 8자리·잔액"),
              ("18.업무별분개", "업무별 예시 분개(통화별 대차 검증 수식 포함). 금액은 고객 서식 샘플과 일치"),
-             ("19.계정이행맵핑", "현행 인도 GBS 8자리 → 차세대 11자리 이행표, 분할 기준·검토 결과·시스템 사용"),
+             ("19.계정이행맵핑", "현행 인도 GBS 8자리 → 차세대 11자리 이행표(06) + 현행 BS/PL 전체 대사·미연결 132개 맵핑 제안"),
              ("20.CoA검토의견", "06 인도 반영 CoA 검토 의견(추가·수정·삭제)")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
@@ -368,6 +368,27 @@ def build_map(wb):
     last = 4 + len(rows)
     ws.cell(last + 2, 1, "잔액 합계 (중복 대상 제외 전, 참고)").font = Font(name=FONT, bold=True, size=9)
     ws.cell(last + 2, 8, f"=SUM(H5:H{last})").number_format = "#,##0.00"
+    # 현행 CoA 전체(2026-07-07 BS/PL) 대사
+    st = d["CUR_STATS"]
+    r = last + 4
+    ws.cell(r, 1, "현행 CoA 전체 대사 (2026-07-07 Balance Sheet · Profit and Loss Statement)").font = Font(name=FONT, bold=True, size=12, color="1F4E79"); r += 1
+    for k, v in [("현행 최하위 계정", st["leaf"]), ("잔액 보유 계정", st["nonzero"]), ("06 이행표 연결", st["mapped"]), ("06 미연결", f"{st['unmapped']} (잔액 보유 {st['unmapped_bal']})"),
+                 ("BS 대차 (자산-부채-자본)", st["bs"]), ("PL 대차 (비용-수익, 당기손익 포함)", st["pl"]), ("06 잔액 vs BS/PL 불일치", len(d["BAL_DIFF"])),
+                 ("06에만 있는 현행 코드", ", ".join(st["extra"]) or "-")]:
+        ws.cell(r, 1, k).font = Font(name=FONT, size=9, bold=True); ws.cell(r, 3, v).font = Font(name=FONT, size=9); r += 1
+    r += 1
+    ws.cell(r, 1, "06 미연결 현행 계정 — 맵핑 제안 (모두 잔액 0)").font = Font(name=FONT, bold=True, size=11, color="1F4E79"); r += 1
+    _hdr(ws, r, ["현행 계정(8자리)", "제안 구분", "제안 대상(11자리)", "대상 계정명", "현행 계정명", "인도 원장 기장", "", "기준일 잔액", "", "", "근거", ""])
+    for u in d["CUR_UNMAPPED"]:
+        r += 1
+        vals = [u["cur"], u["kind"], u["code"], u["name"], u["cur_name"], u["post"], "", u["dr"], "", "", u["why"], ""]
+        f = {"신규맵핑": MOD_FILL, "이행제외": INACT_FILL, "확인": FIX_FILL}[u["kind"]]
+        for c, v in enumerate(vals, 1):
+            x = ws.cell(r, c, v); x.border = BORDER; x.font = Font(name=FONT, size=9); x.alignment = Alignment(vertical="top", wrap_text=c in (4, 5, 11))
+            if c in (2, 3):
+                x.fill = f
+            if c == 8:
+                x.number_format = "#,##0.00"
     for c, w in enumerate([12, 14, 13, 34, 4, 9, 12, 16, 9, 13, 64, 18], 1):
         ws.column_dimensions[get_column_letter(c)].width = w
     ws.freeze_panes = "B5"

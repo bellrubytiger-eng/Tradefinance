@@ -76,6 +76,13 @@ def main(out):
         L.append("INSERT INTO TB_COA_MIGR_MAP (CUR_GBS_CD, ACCT_CD, MAP_TYPE, SPLIT_RULE, BAL_INR_BASE, REVIEW_STS, REVIEW_NOTE, REG_USER_ID, REG_TS) VALUES ("
                  f"{q(m['cur'])}, {q(m['target'] if m['target'] != '이행 제외' else m['code'])}, {q(m['kind'])}, {q(COA.SPLIT_RULE.get(m['cur'], ''))}, {m['bal'] if m['bal'] not in (None, '') else 'NULL'}, "
                  f"{q(m['sev'] if m['target'] != '이행 제외' else '이행제외')}, {q(m['issue'])}, 'SYSTEM', SYSTIMESTAMP);")
+    L.append("-- 06 미연결 현행 계정(2026-07-07 BS/PL 대사) 맵핑 제안 — 대상 없는 이행제외·확인 건은 주석")
+    for u in COA.CUR_UNMAPPED:
+        if u["code"]:
+            L.append("INSERT INTO TB_COA_MIGR_MAP (CUR_GBS_CD, ACCT_CD, MAP_TYPE, SPLIT_RULE, BAL_INR_BASE, REVIEW_STS, REVIEW_NOTE, REG_USER_ID, REG_TS) VALUES ("
+                     f"{q(u['cur'])}, {q(u['code'])}, '1:1', NULL, {u['dr']}, {q('제안-' + u['kind'])}, {q(u['why'])}, 'SYSTEM', SYSTIMESTAMP);")
+        else:
+            L.append(f"-- {u['cur']} {u['cur_name']} : {u['kind']} - {u['why']}")
     L.append("")
     L.append("-- 업무별 분개 규칙 초기적재 (tools/coa_model.py 예시 분개에서 생성)")
     for ev, seq, dc, acct, cb, ab, scr, desc in COA.rule_rows():

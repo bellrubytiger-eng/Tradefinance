@@ -1,0 +1,7997 @@
+{
+"source": "GBS India Balance Sheet / Profit and Loss Statement 2026-07-07 (INR, Base Amt)",
+"rows": [
+{
+"kind": "BS",
+"side": "L",
+"code": "10000000",
+"name": "ASSETS TOTAL",
+"dr": 5959122247.17,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10100000",
+"name": "CASH TOTAL",
+"dr": 500000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10101001",
+"name": "Cash On Hand",
+"dr": 500000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10102001",
+"name": "Cash Item",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10103001",
+"name": "Foreign Currencies On Hand",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10104001",
+"name": "Petty Cash",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10210000",
+"name": "DUE FROM BANKS",
+"dr": 47334919.62,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10211000",
+"name": "DUE FROM BANKS WITH STATE BANK",
+"dr": 38413749.5,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10211001",
+"name": "In Current Account (RBI)",
+"dr": 36913749.5,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10211002",
+"name": "In Statutory Reserve Account (RBI)",
+"dr": 1500000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10211003",
+"name": "In RTGS Settlement Account (RBI)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10212000",
+"name": "DUE FROM BANKS ON DEMAND",
+"dr": 8921170.12,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10212001",
+"name": "Due from Domestic Banks on Demand",
+"dr": 88603.58,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10212002",
+"name": "Due from Oversea Banks on Demand",
+"dr": 8832566.54,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10212003",
+"name": "Due from Domestic Banks on Demand(CSGL)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10213000",
+"name": "DUE FROM BANKS ON TIME",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10213001",
+"name": "Due from Domestic Banks on Time",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10213002",
+"name": "Due from Oversea Banks on Time",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10250000",
+"name": "MONEY MARKET INSTRUMENT TOTAL",
+"dr": 2368960000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10251000",
+"name": "SHORT TERM LENDING - DOMESTIC BANKS",
+"dr": 280000000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10251001",
+"name": "Call Loans - Domestic",
+"dr": 280000000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10251002",
+"name": "Notice money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10251003",
+"name": "Term money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10252000",
+"name": "SHORT TERM LENDING - OVERSEA BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10252001",
+"name": "Call Loans - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10252002",
+"name": "Notice money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10252003",
+"name": "Term money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10253000",
+"name": "LONG TERM LENDING - DOMESTIC BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10253001",
+"name": "Long Term Lending - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10254000",
+"name": "LONG TERM LENDING - OVERSEA BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10254001",
+"name": "LT Lending - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10255000",
+"name": "TIME DEPOSIT TO DOMESTIC OTHER BANKS",
+"dr": 2088960000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10255001",
+"name": "Time Deposit - Domestic Corps",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10255002",
+"name": "Time Deposit - Domestic Banks",
+"dr": 2088960000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10255003",
+"name": "Time Deposit - Domestic Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10256000",
+"name": "TIME DEPOSIT TO OVERSEA OTHER BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10256001",
+"name": "Time Deposit - Oversea Corps",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10256002",
+"name": "Time Deposit - Oversea Banks",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10256003",
+"name": "Time Deposit - Oversea Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10300000",
+"name": "INVESTMENT SECURITIES TOTAL",
+"dr": 58742544.06,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310000",
+"name": "INVESTMENT SECURITIES(AVAILABLE FOR SALE)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310001",
+"name": "Government securities - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310002",
+"name": "Other approved securities - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310003",
+"name": "Shares - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310004",
+"name": "Debenture & Bonds - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310005",
+"name": "Subsidiaries and/ Or Joint Ventures - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10310019",
+"name": "Others - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320000",
+"name": "TRADING SECURITIES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320001",
+"name": "Government securities - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320002",
+"name": "Other approved securities - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320003",
+"name": "Shares - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320004",
+"name": "Debenture & Bonds - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320005",
+"name": "Subsidiaries and/ Or Joint Ventures - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10320019",
+"name": "Others - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330000",
+"name": "INVESTMENT SECURITIES(HOLD TO MATURITY)",
+"dr": 58742544.06,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330001",
+"name": "Government securities - HTM",
+"dr": 58742544.06,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330002",
+"name": "Other approved securities - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330003",
+"name": "Shares - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330004",
+"name": "Debenture & Bonds - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330005",
+"name": "Subsidiaries and/ Or Joint Ventures - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10330019",
+"name": "Others - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410000",
+"name": "BILLS BOUGHT TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410001",
+"name": "Sight Bills Bought",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410004",
+"name": "Usance Bills Bought-D/A",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410005",
+"name": "T/B Bought-Export Nego",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410006",
+"name": "T/B Bought-Export Reim",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10410091",
+"name": "Others Bills Bought",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10420000",
+"name": "BILLS DISCOUNTED TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10420002",
+"name": "Bills Dist. Bankers Acceptance (Domestic)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10420003",
+"name": "Bills Dist. BankerS Acceptance (Overseas)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10600000",
+"name": "LOANS TOTAL",
+"dr": 3230000000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610000",
+"name": "LOANS ON BILLS TOTAL",
+"dr": 3230000000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610001",
+"name": "Loans On Bills (T/R)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610002",
+"name": "Loans On Bills (Personal)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610003",
+"name": "Loans On Bills (Operation-Term)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610004",
+"name": "Loans On Bills (Operation-Credit Line-WCDL)",
+"dr": 750000000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610005",
+"name": "Loans On Bills (Operation-Short Term)",
+"dr": 1180000000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610006",
+"name": "Loans On Bills (Mortgage)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610007",
+"name": "Loans On Bills (Equipment-Term)",
+"dr": 1300000000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610008",
+"name": "Loans On Bills (Equipment-Credit Line)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10610009",
+"name": "Loans On Bills(Operation-Credit Line-Overdraft)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10620000",
+"name": "SYNDICATED LOAN (SHORT-TERM)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10620001",
+"name": "Syn. Working Capital Loan (Short-Term)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10620002",
+"name": "Syn. Equipment Capital Loan (Short-Term)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10630000",
+"name": "SYNDICATED LOAN (LONG-TERM)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10630001",
+"name": "Syn. Working Capital Loan (Long-Term)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10630002",
+"name": "Syn. Equipment Capital Loan (Long-Term)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10650000",
+"name": "PRIVATE PLACEMENT NOTE(BOND)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10650001",
+"name": "Private Placement Note(Bond)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10670000",
+"name": "PAYMENTS ON BEHALF FOR CUSTOMER",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10671001",
+"name": "Payments on Behalf for Customer on L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10672001",
+"name": "Payments on Behalf for Customer on Stand-by L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10672002",
+"name": "Payments on Behalf for Customer on Payment Guarantee",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10680000",
+"name": "LOAN ORIGINATION TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10680001",
+"name": "Loan Origination Fee,LOF",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10680002",
+"name": "Loan Origination Cost_Loc",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690000",
+"name": "ALLOWANCE TOTAL",
+"dr": -15920000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690001",
+"name": "Allowance For Loan Losses - General",
+"dr": -15920000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690002",
+"name": "Allowance For Loan Losses - Specific",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690003",
+"name": "Allowance For Securites Valuation",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690004",
+"name": "Allowance For Private Placement Note(Bond)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10690005",
+"name": "Allowance for Call Loan",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10900000",
+"name": "OTHER ASSETS TOTAL",
+"dr": 115516417.88,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910000",
+"name": "ACCRUED INTEREST RECEIVABLES TOTAL",
+"dr": 44711842.65,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910001",
+"name": "A.I.R On T/R Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910002",
+"name": "A.I.R On Personal Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910003",
+"name": "A.I.R On Operation Loans",
+"dr": 3814438.9,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910004",
+"name": "A.I.R On Mortgage Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910005",
+"name": "A.I.R On Equipment Loans",
+"dr": 3472602.66,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910006",
+"name": "A.I.R On Syndicated Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910007",
+"name": "A.I.R On Other Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910008",
+"name": "A.I.R On Bills Bought",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910009",
+"name": "A.I.R On Bills Discount",
+"dr": 12477.08,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910010",
+"name": "A.I.R On State Fund Sold",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910011",
+"name": "A.I.R On State Treasury Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910012",
+"name": "A.I.R On State GovT Or Agency Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910013",
+"name": "A.I.R On Foreign GovT & Official Instit Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910014",
+"name": "A.I.R On Corporation Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910015",
+"name": "A.I.R On Financial Institution Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910016",
+"name": "A.I.R On Other Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910017",
+"name": "A.I.R On Guarantee Money",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910018",
+"name": "A.I.R On Acceptances",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910019",
+"name": "A.I.R On Inter Office Account",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910020",
+"name": "A.I.R Term Charge On L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910021",
+"name": "A.I.R On Call Loan",
+"dr": 38356,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910022",
+"name": "A.I.R On ST Lending",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910023",
+"name": "A.I.R On Time Deposit",
+"dr": 37373968.01,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910024",
+"name": "A.I.R On LT Lending",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910025",
+"name": "A.I.R On Confirm Charge",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10910091",
+"name": "A.I.R On Time Deposit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920000",
+"name": "PREPAID EXPENSES TOTAL",
+"dr": 46040827.65,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920001",
+"name": "Prepaid Interest Sec. Investments",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920002",
+"name": "Prepaid Interest Interoffice",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920003",
+"name": "Prepaid Insurance",
+"dr": 348163.51,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920004",
+"name": "Prepaid Taxs",
+"dr": 38400000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920005",
+"name": "Prepaid Other Expense",
+"dr": 7170450.34,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920006",
+"name": "Prepaid Interset Call Money",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920007",
+"name": "Prepaid Interset St Borrowing",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920008",
+"name": "Prepaid Interest LT Borrowing",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920009",
+"name": "Prepaid Int. Fed Fund Pur",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920010",
+"name": "Prepaid Int. Ceritificate of Deposit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920011",
+"name": "Prepaid Value Added Tax (VAT)",
+"dr": 35473.94,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920012",
+"name": "Prepaid Expenses for Tangible Tools and Equipment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920013",
+"name": "Prepaid Expenses for Intangible Tools and Equipmen",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10920014",
+"name": "Prepaid TDS on Accured Interest",
+"dr": 86739.86,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10930000",
+"name": "CUST LIABS ON ACCEPTANCES & GUARANTEES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10930001",
+"name": "Cust Liabs On Acceptances",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10930006",
+"name": "Guarantee L/G",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10930009",
+"name": "Guarantee Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990000",
+"name": "OTHERS TOTAL",
+"dr": 24763747.58,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10991001",
+"name": "Account Receivable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10991002",
+"name": "Suspense Receivable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10991003",
+"name": "TDS Receivable",
+"dr": 16592,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10999001",
+"name": "Other Asset",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990013",
+"name": "IGST Input",
+"dr": 1233629.68,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990014",
+"name": "CGST Input",
+"dr": 4308334.38,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990015",
+"name": "SGST Input",
+"dr": 4308334.38,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990019",
+"name": "RCM IGST Input",
+"dr": 1755209.22,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990020",
+"name": "RCM CGST Input",
+"dr": 5502.96,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10990021",
+"name": "RCM SGST Input",
+"dr": 5502.96,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "10999002",
+"name": "Security Deposit",
+"dr": 13130642,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12100000",
+"name": "FIXED ASSETS",
+"dr": 167067315.18,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110000",
+"name": "TANGIBLE FIXED ASSETS",
+"dr": 129179295.33,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110001",
+"name": "Housing and Structures",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110002",
+"name": "Machinery and Equipment",
+"dr": 70054740.19,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110003",
+"name": "Means of Transport, Transmission equipment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110004",
+"name": "Equipment and management tools",
+"dr": 55021505.28,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110005",
+"name": "Others",
+"dr": 4103049.86,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110006",
+"name": "Land",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12110007",
+"name": "Furniture & Fixture",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12120000",
+"name": "INTANGIBLE FIXED ASSETS",
+"dr": 37888019.85,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12120001",
+"name": "Software",
+"dr": 36900095.55,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12120002",
+"name": "Leasehold Improvement",
+"dr": 987924.3,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12120003",
+"name": "Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12130000",
+"name": "RIGHT OF USE ASSETS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12130001",
+"name": "Right of Use Assets",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12200000",
+"name": "IMPAIRMENT LOSS OF FIXED ASSETS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210000",
+"name": "IMPAIRMENT LOSS OF TANGIBLE FIXED ASSETS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210001",
+"name": "Impariment loss of Housing and Structures",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210002",
+"name": "Impariment loss of Machinery and Equipment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210003",
+"name": "Impaired Means of Transport Transmission equipment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210004",
+"name": "Impariment loss of Equipment and management tools",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210005",
+"name": "Impariment loss of Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12210006",
+"name": "Impariment loss of Furniture & Fixture",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12220000",
+"name": "IMPAIRMENT LOSS OF INTANGIBLE FIXED ASSETS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12220001",
+"name": "Software",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12220002",
+"name": "Leasehold Improvement",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12220003",
+"name": "Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12300000",
+"name": "ACCUMULATED DEPRECIATION OF FIXED ASSETS TOTAL",
+"dr": -55766474.06,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310000",
+"name": "ACCUMULATED DEPRECIATION OF TANGIBLE FIXED ASSETS",
+"dr": -54397575.06,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310001",
+"name": "Housing and Structures",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310002",
+"name": "Machinery and Equipment",
+"dr": -36024183.44,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310003",
+"name": "Means of Transport, Transmission equipment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310004",
+"name": "Equipment and management tools",
+"dr": -23204,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310005",
+"name": "Others",
+"dr": -18350187.62,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12310006",
+"name": "Furniture & Fixture",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12320000",
+"name": "ACCUMULATED DEPRECIATION OF INTANGIBLE FIXED ASSETS",
+"dr": -1368899,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12320001",
+"name": "Software",
+"dr": -1368899,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12320002",
+"name": "Leasehold Improvement",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12320003",
+"name": "Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12330000",
+"name": "ACCUMULATED DEPRECIATION OF RIGHT OF USE ASSETS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "12330001",
+"name": "Right of Use Assets",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "13100000",
+"name": "DEFERRED ASSETS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "13101001",
+"name": "Deferred Tax Asset - Tax",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "13101002",
+"name": "Deferred Tax Asset - Sec. Valuation",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "13101003",
+"name": "Deferred Tax Asset - Int. Swap Valuation",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "13102001",
+"name": "Deferred Loss On Derivate Product",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14100000",
+"name": "DERIVATIVES - ASSET TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101000",
+"name": "Derivatives For Swaps",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101001",
+"name": "Derivatives For Swaps -  Currency(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101002",
+"name": "Derivatives For Swaps -  Int. Rate(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101009",
+"name": "Derivatives For Swaps -  Others(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101011",
+"name": "Derivatives For Swaps -  Currency(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101012",
+"name": "Derivatives For Swaps -  Int. Rate(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101019",
+"name": "Derivatives For Swaps -  Others(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101021",
+"name": "Derivatives For Swaps -  Currency(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101022",
+"name": "Derivatives For Swaps -  Int. Rate(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14101029",
+"name": "Derivatives For Swaps -  Others(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14102000",
+"name": "DERIVATIVES FOR FORWARDS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14102001",
+"name": "Derivatives For Security Forward",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14103000",
+"name": "DERIVATIVES FOR FX",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "14103001",
+"name": "Derivatives for FX - Contract",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "15100000",
+"name": "INTEROFFICE A/C TOTAL",
+"dr": 20262283.8,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "15100001",
+"name": "INTEROFFICE KAP(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "15100002",
+"name": "INTEROFFICE EUL(A) A/C",
+"dr": 17068628.75,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "15100003",
+"name": "INTEROFFICE EUL(B) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "15100004",
+"name": "BD BANKER'S ACCEPTANCE",
+"dr": 3193655.05,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "16100000",
+"name": "ACCUMULATED LOSS",
+"dr": 22425240.69,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "16100001",
+"name": "LOSS FROM LAST YEARS",
+"dr": 22425240.69,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "16100002",
+"name": "LOSS FROM CURRENT YEARS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "18800000",
+"name": "LOSS BALANCE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "18800001",
+"name": "LOSS FROM PREVIOUS YEARS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "18800002",
+"name": "CURRENT YEAR LOSS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "60000000",
+"name": "COMMITMENT & CONTINGENCY - DEBIT",
+"dr": 305800000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61000000",
+"name": "CONTINGENT ASSETS",
+"dr": 5695709,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61000001",
+"name": "FORWARD EXCHANGE BOUGHT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61000002",
+"name": "FORWARD EXCHANGE SOLD (CONTRA)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61010000",
+"name": "CUST. LIAB. ON L/C OUTSTANDING",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61010001",
+"name": "Outstanding Sight L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61010002",
+"name": "Outstanding Usance L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61010003",
+"name": "Outstanding Stb L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61010005",
+"name": "Outstanding Other",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61020001",
+"name": "UNSETTLED SPOT BOUGHT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61020002",
+"name": "UNSETTLED SPOT SOLD (CONTRA)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61040000",
+"name": "CUST LIABS ON ACCEPTANCES & GUARANTEES",
+"dr": 5695709,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61040001",
+"name": "Cust Liabs On Acceptances",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61040002",
+"name": "Cust Liabs On Guarantees (Stb L/C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61040003",
+"name": "Cust Liabs On Guarantees (L/G)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "61040004",
+"name": "Cust Liabs On Guarantees (Bonds)",
+"dr": 5695709,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62000000",
+"name": "COMMITMENT - DEBIT",
+"dr": 300104291,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62010000",
+"name": "COMMITMENT ON LOANS (OVER1YEAR)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62010001",
+"name": "General Loan Commitment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62010002",
+"name": "Syndicate Loan Commitment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62020000",
+"name": "COMMITMENT ON LOANS (LESS1YEAR)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62020001",
+"name": "General Loan Commitment - Enterprise",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62020002",
+"name": "Syndicate - Enterprise",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62030000",
+"name": "SECURITIES & DERIVATIVES COMMITMENT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62030001",
+"name": "Contracts On Interest Rates Swap Sold",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62030002",
+"name": "Contracts On Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62040001",
+"name": "RESERVED CREDIT LINE COMMITMENT",
+"dr": 300104291,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "63000000",
+"name": "FINANCIAL DERIVATIVE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "63010000",
+"name": "FX FORWARD",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "63010011",
+"name": "FX Forward on Market Buy",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "63010021",
+"name": "FX Forward on Market Sell",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "62000009",
+"name": "OTHER COMMITMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "L",
+"code": "80000000",
+"name": "TOTAL FOOTNOTES - DEBIT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20000000",
+"name": "LIABILITIES TOTAL",
+"dr": -5959122247.17,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110000",
+"name": "DUE FROM BANKS O/D",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110100",
+"name": "DUE TO CHECKS OUTSTANDING",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110101",
+"name": "Check In Process",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110102",
+"name": "Checks Outstanding",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110200",
+"name": "DUE TO OTHERS OUTSTANDING",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110201",
+"name": "Due To Other Customer",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20110202",
+"name": "Due To Bank Demand Deposit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20111000",
+"name": "DUE FROM BANKS WITH STATE BANK O/D",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20111001",
+"name": "In Current Account (RBI) O/D",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20111002",
+"name": "In Statutory Reserve Account (RBI) O/D",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20111003",
+"name": "In RTGS Settlement Account (RBI) O/D",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20112000",
+"name": "DUE FROM BANKS ON DEMAND O/D",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20112001",
+"name": "Due from Domestic Banks on Demand O/D",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20112002",
+"name": "Due from Oversea Banks on Demand O/D",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20121000",
+"name": "DEMAND DEPOSITS",
+"dr": -4816767.46,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20121001",
+"name": "Saving Account (Resident)",
+"dr": -4816767.46,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20121002",
+"name": "Saving Account (Non Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20121003",
+"name": "Demand Deposit From Individual",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20120006",
+"name": "MMDA From Corps.",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20120007",
+"name": "MMDA From Banks",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20120008",
+"name": "MMDA From Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20122000",
+"name": "TIME DEPOSITS",
+"dr": -650960000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20122001",
+"name": "Fixed Deposit (Resident)",
+"dr": -650960000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20122002",
+"name": "Fixed Deposit (Non Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20122003",
+"name": "Time Deposit From Individual",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20123000",
+"name": "CERTIFICATE OF DEPOSITS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20123001",
+"name": "Certificate of Deposit From Corps.",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20123002",
+"name": "Certificate of Deposit From Domestic Banks",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20123003",
+"name": "Certificate of Deposit From Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20123012",
+"name": "Certificate of Deposit From Oversea Banks",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20124000",
+"name": "RECURRING DEPOSIT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20124001",
+"name": "Recurring Deposit (Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20124002",
+"name": "Recurring Deposit(Non Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20125000",
+"name": "CURRENT DEPOSIT",
+"dr": -121464790.59,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20125001",
+"name": "Current Account(Resident)",
+"dr": -121464790.59,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20125002",
+"name": "Current Account(Non Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20125003",
+"name": "Eefc Account(Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20125004",
+"name": "Eefc Account(Non Resident)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210000",
+"name": "SETTLEMENT CREDITS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210001",
+"name": "Remmittance Payable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210002",
+"name": "Export Payable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210003",
+"name": "Reimbursement Payable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210004",
+"name": "Other Banks Payable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20210005",
+"name": "H.O.Collection Payable",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20400000",
+"name": "BORROWINGS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401000",
+"name": "STATE PURCHASED & REPURCHASED AGREEMENT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401001",
+"name": "State Funds O/N",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401002",
+"name": "State Funds within 3M",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401003",
+"name": "State Funds over 3M",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401011",
+"name": "Sec Sold Under Repurchase Agreement O/N",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20401012",
+"name": "Sec Sold Under Repurchase Agreement Term",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20402000",
+"name": "SHORT TERM BORROWING FROM DOMESTIC BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20402001",
+"name": "Call Money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20402002",
+"name": "Notice money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20402003",
+"name": "Term money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20402004",
+"name": "Commercial Paper - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20403000",
+"name": "SHORT TERM BORROWING FROM OVERSEA BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20403001",
+"name": "Call Money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20403002",
+"name": "Notice money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20403003",
+"name": "Term money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20403004",
+"name": "Commercial Paper - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20404000",
+"name": "LONG TERM BORROWING FROM DOMESTIC BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20404001",
+"name": "Long Term Borrowing - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20405000",
+"name": "LONG TERM BORROWING FROM OVERSEA BANKS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20405001",
+"name": "Long Term Borrowing - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20610000",
+"name": "GUARANTEE MONEY TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20610001",
+"name": "Import Guarantee Money-L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20610002",
+"name": "Import Guarantee Money-Acceptance",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20610009",
+"name": "Other Guarantee Money",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20640000",
+"name": "BORROWING FROM BANKER'S ACCEPTANCE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20640001",
+"name": "Borrowing From Ours(Bankers Acceptance)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20640002",
+"name": "Borrowing From Domestic(Bankers Acceptance)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20640009",
+"name": "Borrowing From Others(Bankers Acceptance)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20900000",
+"name": "OTHER LIABILITIES TOTAL",
+"dr": -38822357.36,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910000",
+"name": "ACCRUED INTEREST PAYABLE TOTAL",
+"dr": -3981791.82,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910001",
+"name": "A.I.P On Mmda",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910002",
+"name": "A.I.P On Demand Deposit",
+"dr": -3298,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910003",
+"name": "A.I.P On Time Deposit",
+"dr": -3978493.82,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910004",
+"name": "A.I.P On Fed Fund Purchased",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910005",
+"name": "A.I.P On Repurchase Agreement",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910006",
+"name": "A.I.P On Short Term Borrowing",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910007",
+"name": "A.I.P On Long Term Borrowing",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910008",
+"name": "A.I.P On Inter Office Account",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910009",
+"name": "A.I.P On Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910010",
+"name": "A.I.P ON CERTIFICATE OF DEPOSITS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20910011",
+"name": "A.I.P On Call Money",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920000",
+"name": "UNEARNED INCOME TOTAL",
+"dr": -57510.09,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920001",
+"name": "Income On Trade Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920002",
+"name": "Income On Personal Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920003",
+"name": "Income On Operation Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920004",
+"name": "Income On Mortgage Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920005",
+"name": "Income On Equipment Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920006",
+"name": "Income On Syndicated Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920007",
+"name": "Income On Other Loans",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920008",
+"name": "Income On Bills Bought",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920009",
+"name": "Income On Bills Discount",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920010",
+"name": "Income On State Fund Sold",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920011",
+"name": "Income On Government Security",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920012",
+"name": "Income On other approve security",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920013",
+"name": "Income On Shares",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920014",
+"name": "Income On Debenture & Bonds",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920015",
+"name": "Income On Subsidiaries and/or joint venture",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920016",
+"name": "Income On Other Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920017",
+"name": "Income On Guarantee Money",
+"dr": -57510.09,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920018",
+"name": "Income On Acceptances",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920019",
+"name": "Income on L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920021",
+"name": "Income On Call Money",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920022",
+"name": "Income On ST Lending",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920023",
+"name": "INCOME ON Time Deposit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920024",
+"name": "Income On LT Lending",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20920025",
+"name": "Income On AD Confirm Charge",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20930000",
+"name": "ACCEPTANCES & GUARANTEES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20930001",
+"name": "Acceptances",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20930006",
+"name": "Guarantee L/G",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20930009",
+"name": "Guarantee Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970000",
+"name": "ACCOUNT PAYABLE",
+"dr": -499849.61,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970001",
+"name": "Account Payable (Remittance)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970002",
+"name": "Account Payable (Commission)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970003",
+"name": "Account Payable (Expense)",
+"dr": -54719.96,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970004",
+"name": "Account Payable (Other)",
+"dr": -445129.65,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20970005",
+"name": "Account Payable(Domestic Remittance)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20980000",
+"name": "SUSPENSE PAYABLE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20980001",
+"name": "SP To be Replaced by B/S Account",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20980002",
+"name": "SP To be Replaced by I/S Account",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990000",
+"name": "OTHER LIABILITIES",
+"dr": -34283205.84,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990001",
+"name": "Dormant Account",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990002",
+"name": "Statutory Reserve",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990003",
+"name": "Income tax payable",
+"dr": -30300000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20991001",
+"name": "Wash Account ( Settlement )",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990045",
+"name": "TDS out of deposit under NSS (Sec. 194EE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990046",
+"name": "TDS repurchase(Sec. 194F)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990047",
+"name": "TDS to transfer of immovable(Sec. 194IA)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990013",
+"name": "IGST Payable Output",
+"dr": -258772.54,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990014",
+"name": "CGST Payable Output",
+"dr": -28140.6,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990015",
+"name": "SGST Payable Output",
+"dr": -28140.66,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990016",
+"name": "IGST Payable On F/X Transactions",
+"dr": -3153432.83,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990017",
+"name": "CGST Payable On F/X Transactions",
+"dr": -13058.55,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990018",
+"name": "SGST Payable On F/X Transactions",
+"dr": -13058.55,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990019",
+"name": "RCM IGST Payable",
+"dr": -148286.01,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990020",
+"name": "RCM CGST Payble",
+"dr": -109980,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990021",
+"name": "RCM SGST Payble",
+"dr": -109980,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990022",
+"name": "TDS On Deposit Interest",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990023",
+"name": "TDS On Deposit Interest(Non-Residents)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990024",
+"name": "TDS Salary(Section 192)",
+"dr": -8000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990025",
+"name": "TDS to contractors(Non Co.)(Sec. 194C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990026",
+"name": "TDS on rent (Plant & Machnery)(Sec. 194I(a))",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990027",
+"name": "TDS on rent(Land,Building,Furniture)(Sec.194I(b))",
+"dr": -29400,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990028",
+"name": "TDS on Commission(Sec. 194H)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990029",
+"name": "TDS to professional and technical services(Sec.19)",
+"dr": -82547,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990030",
+"name": "TDS On Other",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990031",
+"name": "EPF Contribution (Emloyees) Payable",
+"dr": -204.55,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990032",
+"name": "EPF Contribution (Emloyer) Payable",
+"dr": -204.55,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990033",
+"name": "Labour Welfare Fund-Employer",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990034",
+"name": "Labour Welfare Fund-Employees",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990035",
+"name": "TDS PF withdrawal(Section 192A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990036",
+"name": "TDS Payment of Interest on Securities (Sec. 193)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990037",
+"name": "TDS Payment of Dividend(Sec. 194)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990038",
+"name": "TDS Interest to Non Senior(Sec. 194A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990039",
+"name": "TDS Payment to contractors(Company)(Sec. 194C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990040",
+"name": "TCS on Foreign Remittance",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990041",
+"name": "TDS Interest to Senior(Sec. 194A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990042",
+"name": "TDS Interest Other than Securities(Sec. 193)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990043",
+"name": "TDS to Transporter(Sec.194C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990044",
+"name": "TDS to NRI sportsman or association(Sec.194E)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990048",
+"name": "TDS to Rent by Individuals or HUF(Sec. 194IB)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990049",
+"name": "TDS to professional fees to Call Center(Sec. 194J)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990050",
+"name": "TDS compsensation for compulsory acquision(Sec.194",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990051",
+"name": "TDS Certain payments (Sec. 194M)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990052",
+"name": "TDS Cash Withdrawal (Sec. 194N)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990053",
+"name": "TDS Cash withdrawal expired (Sec. 194N)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990054",
+"name": "TDS Credit of amount (Sec. 194O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990055",
+"name": "TDS pension or interest to Senior (Sec. 194P)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990056",
+"name": "TDS purchase of Goods (Sec. 194Q)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "20990057",
+"name": "TDS on Sale of VDA (Sec. 194S)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23100000",
+"name": "DEFERRED LIABILITIES",
+"dr": -5811552,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23100101",
+"name": "DEFERRED Tax Liabilities - Tax",
+"dr": -5811552,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23100201",
+"name": "DEFERRED Tax Liabilities - Sec. Valuation",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23100301",
+"name": "DEFERRED Tax Liabilities - Int. Swap Valuation",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23100401",
+"name": "DEFERRED Gain On Derivate Product",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23200000",
+"name": "Lease Liabilities",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "23200001",
+"name": "Lease Liabilities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24100000",
+"name": "DERIVATIVES - LIABILITIES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101000",
+"name": "DERIVATIVES FOR SWAPS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101001",
+"name": "Derivatives For Swaps -  Currency(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101002",
+"name": "Derivatives For Swaps -  Int. Rate(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101009",
+"name": "Derivatives For Swaps -  Others(Trading)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101011",
+"name": "Derivatives For Swaps -  Currency(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101012",
+"name": "Derivatives For Swaps -  Int. Rate(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101019",
+"name": "Derivatives For Swaps -  Others(Hedge)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101021",
+"name": "Derivatives For Swaps -  Currency(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101022",
+"name": "Derivatives For Swaps -  Int. Rate(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24101029",
+"name": "Derivatives For Swaps -  Others(Inter Office)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24102000",
+"name": "DERIVATIVES FOR FORWARDS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24102001",
+"name": "Derivatives For Security Forward",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24103000",
+"name": "DERIVATIVES FOR FX",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "24103001",
+"name": "Derivatives for FX - Contract",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "25100000",
+"name": "INTEROFFICE A/C TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "25100001",
+"name": "INTEROFFICE KAP(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "25100002",
+"name": "INTEROFFICE EUL(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "25100003",
+"name": "INTEROFFICE EUL(B) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "25100004",
+"name": "BD BANKERS ACCEPTANCE(OUR)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28800000",
+"name": "EQUITY TOTAL",
+"dr": -10096000.49,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28810001",
+"name": "Profit From Previous Years",
+"dr": -10096000.49,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28810002",
+"name": "Current Year Profit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28810003",
+"name": "Sundry Reserves",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28810004",
+"name": "Legal Reserve",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28810019",
+"name": "Net Profit",
+"dr": -77950779.27,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28820000",
+"name": "UNREALIZED GAIN/LOSS AVAILABLE-FOR-SALE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28820001",
+"name": "Unrealized Gain Afs (Sec. Val)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28820002",
+"name": "Unrealized Loss Afs (Sec. Val)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "28900001",
+"name": "Position(Over Bought)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30000000",
+"name": "Stockholders Equity",
+"dr": -5049200000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30000001",
+"name": "Interoffice Kap(A) / Eligible Capital common stock",
+"dr": -5049200000,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110000",
+"name": "Retained Earnings / Accumulated deficit",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110001",
+"name": "Profit From Previous Years",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110002",
+"name": "Current Year Profit",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110003",
+"name": "Net Profit & Loss",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110011",
+"name": "Statutory Reserves",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110012",
+"name": "Voluntary Reserves",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110013",
+"name": "Other statutory reserves",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110014",
+"name": "Other capital surplus",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30110015",
+"name": "Unappropriated Earned Surplus",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30210000",
+"name": "Capital Adjusting Accounts",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "30310000",
+"name": "Other Accumulative Gain or Loss",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "70000000",
+"name": "COMMITMENT & CONTINGENCY - CREDIT",
+"dr": -305800000,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71000000",
+"name": "CONTINGENT LIABILITES",
+"dr": -5695709,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71000001",
+"name": "FORWARD EXCHANGE SOLD",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71000002",
+"name": "FORWARD EXCHANGE BOUGHT  (CONTRA)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71010000",
+"name": "CUST. LIAB. ON L/C OUTSTANDING (CONTRA)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71010001",
+"name": "Outstanding Sight L/C (Contra)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71010002",
+"name": "Outstanding Usance L/C (Contra)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71010003",
+"name": "Outstanding Stb L/C (Contra)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71010005",
+"name": "Outstanding Other (Contra)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71020001",
+"name": "Unsettled Spot Sold",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71020002",
+"name": "Unsettled Spot Bought (Contra)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71040000",
+"name": "ACCEPTANCES & GUARANTEES",
+"dr": -5695709,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71040001",
+"name": "Acceptance",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71040002",
+"name": "Guarantees (Stb L/C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71040003",
+"name": "Guarantees (L/G)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "71040004",
+"name": "Guarantees (Bonds)",
+"dr": -5695709,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72000000",
+"name": "COMMITMENT - CREDIT",
+"dr": -300104291,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72010000",
+"name": "COMMITMENT ON LOANS (OVER1YEAR)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72010001",
+"name": "General Loan Commitment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72010002",
+"name": "Syndicate Loan Commitment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72020000",
+"name": "COMMITMENT ON LOANS (LESS1YEAR)",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72020001",
+"name": "General Loan Commitment - Enterprise",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72020002",
+"name": "Syndicate - Enterprise",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72030000",
+"name": "SECURITIES & DERIVATIVES COMMITMENT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72030001",
+"name": "Contracts On Interest Rates Swap Sold",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72030002",
+"name": "Contracts On Securities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72040001",
+"name": "Reserved Credit Line Commitment",
+"dr": -300104291,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "73000000",
+"name": "FINANCIAL DERIVATIVE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "73010000",
+"name": "FX FORWARD",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "73010011",
+"name": "FX Forward on Market Buy",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "73010021",
+"name": "FX Forward on Market Sell",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "72000009",
+"name": "Other Commitment",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "BS",
+"side": "R",
+"code": "90000000",
+"name": "TOTAL FOOTNOTES - CREDIT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "50000000",
+"name": "EXPENSE TOTAL",
+"dr": 233080204.18,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51000000",
+"name": "INTEREST ON DEPOSITS & INVESTS TOTAL",
+"dr": 8370753.69,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51040000",
+"name": "INTEREST ON SAVING DEPOSIT",
+"dr": 146358,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51040001",
+"name": "INT. ON SAVING DEPOSITS (RESIDENT)",
+"dr": 146358,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51040002",
+"name": "INT. ON SAVING DEPOSITS (NON RESIDENT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51040003",
+"name": "INT. ON DEMAND DEPOSITS (INDIVIDUAL)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51040009",
+"name": "INT. ON DEMAND DEPOSITS (OTHER)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51050000",
+"name": "INTEREST ON RECURRING DEPOSIT",
+"dr": 1193,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51050001",
+"name": "INT. ON RECURRING DEPOSITS (RESIDENT)",
+"dr": 1193,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51050002",
+"name": "INT. ON RECURRING DEPOSITS (NON RESIDENT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51050009",
+"name": "INTEREST ON RECURRING DEPOSIT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060000",
+"name": "INTEREST ON FIXED DEPOSITS",
+"dr": 8223202.69,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060001",
+"name": "INT. ON FIXED DEPOSITS (RESIDENT)",
+"dr": 8223202.69,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060002",
+"name": "INT. ON FIXED DEPOSITS (NON RESIDENT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060003",
+"name": "INT. ON TIME DEPOSITS (INDIVIDUAL)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060009",
+"name": "INT. ON TIME DEPOSITS (OTHER)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060010",
+"name": "INTEREST ON CERTIFICATE OF DEPOSITS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060011",
+"name": "INT. ON CERTIFICATE OF DEPOSITS (CORP)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060012",
+"name": "INT. ON CERTIFICATE OF DEPOSITS (BANK)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51060013",
+"name": "INT. ON CERTIFICATE OF DEPOSITS (OTHER)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51070000",
+"name": "INTEREST ON ON DUE TO BANK",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51070001",
+"name": "INT. ON DUE TO FOREIGN BANK",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51070002",
+"name": "INT. ON DUE TO DOMESTIC BANK",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51070009",
+"name": "INT. ON DUE TO OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51110000",
+"name": "INTEREST ON SHORT TERM BORROWING",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51111001",
+"name": "Int. On Call Money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51111002",
+"name": "Int. On Notice money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51111003",
+"name": "Int. On Term money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51111004",
+"name": "INT. ON COMMERCIAL PAPER - DOMESTIC",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51112001",
+"name": "Int. On Call Money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51112002",
+"name": "Int. On Notice money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51112003",
+"name": "Int. On Term money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51120000",
+"name": "INTEREST ON LONG TERM BORROWING",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51121001",
+"name": "INT. ON LT BORROWING - DOMESTIC",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51122001",
+"name": "INT. ON LT BORROWING - OVERSEA",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51130000",
+"name": "INTEREST ON MONEY MARKET",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51130001",
+"name": "INT. ON STATE FUND PUR O/N WITHIN 3M",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51130009",
+"name": "INT. ON OTHERS O/N",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51130011",
+"name": "INT. ON STATE FUND PUR OVER 3M",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51130019",
+"name": "INT. ON OTHER TERM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140000",
+"name": "AMORT PREMIUM ON SECURITIES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140001",
+"name": "Amort Pre. On Government Securities - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140002",
+"name": "Amort Pre. On other approved Security - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140003",
+"name": "Amort Pre. On Shares - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140004",
+"name": "Amort Pre. On Debenture & Bonds - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140005",
+"name": "Amort Pre. On Subsidiaries Joint Venture - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140006",
+"name": "Amort Pre. On Others - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140021",
+"name": "Amort Pre. On Government Securities - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140022",
+"name": "Amort Pre. On other approved Security - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140023",
+"name": "Amort Pre. On Shares - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140024",
+"name": "Amort Pre. On Debenture & Bonds - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140025",
+"name": "Amort Pre. On Subsidiaries Joint Venture - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140026",
+"name": "Amort Pre. On Others - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140041",
+"name": "Amort Pre. On Government Securities - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140042",
+"name": "Amort Pre. On other approved Security - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140043",
+"name": "Amort Pre. On Shares - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140044",
+"name": "Amort Pre. On Debenture & Bonds - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140045",
+"name": "Amort Pre. On Subsidiaries Joint Venture - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51140046",
+"name": "Amort Pre. On Others - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51160000",
+"name": "INTEREST ON GUARANTEE MONEY",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51160001",
+"name": "INT. ON GUARANTEE MONEY-IMPORT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51160009",
+"name": "INT. ON OTHER GUARANTEE MONEY",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51180000",
+"name": "INTEREST PAID ON FOREIGN EXCHANGE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51180001",
+"name": "INT. PAID ON EXPORT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51180002",
+"name": "INT. PAID ON IMPORT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51180003",
+"name": "INT. PAID 0N REMITT & COLL",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51180009",
+"name": "INT. PAID (OTHERS)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51200000",
+"name": "OTHER INTEREST EXPENSES",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51200001",
+"name": "interest expenses on lease liabilities",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51290000",
+"name": "INTEREST ON INTER-OFFICE A/C",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51290001",
+"name": "INT. ON INTER-OFFICE KAP(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51290002",
+"name": "INT. ON INTER-OFFICE EUL(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "51290003",
+"name": "INT. ON INTER-OFFICE EUL(B) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010001",
+"name": "Depreciation For Housing and Structures",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010002",
+"name": "Depreciation For Machinery and Equipment",
+"dr": 6296235.61,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010003",
+"name": "Depreciation For Means of Transport, Transmission",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010004",
+"name": "Depreciation For Equipment and Management tools",
+"dr": 2847288.22,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010005",
+"name": "Depreciation For Others",
+"dr": 247325.82,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52010006",
+"name": "Depreciation For Furniture & Fixtures",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52012001",
+"name": "DEPRECIATION FOR SOFTWARE",
+"dr": 5941554.66,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52012002",
+"name": "DEPRECIATION FOR LEASEHOLD IMPROVEMENT",
+"dr": 73456.13,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52012003",
+"name": "DEPRECIATION FOR OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52020000",
+"name": "AMORTIZATIONS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52020001",
+"name": "AMORTIZATION FOR ORGANIZATION EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52020002",
+"name": "AMORTIZATION FOR DEFERRED EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52020003",
+"name": "AMORTIZATION FOR LEASE EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52020009",
+"name": "AMORTIZATION FOR OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52030000",
+"name": "GENERAL & ADMINISTRATIVE EXPENSE TOTAL",
+"dr": 112592802.8,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031000",
+"name": "PERSONNEL EXPENSES TOTAL",
+"dr": 40420200.84,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031001",
+"name": "SALARY(BASE)",
+"dr": 4210517.32,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031002",
+"name": "SALARY(KOREAN)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031003",
+"name": "SALARY(QUALIFIICATION)",
+"dr": 1444330.17,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031004",
+"name": "SALARY(POST ATTACHED)",
+"dr": 3496465.95,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031005",
+"name": "SALARY(LOCAL)",
+"dr": 5868633.98,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031006",
+"name": "SALARY(OVERTIME-LOCAL)",
+"dr": 759423.98,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031011",
+"name": "SUNDRY ALLOWANCES(OVERTIME)",
+"dr": 35160.81,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031012",
+"name": "SUNDRY ALLOWANCES(BONUS-LOCAL)",
+"dr": 955960.51,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031013",
+"name": "SUNDRY ALLOWANCES(ANNUAL PAID VACATION)",
+"dr": 1237253.46,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031014",
+"name": "SUNDRY ALLOWANCES(OVERSEAS BONUS)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031015",
+"name": "SUNDRY ALLOWANCES(OVERSEAS ADJUST)",
+"dr": 3961976.44,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031016",
+"name": "SUNDRY ALLOWANCES(OTHERS)",
+"dr": 6194770.45,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031017",
+"name": "SUNDRY ALLOWANCES(MANAGEMENT ACTIVITY)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031018",
+"name": "SUNDRY ALLOWANCES(FIXED BONUS)",
+"dr": 3089690.89,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031019",
+"name": "SUNDRY ALLOWANCES(FLAT BONUS)",
+"dr": 2227843.88,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031020",
+"name": "SUNDRY ALLOWANCES(SPECIAL BONUS)",
+"dr": 2636740.99,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031021",
+"name": "SUNDRY ALLOWANCES(OVERSEAS SEND)",
+"dr": 3597195.88,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52031022",
+"name": "SUNDRY RETIREMENT-LOCAL",
+"dr": 704236.13,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032000",
+"name": "OFFICE EXPENSES TOTAL",
+"dr": 72172601.96,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032013",
+"name": "MEAL EXPENSE(OTHER)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032014",
+"name": "SHARE EXPENSE(OTHER)",
+"dr": 814561.79,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032001",
+"name": "TRAVEL EXPENSE (DOMESTIC)",
+"dr": 201166.65,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032002",
+"name": "TRAVEL EXPENSE (OVERSEA)",
+"dr": 122270,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032003",
+"name": "TRAVEL EXPENSE (EDUCATION)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032004",
+"name": "TRAVEL EXPENSE (INCOMING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032011",
+"name": "LUNCH EXPENSE",
+"dr": 763169.33,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032012",
+"name": "LATE NIGHT MEAL EXPENSE",
+"dr": 25033.86,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032101",
+"name": "WELFARE EXPENSE(FIDELITYBOND)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032102",
+"name": "WELFARE EXPENSE(WORKERS COMPENSATION)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032201",
+"name": "COMMUNICATION & TRANSPORT EXPENSE",
+"dr": 7707308.06,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032103",
+"name": "WELFARE EXPENSE(HEALTH INSURANCE)",
+"dr": 293839.98,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032221",
+"name": "OFFICE SUPPLIES EXPENSE",
+"dr": 147104.51,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032104",
+"name": "WELFARE EXPENSE(SCHOLASHIP)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032241",
+"name": "PRINTING EXPENSE",
+"dr": 75423,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032105",
+"name": "WELFARE EXPENSE(ACCIDENT INSURANCE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032261",
+"name": "SUNDRY OFFICE RENTAL EXPENSE",
+"dr": 1651911.59,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032106",
+"name": "WELFARE EXPENSE(NATIONAL PENSION)",
+"dr": 457344,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032281",
+"name": "ADVERTISING PUBLIC RELATIONS",
+"dr": 677832,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032282",
+"name": "OTHER ADVERTISING EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032107",
+"name": "WELFARE EXPENSE(CONGRATULATION AND CONDOLENCES)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032301",
+"name": "REGISTERED MAIL & LAWSUIT EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032108",
+"name": "WELFARE EXPENSE(TRANSPORT)",
+"dr": 13760.94,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032321",
+"name": "REGULARITY DEVELOPMENT EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032109",
+"name": "WELFARE EXPENSE(HEALTH & PHYSICAL)",
+"dr": 74110,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032341",
+"name": "BUSINESS EXPENSE",
+"dr": 235508.73,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032110",
+"name": "WELFARE EXPENSE(UNEMPLOYMENT INSURANCE)",
+"dr": 650982.58,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032361",
+"name": "REPAIR EXPENSE",
+"dr": 519729.3,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032111",
+"name": "WELFARE EXPENSE(OTHER FOR SALAY)",
+"dr": 437408,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032381",
+"name": "WATER & ELECTRIC EXPENSE",
+"dr": 399813.71,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032112",
+"name": "WELFARE EXPENSE(CLOTHING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032401",
+"name": "BENEVOLENT FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032113",
+"name": "WELFARE EXPENSE(WELFARE PENSION)",
+"dr": 1083601.01,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032421",
+"name": "RENTAL EXPENSE",
+"dr": 20398333.7,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032114",
+"name": "WELFARE EXPENSE(ACCIDENT COMPENSATION)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032441",
+"name": "VEHICLE MAINTENANCE EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032115",
+"name": "WELFARE EXPENSE(DIABLED KIDS)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032461",
+"name": "TRAINING EXPENSE",
+"dr": 49970,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032116",
+"name": "WELFARE EXPENSE(SELF DEVELOPMENT)",
+"dr": 638833.19,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032481",
+"name": "Service Commission Expense",
+"dr": 26187292.15,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032117",
+"name": "WELFARE EXPENSE(LONGTERM CARE INSURANCE FOR THE AGED)",
+"dr": 38478.36,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032501",
+"name": "MEETING EXPENSE",
+"dr": 219023.11,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032118",
+"name": "WELFARE EXPENSE(OTHER)",
+"dr": 1241368.28,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032521",
+"name": "MISC. TAX",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032119",
+"name": "WELFARE EXPENSE(TRANSPORT FOR LOCAL)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032120",
+"name": "WELFARE EXPENSE(WELFARE POINT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032541",
+"name": "OTHER EXPENSE",
+"dr": 295117.06,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032542",
+"name": "CGST Ineligible",
+"dr": 1622890.08,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032543",
+"name": "SGST Ineligible",
+"dr": 1622890.08,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032544",
+"name": "IGST Ineligible",
+"dr": 1378355.18,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032545",
+"name": "RCM CGST Ineligible",
+"dr": 532980,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032546",
+"name": "RCM SGST Ineligible",
+"dr": 532980,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032547",
+"name": "RCM IGST Ineligible",
+"dr": 480903.01,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032601",
+"name": "DEPOSIT INSURANCE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032602",
+"name": "DEPOSIT INSURANCE(SPECIAL CONTRIBUTION)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032603",
+"name": "INSURANCE FEE",
+"dr": 581308.72,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52032491",
+"name": "REWARD EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52043000",
+"name": "Tools and Equipment Expense",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52043001",
+"name": "Tangible Tools and Equipment Expense",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "52043002",
+"name": "Intangible Tools and Equipment Expense",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010000",
+"name": "COMMISSION PAID & OTHER TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010001",
+"name": "COMM PAID ON EXPORT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010002",
+"name": "COMM PAID ON IMPORT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010003",
+"name": "COMM PAID ON REMIT & COLL",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010004",
+"name": "COMM PAID ON FX TRANSACTIONS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010005",
+"name": "CORRESPONDENT FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010006",
+"name": "CABLE & POSTAGE PAID",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010007",
+"name": "SUNDRY COMMISSION PAID",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010008",
+"name": "COMMISSIONS PAID ON BILL",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010009",
+"name": "AGENCY COMMISSION PAID",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010010",
+"name": "COMMISSION PAID ON OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010011",
+"name": "COMMISSION PAID ON CARD",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010012",
+"name": "COMMISSION PAID ON BORROWING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010013",
+"name": "Upfront Commission Paid",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010014",
+"name": "COMMISSION PAID - AOB DEPOSIT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53010015",
+"name": "COMMISSION PAID ON DOMESTIC TRANSFER",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030000",
+"name": "LOSS ON INVESTMENT TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030100",
+"name": "INVEST LOSS ON TRADING TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030101",
+"name": "REALIZED LOSS ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030102",
+"name": "UNREALIZED LOSS ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030103",
+"name": "EXPENSE LOSS ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030201",
+"name": "INVEST LOSS ON HELD TO MATURITY",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53030301",
+"name": "INVEST LOSS ON AVAILABLE FOR SALE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53040000",
+"name": "LOSS ON DERIVATIVE PRODUCTS",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041000",
+"name": "LOSS ON VALUATIONS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041001",
+"name": "LOSS ON VALUATION OF CURR. SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041002",
+"name": "LOSS ON VALUATION OF INT. RATE SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041003",
+"name": "LOSS ON VALUATION OF OTHERS (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041004",
+"name": "LOSS ON VALUATION OF CURR. SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041005",
+"name": "LOSS ON VALUATION OF INT. RATE SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041006",
+"name": "LOSS ON VALUATION OF OTHERS (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041007",
+"name": "LOSS ON VALUATION OF CURR. SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041008",
+"name": "LOSS ON VALUATION OF INT. RATE SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53041009",
+"name": "LOSS ON VALUATION OF OTHERS (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042000",
+"name": "LOSS ON TRANSACTIONS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042001",
+"name": "LOSS ON TRANSACTION OF CURR. SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042002",
+"name": "LOSS ON TRANSACTION OF INT. RATE SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042003",
+"name": "LOSS ON TRANSACTION OF OTHERS (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042004",
+"name": "LOSS ON TRANSACTION OF CURR. SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042005",
+"name": "LOSS ON TRANSACTION OF INT. RATE SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042006",
+"name": "LOSS ON TRANSACTION OF OTHERS (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042007",
+"name": "LOSS ON TRANSACTION OF CURR. SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042008",
+"name": "LOSS ON TRANSACTION OF INT. RATE SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53042009",
+"name": "LOSS ON TRANSACTION OF OTHERS (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090000",
+"name": "LOSS ON OTHERS TOTAL",
+"dr": 7060007.98,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090001",
+"name": "LOSS ON SEC. REDEMPTION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090002",
+"name": "LOSS ON SEC. ADJUSTMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090003",
+"name": "LOSS FOR RECEIVABLE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090004",
+"name": "LOSS ON DISPOSAL OF BUSINESS ASSETS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090005",
+"name": "LOSS ON DISPOSAL OF NON-BUSI ASSETS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090006",
+"name": "LOSS ON SUSPENSE ACCOUNTS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090007",
+"name": "DONATION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090008",
+"name": "RETURN OF UNEARNED/RECEIVABLE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090009",
+"name": "NON-OPERATING EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090010",
+"name": "BAD & DOUBTFUL DEBT REMEMPTION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090011",
+"name": "LOSS ON F/X TRANSACTION-LOSS",
+"dr": 245.6,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090012",
+"name": "LOSS ON F/X REVALUATION",
+"dr": 7059762.38,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090013",
+"name": "ADJUSTED LOSS OF PREVIOUS TERM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090014",
+"name": "LOSS ON SECURITIES SOLD",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090015",
+"name": "Round Off (Loss)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090031",
+"name": "EXPENSES OF PURCHASE ON TRADING BONDS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090032",
+"name": "EXPENSES OF PURCHASE ON TRADING STOCKS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090091",
+"name": "LOSS ON OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "53090092",
+"name": "TOCKEN COST",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010000",
+"name": "PROVISIONS TOTAL",
+"dr": 4600000,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010001",
+"name": "PROVISION FOR LOANS",
+"dr": 4600000,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010002",
+"name": "PROVISION FOR GUARANTEES",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010003",
+"name": "PROVISION FOR ACCEPTANCE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010004",
+"name": "PROVISION FOR RETIREMENT ALLOWANCE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010005",
+"name": "PROVISION FOR CALL LOAN",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "54010091",
+"name": "PROVISION FOR OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "58010000",
+"name": "INCOME TAX EXPENSES",
+"dr": 7100000,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "58010001",
+"name": "DEFERRED TAX EXPENSE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "58010011",
+"name": "Income TAX EXPENSE",
+"dr": 7100000,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "58010014",
+"name": "FOREIGN TAX",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "58010019",
+"name": "OTHERS TAX",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "59010001",
+"name": "NET PROFIT OF TERM",
+"dr": 77950779.27,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "L",
+"code": "59010002",
+"name": "INCOMM SUMMARY LOSS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "40000000",
+"name": "INCOME TOTAL",
+"dr": -233080204.18,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41000000",
+"name": "INTEREST ON LOANS & INVEST & BILLS",
+"dr": -183346549.22,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41010000",
+"name": "INTEREST ON OVERDRAFT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41010001",
+"name": "INT. ON OVERDRAFT (CUST)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41010002",
+"name": "INT. ON OVERDRAFT (BANK)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020000",
+"name": "INTEREST ON LOANS  TOTAL",
+"dr": -105701412.45,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020001",
+"name": "INT. ON LOANS ON BILLS (T/R)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020002",
+"name": "INT. ON LOANS ON BILLS (PERSONAL)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020003",
+"name": "INT. ON LOANS ON BILLS (OPERATION-TIME)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020004",
+"name": "Int. On Loans On Bills (Operation-Credit Line-WCD)",
+"dr": -21640276.03,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020005",
+"name": "INT. ON LOANS ON BILLS (OPERATION-SHORT TERM)",
+"dr": -49071273.57,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020006",
+"name": "INT. ON LOANS ON BILLS (MORTGAGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020007",
+"name": "INT. ON LOANS ON BILLS (EQUIPMENT-TIME)",
+"dr": -34989862.85,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020008",
+"name": "INT. ON LOANS ON BILLS (EQUIPMENT-CREDIT LINE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020009",
+"name": "INT.ON LOAN COMMITMENT(LOC/F)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41020012",
+"name": "INT. ON LOANS ON BILLS(OPERATION-CREDIT LINE-OD)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030000",
+"name": "INTEREST ON SYNDICATED LOANS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030001",
+"name": "INT. ON WORKING CAPITAL (SHORT-TERM)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030002",
+"name": "INT. ON EQUIPMENT CAPITAL (SHORT-TERM)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030003",
+"name": "INT. ON WORKING CAPITAL (LONG-TERM)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030004",
+"name": "INT. ON EQUIPMENT CAPITAL (LONG-TERM)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41030005",
+"name": "INT. ON PRIVATE PLACEMENT NOTE (BOND)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41040000",
+"name": "INTEREST ON BILLS BOUGHTS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41040001",
+"name": "INT. ON SIGHT BILLS BOUGHT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41040002",
+"name": "INT. ON USANCE BILLS BOUGHT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41040003",
+"name": "INT. ON T/B BOUGHT-EXPORT NEGO",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41040004",
+"name": "INT. ON T/B BOUGHT-EXPORT REIM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41050000",
+"name": "INTEREST ON BILLS DISCOUNTED TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41050002",
+"name": "INT. ON BILLS DISCOUNTED B.A (DOMESTIC)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41050003",
+"name": "INT. ON BILLS DISCOUNTED B.A (OVERSEAS)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41070000",
+"name": "INTEREST ON DUE FROM BANKS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41070001",
+"name": "INT. ON DUE FROM BANKS ON TIME",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41070002",
+"name": "INT. ON DUE FROM BANKS ON DEMAND",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41070019",
+"name": "INT. ON DUE FROM BANKS (OTHERS)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41090000",
+"name": "INTEREST ON MONEY MARKET TOTAL",
+"dr": -75541414.29,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41091001",
+"name": "Int. on Call Loan - Domestic",
+"dr": -9617798.41,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41091002",
+"name": "Int. on Notice Money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41091003",
+"name": "Int. on Term money - Domestic",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41092001",
+"name": "Int. on Call Loan - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41092002",
+"name": "Int. on Notice Money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41092003",
+"name": "Int. on Term money - Oversea",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41093001",
+"name": "INT. ON LT LENDING - DOMESTIC",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41094001",
+"name": "INT. ON LT LENDING - OVERSEA",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41095001",
+"name": "Int. on Time Deposit - Domestic Corps",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41095002",
+"name": "Int. on Time Deposit - Domestic Banks",
+"dr": -65923615.88,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41095003",
+"name": "Int. on Time Deposit - Domestic Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41096001",
+"name": "Int. on Time Deposit - Oversea Corps",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41096002",
+"name": "Int. on Time Deposit - Oversea Banks",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41096003",
+"name": "Int. on Time Deposit - Oversea Others",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41100000",
+"name": "INTEREST ON SECURITIES TOTAL",
+"dr": -1616728.68,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110000",
+"name": "INT. ON SECURITIES AVAILABLE FOR SALE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110001",
+"name": "Int. On Government Securities - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110002",
+"name": "Int. On other approved Security - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110003",
+"name": "Int. On Shares - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110004",
+"name": "Int. On Debenture & Bonds - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110005",
+"name": "Int. On Subsidiaries and /or Joint Venture - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41110006",
+"name": "Int. On Others - Afs",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120000",
+"name": "INT. ON SECURITIES TRADE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120001",
+"name": "Int. On Government Securities - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120002",
+"name": "Int. On other approved Security - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120003",
+"name": "Int. On Shares - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120004",
+"name": "Int. On Debenture & Bonds - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120005",
+"name": "Int. On Subsidiaries and /or Joint Venture - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41120006",
+"name": "Int. On Others - Trade",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130000",
+"name": "INT. ON SECURITIES HELD TO MATURITY",
+"dr": -1616728.68,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130001",
+"name": "Int. On Government Securities - Htm",
+"dr": -1616728.68,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130002",
+"name": "Int. On other approved Security - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130003",
+"name": "Int. On Shares - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130004",
+"name": "Int. On Debenture & Bonds - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130005",
+"name": "Int. On Subsidiaries and /or Joint Venture - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41130006",
+"name": "Int. On Others - Htm",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190000",
+"name": "ACCRETION OF DISCOUNT",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190001",
+"name": "ACC. OF DIS ON STATE TREASURY - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190002",
+"name": "ACC. OF DIS ON OTHER STATE GOVT OR AGENCIES - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190003",
+"name": "ACC. OF DIS ON FOREIGN GOVT & OFFICIAL INSTITUTION - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190004",
+"name": "ACC. OF DIS ON CORPORATION - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190005",
+"name": "ACC. OF DIS ON FINANCIAL INSTITUTION - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190006",
+"name": "ACC. OF DIS ON OTHERS - AFS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190021",
+"name": "ACC. OF DIS ON STATE TREASURY - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190022",
+"name": "ACC. OF DIS ON OTHER STATE GOVT OR AGENCIES - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190023",
+"name": "ACC. OF DIS ON FOREIGN GOVT & OFFICIAL INSTITUTION - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190024",
+"name": "ACC. OF DIS ON CORPORATION - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190025",
+"name": "ACC. OF DIS ON FINANCIAL INSTITUTION - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190026",
+"name": "ACC. OF DIS ON OTHERS - TRADE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190041",
+"name": "ACC. OF DIS ON STATE TREASURY - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190042",
+"name": "ACC. OF DIS ON OTHER STATE GOVT OR AGENCIES - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190043",
+"name": "ACC. OF DIS ON FOREIGN GOVT & OFFICIAL INSTITUTION - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190044",
+"name": "ACC. OF DIS ON CORPORATION - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190045",
+"name": "ACC. OF DIS ON FINANCIAL INSTITUTION - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41190046",
+"name": "ACC. OF DIS ON OTHERS - HTM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41290000",
+"name": "INTEREST ON INTER-OFFICE A/C TOTAL",
+"dr": -486993.8,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41290001",
+"name": "INT. ON INTER-OFFICE KAP(A) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41290002",
+"name": "INT. ON INTER-OFFICE EUL(A) A/C",
+"dr": -271432,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41290003",
+"name": "INT. ON INTER-OFFICE EUL(B) A/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "41290004",
+"name": "INTEROFFICE EUL(B) INT.ON BD B.A(OUR)",
+"dr": -215561.8,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42010000",
+"name": "COMMISSION - GUARANTEE TOTAL",
+"dr": -29550.53,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42010011",
+"name": "COMMISSION - GUARANTEE (STANDBY L/C)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42010012",
+"name": "COMMISSION - GUARANTEE (L/G)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42010013",
+"name": "COMMISSION - GUARANTEE(Bond)",
+"dr": -29550.53,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42010014",
+"name": "COMMISSION - Cable and Postage(GUARANTEE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020000",
+"name": "COMMISSION INCOME TOTAL",
+"dr": -3818711.95,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020100",
+"name": "COMMISSION - IMPORT L/C TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020101",
+"name": "COMMISSION - IMPORT STANDBY L/C",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020102",
+"name": "COMMISSION - IMPORT L/C ISSUED",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020103",
+"name": "COMMISSION - IMPORT AMEND",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020104",
+"name": "COMMISSION - IMPORT TERM CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020105",
+"name": "COMMISSION - IMPORT DISCREPANCY FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020106",
+"name": "COMMISSION - IMPORT PAYMENT CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020107",
+"name": "COMMISSION - ACCEPTANCE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020108",
+"name": "COMMISSION - L/G",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020110",
+"name": "COMMISSION - L/C CANCELLATION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020111",
+"name": "COMMISSION - IMPORT COLLECTION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020112",
+"name": "COMMISSION - TLX/POSTAGE(IMPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020113",
+"name": "COMMISSION - CABLE AND POSTAGE(IMPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020129",
+"name": "COMMISSION - OTHER(IMPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020200",
+"name": "COMMISSION - D/P D/A TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020201",
+"name": "COMMISSION - PAYMENT CHARGE(D/P)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020202",
+"name": "COMMISSION - PAYMENT CHARGE(D/A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020203",
+"name": "COMMISSION - CABLE AND POSTAGE(D/P D/A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020204",
+"name": "COMMISSION - OTHER (D/P D/A)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020205",
+"name": "COMMISSION - D/P D/A CANCELLATION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020300",
+"name": "COMMISSION - EXPORT L/C TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020301",
+"name": "COMMISSION - ADVISING/AMEND(EXPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020302",
+"name": "COMMISSION - NEGOTIATION FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020303",
+"name": "COMMISSION - TRANSFER & ASSIGNMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020304",
+"name": "COMMISSION - COLLECTION FEE(EXPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020305",
+"name": "COMMISSION - DISCREPANCY FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020306",
+"name": "COMMISSION - L/C TRANSFER CANCEL",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020307",
+"name": "COMMISSION - POSTAGE/DHL(EXPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020308",
+"name": "COMMISSION - CABLE AND POSTAGE(EXPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020309",
+"name": "COMMISSION - AD CONFIRM CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020329",
+"name": "COMMISSION - OTHER(EXPORT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020400",
+"name": "COMMISSION - REIMBURSEMENT TOTAL",
+"dr": -51366.47,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020401",
+"name": "COMMISSION - REIMBURSEMENT",
+"dr": -23716.44,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020402",
+"name": "COMMISSION - CABLE AND POSTAGE(REIMBURSEMENT)",
+"dr": -3826.61,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020403",
+"name": "COMMISSION - EXTENTION",
+"dr": -23823.42,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020404",
+"name": "COMMISSION - EARLY SETTLEMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020405",
+"name": "COMMISSION - OTHER(REIMBURSEMENT)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020500",
+"name": "COMMISSION - RCV'D ON EXP. CONTRACTS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020501",
+"name": "COMMISSION - COLLECTION ON EXP. D/P",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020502",
+"name": "COMMISSION - COLLECTION ON EXP. D/A",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020503",
+"name": "COMMISSION - OUTWARD COLL. UNPAID CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020600",
+"name": "COMMISSION - REMITTANCE TOTAL",
+"dr": -1845209.19,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020601",
+"name": "COMMISSION - REMITTANCE OF OUTWARD",
+"dr": -237500,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020602",
+"name": "COMMISSION - REMITTANCE OF INWARD",
+"dr": -1000,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020603",
+"name": "COMMISSION - CABLE AND POSTAGE(REMITTANCE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020621",
+"name": "COMMISSION - In Lieu of Exchange (EEFC)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020629",
+"name": "COMMISSION - OTHERS(REMITTANCE)",
+"dr": -1606709.19,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020604",
+"name": "COMMISSION - OTHER BANKS PAYMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020605",
+"name": "COMMISSION-H.O. COLLECTION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020606",
+"name": "Commission - Remittance Of Outward(OUR)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020607",
+"name": "Commission - DOMESTIC REMITTANCE FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020608",
+"name": "Commission - RTGS REMITTANCE FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020700",
+"name": "COMMISSION - LOANS TOTAL",
+"dr": -1922136.29,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020701",
+"name": "COMMISSION - LOAN APPLICATION FEE",
+"dr": -1640000,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020702",
+"name": "COMMISSION - LOAN ORIGINATION & RENEWAL FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020703",
+"name": "COMMISSION - LOAN LATE PAYMENT CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020704",
+"name": "COMMISSION - LOAN COMMITMENT FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020705",
+"name": "COMMISSION - SYNDICATED LOAN PARTICIPATION FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020706",
+"name": "COMMISSION - SYNDICATED LOAN ARRANGE FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020707",
+"name": "COMMISSION - UNUSED LINE FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020708",
+"name": "COMMISSION - PREPAYMENT FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020709",
+"name": "COMMISSION - LOAN PENAL CHARGES",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020729",
+"name": "COMMISSION - OTHER FEE",
+"dr": -282136.29,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020800",
+"name": "COMMISSION - AOB TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020801",
+"name": "COMMISSION - AOB PAYMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020900",
+"name": "COMMISSION - OTHERS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020901",
+"name": "COMMISSION - BOUNCED & RETURNED CHECK",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020902",
+"name": "COMMISSION - CABLE AND POSTAGE CHARGE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020903",
+"name": "COMMISSION - CLEARANCE TRANSACTION",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020904",
+"name": "COMMISSION - LOAN MANAGEMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020905",
+"name": "COMMISSION - REPRINT OF STATEMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020906",
+"name": "COMMISSION - CURRENT CHECK",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42020929",
+"name": "COMMISSION - OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42030000",
+"name": "COMMISSION-ACCOUNT MANAGEMENT SERVICE",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42030001",
+"name": "COMMISSION-DRAWING FEE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "42030002",
+"name": "COMMISSION-FUNDS MANAGEMENT",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050000",
+"name": "INVESTMENT INCOME TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050100",
+"name": "INVESTMENT INCOME ON TRADING TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050101",
+"name": "REALIZED PROFIT ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050102",
+"name": "UNREALIZED PROFIT ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050103",
+"name": "EXPENSE ON TRADING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050201",
+"name": "INVEST INCOME ON HELD TO MATURITY",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "43050301",
+"name": "INVEST INCOME ON AVAILABLE FOR SALE",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44010000",
+"name": "GAIN ON DERIVATIVE PRODUCTS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011000",
+"name": "GAIN ON VALUATIONS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011001",
+"name": "GAIN ON VALUATION OF CURR. SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011002",
+"name": "GAIN ON VALUATION OF INT. RATE SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011003",
+"name": "GAIN ON VALUATION OF OTHERS (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011004",
+"name": "GAIN ON VALUATION OF CURR. SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011005",
+"name": "GAIN ON VALUATION OF INT. RATE SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011006",
+"name": "GAIN ON VALUATION OF OTHERS (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011007",
+"name": "GAIN ON VALUATION OF CURR. SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011008",
+"name": "GAIN ON VALUATION OF INT. RATE SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44011009",
+"name": "GAIN ON VALUATION OF OTHERS (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012000",
+"name": "GAIN ON TRANSACTIONS TOTAL",
+"dr": 0,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012001",
+"name": "GAIN ON TRANSACTION OF CURR. SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012002",
+"name": "GAIN ON TRANSACTION OF INT. RATE SWAP (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012003",
+"name": "GAIN ON TRANSACTION OF OTHERS (TRADING)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012004",
+"name": "GAIN ON TRANSACTION OF CURR. SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012005",
+"name": "GAIN ON TRANSACTION OF INT. RATE SWAP (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012006",
+"name": "GAIN ON TRANSACTION OF OTHERS (HEDGE)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012007",
+"name": "GAIN ON TRANSACTION OF CURR. SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012008",
+"name": "GAIN ON TRANSACTION OF INT. RATE SWAP (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "44012009",
+"name": "GAIN ON TRANSACTION OF OTHERS (I/O)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010000",
+"name": "OTHER INCOMES TOTAL",
+"dr": -14357088,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010001",
+"name": "INCOME ON LOAN SELLING",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010002",
+"name": "INCOME ON SECURITIES SOLD",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010005",
+"name": "INCOME ON DISP ON BUSINESS ASSETS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010006",
+"name": "INCOME ON DISP ON NON-BUSI ASSETS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010007",
+"name": "REVERSAL OF PROVISION FOR SEC.",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010008",
+"name": "REVERSAL OF PROVISION FOR LOAN",
+"dr": -2100000,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010009",
+"name": "REVERSAL OF PROVISION FOR TAX",
+"dr": -12257088,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010010",
+"name": "RETURN PREPAID/ACCRUED INT.",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010011",
+"name": "REVERSAL OF PROVISION FOR PRIVATE PLACEMENT NOTE(BOND)",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010012",
+"name": "Reversal of Provision For Call Loan",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010019",
+"name": "RETURN INT. - OTHERS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48010020",
+"name": "INCOME ON SELLING TOCKEN",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020000",
+"name": "NON-OPERATING INCOME TOTAL",
+"dr": -88587.83,
+"leaf": false
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020001",
+"name": "INCONE ON SUSPENSE ACCOUNTS",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020002",
+"name": "INCOME ON PENALTY",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020003",
+"name": "INCOME ON DEFERRED TAX",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020009",
+"name": "INCOME ON OTHERS",
+"dr": -88587,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48020010",
+"name": "Round Off (Profit)",
+"dr": -0.83,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48090001",
+"name": "GAIN ON F/X TRANSACTION",
+"dr": -20935063.07,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48090002",
+"name": "GAIN ON F/X REVALUATION",
+"dr": -10504653.58,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "48090003",
+"name": "GAIN ADJUST FOR PRIOR TERM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "49010001",
+"name": "NET LOSS OF TERM",
+"dr": 0,
+"leaf": true
+},
+{
+"kind": "PL",
+"side": "R",
+"code": "49010002",
+"name": "INCOMM SUMMARY PROFIT",
+"dr": 0,
+"leaf": true
+}
+]
+}

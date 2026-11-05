@@ -149,6 +149,153 @@ def _map_rows():
 MAPPING = _map_rows()
 
 # ---------------------------------------------------------------------------
+# 현행 CoA 전체(2026-07-07 BS/PL) 대사 + 06 미연결 계정 맵핑 제안
+# ---------------------------------------------------------------------------
+CUR = {r["code"]: r for r in json.load(open(os.path.join(_HERE, "data", "cur_gbs_20260707.json"), encoding="utf-8"))["rows"]}
+CUR_LEAF = {c for c, r in CUR.items() if r["leaf"]}
+_by_gbs = defaultdict(list)
+for a in BASE:
+    for g in re.split(r"[,\s]+", a["gbs"]):
+        if g:
+            _by_gbs[g].append(a["code"])
+
+_DRV_TYPE = {"1": ("200200", "200200", "통화스왑"), "2": ("100300", "100300", "금리스왑"), "9": (None, None, "기타")}
+_PL_Y = {"1": ("T", "1"), "2": ("T", "2"), "3": ("T", "9"), "4": ("H", "1"), "5": ("H", "2"), "6": ("H", "9"), "7": ("IO", "1"), "8": ("IO", "2"), "9": ("IO", "9")}
+_SEC = {"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6"}   # 국채·기타정부·외국정부·회사채·금융기관·기타
+
+
+def _propose(c):
+    """(대상, 구분, 근거). 구분: 신규맵핑 / 이행제외 / 확인"""
+    n = CUR[c]["name"]
+    if c in ("80000000", "90000000"):
+        return "", "이행제외", "난외 각주 합계(잔액 0, 하위 없음)"
+    if c in ("10255001", "10255003", "10256001", "10256003"):
+        return "", "이행제외", "법인·기타 대상 정기예치 — 06 결정 M2에서 비활성(은행 예치만 10106010000)"
+    if c in ("20120006", "20120007", "20120008"):
+        return "", "이행제외", "MMDA는 인도 예금상품에 없음(FEM Deposit·RBI 예금 지침)"
+    if c == "20125004":
+        return "", "이행제외", "EEFC는 거주자 계정(FEMA) — 비거주자 EEFC 상품 없음"
+    if c in ("20402004", "20403004", "51111004"):
+        return "", "이행제외", "은행은 CP 발행 주체가 아님(RBI CP Directions) — 차입 CP 계정 불필요"
+    if c == "41290001":
+        return "", "이행제외", "갑기금 무이자 확정 — 40610000000 비활성"
+    if c == "20990001":
+        return "", "이행제외", "휴면계좌는 예금 유지 + 상태 속성(결정 P7), 0930 DORMANT 20510100000 인도 비활성"
+    if c == "20990055":
+        return "20510400101", "신규맵핑", "194P 고령자 연금·이자 TDS → 예금이자 TDS L6, 고령자 구분은 파라미터(결정 T2)"
+    if c == "20990057":
+        return "20510400199", "신규맵핑", "194S 가상자산 TDS → TDS 기타(거주자)(결정 T1)"
+    if c in ("23100201", "23100301"):
+        return "20720100000", "신규맵핑", "0930 이연법인세부채 단일 leaf(평가 성격은 속성). 자산측은 10820200000·10820300000으로 분리되어 있어 부채측 L5 신설 여부 확인"
+    if c in ("23200001",):
+        return "20610900000", "확인", "리스부채: 인도 원장 AS 19 미기장(결정 F2) — 본점 IFRS 조정 전용 계정"
+    if c in ("12130001", "12330001"):
+        return "10710300000", "확인", "사용권자산: 본점 IFRS 조정 전용(결정 F2)"
+    if c == "51200001":
+        return "50320500000", "확인", "리스부채 이자: 본점 IFRS 조정 전용(결정 F2)"
+    if c in ("13102001", "23100401"):
+        return "", "확인", "파생상품 이연손익(Day-1): 0930에 대응 계정 없음 — 파생 취급 개시 시 신설 요청"
+    if c == "30210000":
+        return "", "확인", "자본조정: 0930 자본 계정군에 대응 없음 — 갑기금(31140100000)·자본준비금(31110500000) 중 성격 확인"
+    if c == "51060010":
+        return "50130100000", "신규맵핑", "CD 이자 → 0930 CD 이자(법인/은행/기타 L4) — 보유자 유형으로 분할(현재 CD 미발행)"
+    if c == "53090002":
+        return "50430303000", "확인", "유가증권 조정손실 → FVPL 공정가치 손실 추정, 성격 확인"
+    # 유가증권: 인도 HTM/AFS/HFT ↔ 0930 AC/FVOCI/FVPL
+    if c.startswith("411900"):
+        y = c[-2:]
+        cls, k = {"0": ("AFS", y[1]), "2": ("HFT", y[1]), "4": ("HTM", y[1])}[y[0]]
+        code = {"AFS": "402" + "4" + "0" + k, "HTM": "402" + "5" + "0" + k, "HFT": "402" + "2" + "0" + k}[cls] + "00000"
+        return code, ("신규맵핑" if cls != "HFT" else "확인"), f"{cls} 할인상각 → 0930 {'FVOCI' if cls == 'AFS' else 'AC' if cls == 'HTM' else 'FVPL 이자(할인상각 계정 없음)'} (RBI 2023 투자 지침 분류 대응)"
+    if c.startswith("511400"):
+        y = c[-2:]
+        cls = {"0": "AFS", "2": "HFT", "4": "HTM"}[y[0]]
+        if cls == "AFS":
+            return "50410100000", "신규맵핑", "AFS 프리미엄 상각 → 0930 FVOCI 프리미엄 상각"
+        if cls == "HTM":
+            return "50420100000", "신규맵핑", "HTM 프리미엄 상각 → 0930 AC 프리미엄 상각"
+        return "50430303000", "확인", "HFT는 공정가치 평가로 프리미엄 상각 계정 없음 → FVPL 공정가치 손실로 흡수 여부 확인"
+    m = {"43050101": ("40260302000", "HFT 실현이익 → FVPL 처분이익"), "43050102": ("40260303000", "HFT 미실현이익 → FVPL 공정가치 이익"),
+         "43050103": ("50440100000", "매매 부대비용 → 채권 매입비용"), "53030101": ("50430302000", "HFT 실현손실 → FVPL 처분손실"),
+         "53030102": ("50430303000", "HFT 미실현손실 → FVPL 공정가치 손실"), "53030103": ("50440100000", "매매 부대비용 → 채권 매입비용"),
+         "53030201": ("50430102000", "HTM 손실 → AC 처분손실")}
+    if c in m:
+        return m[c][0], "신규맵핑", m[c][1] + " (HTM/AFS/HFT ↔ AC/FVOCI/FVPL)"
+    # 파생: 1410/2410 1 0XY (X 0 트레이딩·1 헤지·2 본지점, Y 1 통화·2 금리·9 기타)
+    if c[:5] in ("14101", "24101"):
+        x, y = c[6], c[7]
+        base = ("10910" if x in "02" else "10920") if c[0] == "1" else ("20810" if x in "02" else "20820")
+        if y == "9":
+            return base + "500000", "신규맵핑", "기타 파생 → OTHERS" + (" (본지점 거래는 트레이딩 + 거래상대 속성 HO)" if x == "2" else "")
+        return base + _DRV_TYPE[y][0], "신규맵핑", _DRV_TYPE[y][2] + (" (본지점 거래는 트레이딩 + 거래상대 속성 HO)" if x == "2" else "")
+    if c in ("14102001", "24102001"):
+        return ("10910100200" if c[0] == "1" else "20810100200"), "신규맵핑", "채권 선도 → OTC BOND FORWARD"
+    if c in ("14103001", "24103001"):
+        return ("10910200100" if c[0] == "1" else "20810200100"), "신규맵핑", "외환 선물환 계약 → 통화 FORWARD"
+    if c[:4] in ("4401", "5304"):
+        val = c[4] == "1"
+        mode, t = _PL_Y[c[-1]]
+        if t == "9":
+            return "", "확인", "기타 파생 손익: 0930 손익 계정에 OTHERS 없음 — 성격(통화·금리·신용·상품) 확인 후 지정"
+        gain = c[0] == "4"
+        pre = {(True, False, "T"): "40910", (True, True, "T"): "40920", (True, False, "H"): "41010", (True, True, "H"): "41020",
+               (False, False, "T"): "50710", (False, True, "T"): "50720", (False, False, "H"): "50810", (False, True, "H"): "50830"}[(gain, val, "H" if mode == "H" else "T")]
+        sw = "200200" if t == "1" else "100300"
+        return pre + sw, "신규맵핑", f"{'평가' if val else '거래'} {'이익' if gain else '손실'} · {'통화' if t == '1' else '금리'}스왑" + (" (본지점 → 트레이딩 + HO 속성)" if mode == "IO" else "")
+    g = [k for k in _by_gbs.get(c, []) if k in LEAF]
+    if g:
+        k = g[0]
+        if usable(k):
+            return k, "신규맵핑", "0930 GBS코드 열 일치"
+        return "", "이행제외", f"0930 대응 {k}는 인도 미사용({BY[k]['status'] or BY[k]['post']})"
+    return "", "확인", "대응 계정 없음 — 성격 확인"
+
+
+def _cur_rows():
+    out = []
+    for c in sorted(CUR_LEAF - set(_cur)):
+        t, k, why = _propose(c)
+        if t:
+            assert t in BY, (c, t)
+            if t not in LEAF:
+                why += f" — 주의: {t}는 상위 계정"
+        out.append({"cur": c, "cur_name": CUR[c]["name"], "dr": CUR[c]["dr"], "code": t, "name": acct_name(t) if t else "", "kind": k, "why": why,
+                    "post": BY[t]["post"] if t else ""})
+    return out
+
+
+CUR_UNMAPPED = _cur_rows()
+CUR_STATS = {
+    "leaf": len(CUR_LEAF), "nonzero": sum(1 for c in CUR_LEAF if CUR[c]["dr"]),
+    "mapped": len(CUR_LEAF & set(_cur)), "unmapped": len(CUR_LEAF - set(_cur)),
+    "unmapped_bal": sum(1 for c in CUR_LEAF - set(_cur) if CUR[c]["dr"]),
+    "extra": sorted(set(_cur) - set(CUR)),
+    "bs": round(sum(CUR[c]["dr"] for c in CUR_LEAF if CUR[c]["kind"] == "BS" and CUR[c]["code"][0] in "123"), 2),
+    "pl": round(sum(CUR[c]["dr"] for c in CUR_LEAF if CUR[c]["kind"] == "PL"), 2),
+    "offbs": round(sum(CUR[c]["dr"] for c in CUR_LEAF if CUR[c]["code"][0] in "67"), 2),
+}
+
+
+def _bal_check():
+    """06 대상 잔액 = 현행 BS/PL 잔액 합 (1:1·N:1 대상만)"""
+    agg = defaultdict(float)
+    for g, tg in _cur.items():
+        if len(tg) == 1 and g in CUR:
+            agg[tg[0]] += CUR[g]["dr"]
+    bad = []
+    for code, v in agg.items():
+        srcs = [g for g, tg in _cur.items() if code in tg]
+        if all(len(_cur[g]) == 1 for g in srcs):
+            b = float(BY[code]["bal"] or 0)
+            if abs(b - v) > 0.5:
+                bad.append((code, b, round(v, 2)))
+    return bad
+
+
+BAL_DIFF = _bal_check()
+
+
+# ---------------------------------------------------------------------------
 # 06 파일 검토 의견 (추가·수정·삭제)
 # ---------------------------------------------------------------------------
 REVIEW = [
@@ -159,7 +306,10 @@ REVIEW = [
     ("수정", "중간", "현행 53090014", "매매손실 50430201000과 처분손실 50440000000(상위 계정)에 동시 연결(0930 GBS 중복)", "성격별 1개 leaf로 지정(처분손실이면 50440100000/200000)", "G4"),
     ("수정", "중간", "상위 계정 연결 10건", "현행 코드가 하위 계정이 있는 상위 계정에 연결(10610000000·20181100000·31130000000·59900000000 등). G2 '기장은 leaf'와 불일치", "19.계정이행맵핑 시트의 '권고 대상' 열 leaf로 정정", "G2"),
     ("수정", "중간", "1:N 분할 18건", "현행 1개 → 차세대 여러 계정(예: 20125001 → 법인 당좌/개인 당좌, 20990040 → TCS 3종). 이행 프로그램에 분할 키가 없으면 잔액 배분 불가", "건별 분할 기준(고객유형·FAR 자산분류·거주성·TCS 유형·EP 코드)을 이행 규칙으로 확정", "P1·F1·T1·X6"),
-    ("추가", "중간", "현행 CoA 전체 목록", "06 파일은 잔액 있는 현행 계정(145개, 합계 0 ✓)과 연결된 697개만 보여줌. 잔액 0인 현행 계정 중 누락 여부는 확인 불가", "현행 GBS 8자리 계정 마스터 전체 제공 → 미연결 코드 0건 확인", "G1"),
+    ("추가", "중간", "현행 CoA 미연결 132개 (2026-07-07 BS/PL 대사)", "현행 BS·PL 최하위 계정 828개 중 06 이행표에 없는 132개(모두 잔액 0): 파생 54·유가증권 손익 47·차입 CP·MMDA·리스 등. 잔액 있는 159개는 전부 연결, 06 잔액과 BS/PL 잔액 일치", "19.계정이행맵핑 '현행 미연결' 구역의 제안 대상으로 이행표 보완(신규맵핑 / 이행제외 / 확인)", "G1"),
+    ("수정", "중간", "0930 GBS코드 열 — 파생", "0930이 현행 14101001(통화스왑·트레이딩)을 금리스왑 10910100300에, 14101012(금리스왑·헤지)를 통화스왑·트레이딩 10910200200에 대응(24101xxx도 같음). 06 이행표는 이 대응을 쓰지 않아 미연결로 남음", "현행 코드 규칙(X 트레이딩/헤지/본지점 × Y 통화/금리/기타)으로 재대응 — 제안 반영", "G4"),
+    ("확인", "낮음", "현행 10990003 (관리비 예치금)", "06 이행표에 연결되어 있으나 현행 BS/PL에 없는 코드(결정 M5에서 현행 신설 예정으로 표기)", "현행 GBS에 신설 후 이행, 또는 이행표에서 '신설 예정' 표시", "M5"),
+    ("확인", "중간", "인도 HTM/AFS/HFT ↔ 0930 AC/FVOCI/FVPL", "현행 투자 계정은 RBI 2023 투자 지침 분류(HTM·AFS·HFT). 0930은 IFRS 9 분류. HFT 할인·프리미엄 상각 계정이 0930에 없음", "HFT는 FVPL 이자·공정가치 손익으로 흡수(제안). 31130000000 AFS Reserve 명칭 변경과 일관", "G9"),
     ("수정", "낮음", "당발 OUR 수수료", "결정 C1: OUR 정액 40570060000, 중계은행 수수료 고객 회수 40570110000(과세). 송금 화면 수수료 엔진에 OUR 부과 항목이 아직 없음", "송금 화면에 OUR 수수료 행 추가(정액/실비 회수 구분)", "C1"),
     ("확인", "낮음", "ECL 시행일", "결정 L3는 2027-04-01 ECL 전환 전제. RBI ECL 최종 지침의 적용일·대상(외국은행 지점 포함 여부) 확인 필요", "최종 고시 확인 후 TEMP_USE 기한 확정", "L3·L6"),
     ("반영", "-", "시스템 기장 계정 (당 설계)", "분개·화면이 쓰던 상위·철회 계정 8종을 06 파일 leaf로 변경: RBI 10104010100, 에스크로 20150400100, TCS 20510400201, GST L6(수수료 x01 / 환전 x02), 내국 LC → 60120100000+속성, 금융·이행보증 → 60130400000+속성, SNRR(FPI) → 20150100300+속성", "적용 완료 (R-ACC-01 leaf 검증 통과)", "G2·L7·P5·T7"),
@@ -517,3 +667,5 @@ def gl_summary():
 if __name__ == "__main__":
     print(check(), "steps OK;", len(journal_rows()), "lines;", len(BASE), "accounts;", len(MAPPING), "mapping rows;",
           sum(1 for m in MAPPING if m["sev"] != "OK"), "to review")
+    from collections import Counter
+    print("current CoA", CUR_STATS, Counter(r["kind"] for r in CUR_UNMAPPED), "balance diffs", BAL_DIFF)

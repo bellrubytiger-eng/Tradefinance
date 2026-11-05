@@ -2019,7 +2019,8 @@ def as_dict():
             "FORMS": FORMS, "FORM_SAMPLES": SAMPLES, "BRANCH": BRANCH, "SWIFT_TYPES": SWIFT_TYPES,
             "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX,
             "COA": COA.coa_rows(), "JOURNAL": COA.journal_rows(), "ACCT_RULE": COA.rule_rows(),
-            "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX, "COA_MAP": COA.MAPPING, "COA_REVIEW": COA.REVIEW}
+            "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX, "COA_MAP": COA.MAPPING, "COA_REVIEW": COA.REVIEW,
+            "CUR_UNMAPPED": COA.CUR_UNMAPPED, "CUR_STATS": COA.CUR_STATS, "BAL_DIFF": COA.BAL_DIFF}
 
 
 if __name__ == "__main__":
