@@ -34,11 +34,11 @@ FORMS = [
                 ("ben_cin", "CIN", "법인등록번호", f"{FDI}.INVESTEE_CIN", None),
                 ("ben_pan", "PAN", "PAN", f"{MST}.PAN_SNAP", None),
                 ("ben_acct", "Account Credited", "입금계좌", f"{MST}.SRC_ACCT_NO", None),
-                ("ben_addr", "Registered Office", "등록주소", f"{PTY}(BENE).ADDR1/ADDR2/TOWN", None),
+                ("ben_addr", "Registered Office", "등록주소", f"{PTY}(BENE).STRT_NM~CTRY (PstlAdr 구조화)", None),
             ]},
             {"t": "Remitter · Non-resident Investor", "f": [
                 ("rem_name", "Name", "투자자명", f"{FDI}.INVESTOR_NAME", None),
-                ("rem_addr", "Address", "주소", f"{PTY}(APPL).ADDR1/TOWN", None),
+                ("rem_addr", "Address", "주소", f"{PTY}(APPL).STRT_NM~CTRY (PstlAdr 구조화)", None),
                 ("rem_ctry", "Country", "국가", f"{FDI}.INVESTOR_CTRY", None),
                 ("rem_bank", "Remitting Bank", "송금은행 / BIC", f"{PTY}(ORDINS).PARTY_NAME, BIC", None),
                 ("their_ref", "Sender's Reference", "송금은행 Ref", f"{MST}.THEIR_REF_NO", None),
@@ -113,7 +113,7 @@ FORMS = [
             {"t": "Beneficiary", "f": [
                 ("ben_name", "Name", "수취인", f"{PTY}(BENE).PARTY_NAME", None),
                 ("ben_acct", "Account / IBAN", "수취계좌", f"{PTY}(BENE).ACCT_NO", None),
-                ("ben_addr", "Address", "주소", f"{PTY}(BENE).ADDR1/TOWN/CTRY", None),
+                ("ben_addr", "Address", "주소", f"{PTY}(BENE).STRT_NM~CTRY (PstlAdr 구조화)", None),
                 ("ben_bank", "Beneficiary Bank", "수취은행 / BIC", f"{PTY}(BENBNK).PARTY_NAME, BIC", None),
                 ("intm", "Intermediary Bank", "중계은행", f"{PTY}(INTRMD).BIC", None),
             ]},
@@ -180,7 +180,7 @@ FORMS = [
             ]},
             {"t": "Remitter", "f": [
                 ("rem_name", "Name", "송금인", f"{PTY}(APPL).PARTY_NAME", None),
-                ("rem_addr", "Address", "주소", f"{PTY}(APPL).ADDR1/TOWN", None),
+                ("rem_addr", "Address", "주소", f"{PTY}(APPL).STRT_NM~CTRY (PstlAdr 구조화)", None),
                 ("rem_ctry", "Country", "국가", f"{MST}.REMIT_CTRY", None),
                 ("rem_bank", "Remitting Bank", "송금은행 / BIC", f"{PTY}(ORDINS).PARTY_NAME, BIC", None),
             ]},

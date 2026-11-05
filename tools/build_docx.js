@@ -282,9 +282,9 @@ flow("3.16 당발송금 결제경로·전문 결정 (RT11~14 · FD12 ④단계)"
   ["③ 수취은행 BIC 입력(또는 BIC 없으면 청산코드) → 디렉터리 조회: 은행명·국가와 당행 관계 배지(Nostro·본점·RMA·SSI·Vostro·고위험) 표시", "TB_BIC_DIR, TB_BANK_SSI, TB_SWIFT_RMA"],
   ["판정 Q1: INR이면 수취은행의 당행 Vostro(SRVA 등) 입금(INGA). Vostro가 없으면 해외 SWIFT 불가(국내 INR은 SF11)", "R-RTG-01"],
   ["Q2·Q3: 수취은행 = 통화별 Nostro → DIRECT, 본점·당행 점포 → DIRECT 본지점(을A 결제)", "R-RTG-01, R-RTG-07"],
-  ["Q4~Q6: RMA(지급전문) 있음 + 통화별 SSI 있음 + SSI 코레스 ≠ 당행 Nostro + 고위험국 아님 → Cover 가능. 하나라도 아니면 Serial", "R-RTG-02/03"],
-  ["Q7: Cover 가능하고 USD 환산 ≥ 100,000(ROUTE_COVER_MIN_USD) 또는 긴급 → Cover 권장, 아니면 Serial 권장(비용)", "ROUTE_COVER_MIN_USD"],
-  ["조작자는 경로 카드에서 권장안을 확인. 불가 경로는 비활성(사유 표시), 권장과 다른 경로는 사유코드 + Checker 승인", "R-RTG-05, TB_REMIT_ROUTE"],
+  ["Q4~Q6: RMA(지급전문) 있음 + 통화별 SSI 있음 + SSI 코레스 ≠ 당행 Nostro + 고위험국 아님 → Cover 가능. 하나라도 아니면 Serial로 확정", "R-RTG-02/03"],
+  ["Serial·Cover 모두 가능하면 금액 기준 없이 조작자가 건별 선택: 화면이 중계은행 관계(gpi·당행 RMA·예상 공제·평균 처리시간·최근 반송/지연)를 비교표로 보여주고, 기본 선택값은 두지 않음. 선택 근거코드 필수", "R-RTG-10, TB_BIC_DIR"],
+  ["불가 경로는 비활성(사유 표시). 시스템이 하나로 정한 경로(Direct·Vostro·Serial 확정)와 다른 경로를 고르면 사유코드 + Checker 승인", "R-RTG-05, TB_REMIT_ROUTE"],
   ["결제일: Nostro 마감(IST) 경과 또는 IN·통화국 휴일이면 양쪽 영업일로 이동", "R-RTG-06, CM21"],
   ["전문 생성: Direct·Serial·Vostro는 pacs.008 1건, Cover는 pacs.009 COV(먼저) + pacs.008, 같은 UETR. SW11 큐 등록", "R-RTG-04, TB_SWIFT_MSG"],
   ["회계: 경로에 따라 결제(대변) 계정만 다름 - Nostro 10105020000 / 을A 21010000000 / Vostro 20150200100·200", "R-RTG-07, 18.업무별분개 OUT-04/05"],
@@ -294,20 +294,34 @@ C.push(TBL(["경로", "보내는 전문 (수신은행)", "SttlmMtd", "주요 요
   ["Direct", "pacs.008 → 수취은행(=Nostro)", "INDA", "InstdAgt=CdtrAgt (57a 생략)", "수취인 계좌가 당행 Nostro 은행에 있음"],
   ["Direct 본지점", "pacs.008 → 본점", "INDA", "결제는 을A 본지점 계정", "수취인 계좌가 본점(또는 KRW: 본점이 Nostro)"],
   ["Vostro (INR)", "pacs.008 → 수취은행", "INGA", "SttlmAcct = 수취은행 Vostro (53B)", "INR 무역결제(SRVA)"],
-  ["Serial", "pacs.008 → Nostro → (중계) → 수취은행", "INDA", "IntrmyAgt1 (56A) = 수취은행 코레스, CdtrAgt (57A)", "RMA 없음, 소액, 고위험국, 코레스 = 당행 Nostro"],
-  ["Cover", "① pacs.009 COV → Nostro, ② pacs.008 → 수취은행", "COVE", "InstgRmbrsmntAgt (53A) = 당행 Nostro, InstdRmbrsmntAgt (54A) = 수취은행 코레스 / COV: CdtrAgt (57A) 코레스, Cdtr (58A) 수취은행, UndrlygCstmrCdtTrf (Seq B)", "RMA·SSI 있음, 고액·긴급"],
+  ["Serial (메시지 → Nostro·중계은행)", "pacs.008 → Nostro → (중계) → 수취은행", "INDA", "IntrmyAgt1 (56A) = 수취은행 코레스, CdtrAgt (57A)", "RMA 없음, 고위험국, 코레스 = 당행 Nostro, 또는 조작자 선택"],
+  ["COV (메시지 → 수취은행 직접)", "① pacs.009 COV → Nostro, ② pacs.008 → 수취은행", "COVE", "InstgRmbrsmntAgt (53A) = 당행 Nostro, InstdRmbrsmntAgt (54A) = 수취은행 코레스 / COV: CdtrAgt (57A) 코레스, Cdtr (58A) 수취은행, UndrlygCstmrCdtTrf (Seq B)", "RMA·SSI 있음 + 조작자 건별 선택"],
 ], [0.9, 1.6, 0.6, 2.6, 1.3], { size: 14 }));
+C.push(P("용어: 메시지를 당행 Nostro·중계은행으로 전달하면 Serial, 수취은행에 직접 전달하고 자금만 Nostro를 통해 pacs.009 COV로 보내면 COV로 표기합니다(SWIFT 표준의 Serial / Cover method와 같은 구분)."));
+C.push(H3("Nostro와 중계은행 표시 (R-RTG-11/12)"));
+["④ 상단에 당행 예치환계좌(Nostro) 선택, Nostro BIC·계좌, 결정 사유, 중계은행 BIC(IntrmyAgt1), 수취은행 코레스(SSI), 수취은행 BIC, 메시지 수신은행, 자금 전문 수신은행을 항상 표시",
+ "통화별 Nostro가 여러 개면 조작자 선택 → 수취은행 = Nostro → 수취은행 코레스와 같은 Nostro(중계 없음) → 기본 Nostro 순으로 결정. 개설 예정(PLANNED) 계좌는 목록에 보이되 선택 불가",
+ "중계은행은 SSI에서 자동으로 채우고 조작자가 바꿀 수 있음. SSI와 다르면 경고와 함께 수취은행 지시 근거 확인(INTRMY_SRC=MANUAL)",
+ "Nostro가 늘어도 GL은 10105020000 하나이며 Nostro별 하위원장(SUB_LEDGER)으로 대사"].forEach((t) => C.push(B(t)));
+C.push(H3("ISO 20022 구조화 주소 (R-ADR-01~05)"));
+C.push(TBL(["화면 항목", "MX 요소 (PstlAdr)", "길이", "필수", "MT option F"], [
+  ["Country", "Ctry", "2", "필수", "3/국가/도시"], ["State / Province", "CtrySubDvsn", "35", "권장(US·CA·AU·IN·AE 등)", "2/"], ["District", "DstrctNm", "35", "", "2/"],
+  ["Town", "TwnNm", "35", "필수", "3/국가/도시"], ["Town Location", "TwnLctnNm", "35", "", "-"], ["Post Code", "PstCd", "16", "", "2/"],
+  ["Street", "StrtNm", "70", "도로명 또는 사서함 권장", "2/"], ["Building No / Name", "BldgNb / BldgNm", "16 / 35", "", "2/"], ["Floor / Room", "Flr / Room", "70 / 70", "", "2/"],
+  ["PO Box", "PstBx", "16", "", "2/"], ["Address Line 1·2", "AdrLine (Hybrid만, 최대 2줄)", "70", "", "2/"],
+], [1.4, 1.8, 0.7, 1.6, 1.0], { size: 15 }));
+C.push(B("수취인 주소는 ③ 섹션에서 구조화로 입력(Structured / Hybrid 선택), 송금인 주소는 CH11 고객 프로필의 구조화 주소를 조회해 Dbtr/PstlAdr로 매핑. 전문 미리보기에 두 주소의 MX 요소와 MT :50F:/:59F: 대응문 표시"));
 C.push(H3("조작자 화면 구성 (④ Payment Route & SWIFT Messages)"));
 [
   "상단 단계 표시줄: ① 고객·계좌 ② 금액·목적 ③ 수취인·수취은행 ④ 결제경로·전문 ⑤ 수수료/딜. 단계별 상태(정상·경고·오류) 색으로 표시, 클릭 시 이동",
-  "권장 배너: '시스템 권장: Cover · pacs.009 COV → Nostro + pacs.008 → 수취은행 · 결제일' 한 줄 요약",
-  "경로 카드 4개(Direct·Direct 본지점·Cover·Serial, INR이면 Vostro): 가능/불가와 그 이유를 카드 안에 표시",
+  "결과 배너: 시스템이 하나로 정하면 '시스템 결정', Serial·COV 모두 가능하면 '조작자 선택 필요' 안내와 Serial·COV 비교표(전문, 경유 BIC, 중계은행 관계, 해외 공제, 입금 시점, 최근 이력)",
+  "경로 카드 4개(Direct·Direct 본지점·Cover·Serial, INR이면 Vostro): 가능/불가와 그 이유를 카드 안에 표시. 선택 후 근거코드(중계은행 관계 양호·긴급·전액 도착·지연 이력·고객 지정·수취은행 요청) 입력",
   "탭: 흐름도(전문 흐름과 자금 흐름을 두 줄로 그림) / 판정 근거(Q1~Q7 표) / 전문 미리보기(MX 주요 요소 + MT 대응문) / 회계·수수료 / 방식 안내",
   "수취은행 예시 목록으로 경로별 결과를 바로 확인할 수 있음(교육·테스트용)",
 ].forEach((t) => C.push(B(t)));
-C.push(B("기준 변경(PM01): Cover 사용 여부, 기준금액(기본 USD 환산 + 통화별 예외 금액), 고위험국 Cover 금지를 적용시작일(다음 영업일 이후)로 등록 → Checker 승인 후 효력. 송금은 거래일 유효값을 쓰고 적용 기준을 스냅샷으로 저장(R-RTG-09)"));
+C.push(B("정책 변경(PM01): Cover 사용 여부와 고위험국 Cover 금지만 적용시작일(다음 영업일 이후)로 등록 → Checker 승인 후 효력(R-RTG-09). 중계은행 관계는 건마다 달라 금액 기준을 두지 않음"));
 C.push(B("고객 확인서(FM-OUT-01)에는 결제경로(Serial·Cover 등)를 표시하지 않고, 고객에게 보낸 SWIFT 전문 유형(pacs.008 / MT103)·송신일과 UETR만 표시"));
-C.push(NOTE("Cover 기준금액(기본 USD 100,000)과 고위험국 Cover 금지는 은행 정책 파라미터이며 PM01에서 바꿀 수 있습니다. 운영 Nostro·SSI·RMA는 SWIFTRef와 SWIFT RMA 데이터로 매일 갱신해야 합니다(VERIFY)."));
+C.push(NOTE("중계은행 관계 정보(gpi·예상 공제·처리시간·반송 이력)는 TB_BIC_DIR에서 관리하며 gpi 실적·SW11 이력으로 주기 갱신이 필요합니다. 운영 Nostro·SSI·RMA는 SWIFTRef와 SWIFT RMA 데이터로 매일 갱신해야 합니다(VERIFY)."));
 
 // ---------------- 4. 화면 ----------------
 C.push(H1("4. 화면 설계"));

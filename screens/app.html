@@ -257,16 +257,24 @@ function purposeField(def, dir="O"){
   return F({l:"Purpose Code",id:"pc",t:"sel",o:list,v:def,rq:1,s:2})+F({l:"Others Code / Desc",id:"pcf",ph:"5자리",max:5,suf:`<input id="pcd" placeholder="Description (100자)" maxlength="100">`,s:3});
 }
 
-/* ---------- 당발 결제경로 엔진 (R-RTG-01~08) : Direct / Serial / Cover / Vostro ---------- */
-// TB_NOSTRO_ACCT (예시 · 가상 BIC)
+/* ---------- 당발 결제경로 엔진 (R-RTG-01~12) : Direct / Serial / COV / Vostro ---------- */
+// TB_NOSTRO_ACCT : 통화별 복수 계좌 지원 (act=0은 개설 예정 · 선택 불가)
 const OWNB = {br:"OURBINBBNOI", ho:"OURBKRSE"};
-const NOSTRO = {
-  USD:{bic:"NOSTUS33",name:"[USD Nostro bank], New York",acct:"4001",cut:"16:30",cal:"US"},
-  EUR:{bic:"NOSTDEFF",name:"[EUR Nostro bank], Frankfurt",acct:"4002",cut:"14:30",cal:null},
-  JPY:{bic:"NOSTJPJT",name:"[JPY Nostro bank], Tokyo",acct:"4003",cut:"10:30",cal:null},
-  KRW:{bic:"OURBKRSE",name:"[BANK] Head Office, Seoul",acct:"4004",cut:"11:30",cal:"KR",ho:true},
-  GBP:{bic:"NOSTGB2L",name:"[GBP Nostro bank], London",acct:"4005",cut:"15:30",cal:null},
-  AED:{bic:"NOSTAEAD",name:"[AED Nostro bank], Dubai",acct:"4006",cut:"13:00",cal:null}};
+const NOSTROS = {
+  USD:[{bic:"NOSTUS33",name:"[USD Nostro bank], New York",acct:"4001",cut:"16:30",cal:"US",def:1,act:1},
+       {bic:"NOS2US33",name:"[USD Nostro bank 2], New York",acct:"4011",cut:"17:00",cal:"US",def:0,act:0,note:"개설 예정"}],
+  EUR:[{bic:"NOSTDEFF",name:"[EUR Nostro bank], Frankfurt",acct:"4002",cut:"14:30",cal:null,def:1,act:1}],
+  JPY:[{bic:"NOSTJPJT",name:"[JPY Nostro bank], Tokyo",acct:"4003",cut:"10:30",cal:null,def:1,act:1}],
+  KRW:[{bic:"OURBKRSE",name:"[BANK] Head Office, Seoul",acct:"4004",cut:"11:30",cal:"KR",ho:true,def:1,act:1}],
+  GBP:[{bic:"NOSTGB2L",name:"[GBP Nostro bank], London",acct:"4005",cut:"15:30",cal:null,def:1,act:1}],
+  AED:[{bic:"NOSTAEAD",name:"[AED Nostro bank], Dubai",acct:"4006",cut:"13:00",cal:null,def:1,act:1}]};
+const isOurNostro = bic => Object.values(NOSTROS).some(L=>L.some(a=>a.bic===bic&&!a.ho));
+// 우선순위: 조작자 선택 → 수취은행 = Nostro → 수취은행 코레스와 같은 Nostro(중계 없음) → 기본 (R-RTG-11)
+function pickNostro(x,b){ const L=(NOSTROS[x.ccy]||[]).filter(a=>a.act); if(!L.length) return {n:null,why:"해당 통화 Nostro 없음"};
+  if(x.nos){ const s=L.find(a=>a.bic===x.nos); if(s) return {n:s,why:"조작자 선택"}; }
+  const own=L.find(a=>a.bic===x.bic); if(own) return {n:own,why:"수취은행 = 이 Nostro"};
+  const ssi=b&&b.ssi&&b.ssi[x.ccy], same=ssi&&L.find(a=>a.bic===ssi[0]); if(same) return {n:same,why:"수취은행 코레스와 같은 Nostro (중계 없음)"};
+  return {n:L.find(a=>a.def)||L[0],why:L.length>1?"기본 Nostro (변경 가능)":"유일한 Nostro"}; }
 // TB_BIC_DIR + TB_SWIFT_RMA + TB_BANK_SSI (예시 · 가상 은행)
 const BICDIR = {
   OURBKRSE:{n:"[BANK] Head Office",t:"SEOUL",c:"KR",own:1,rma:1},
@@ -276,117 +284,160 @@ const BICDIR = {
   AEBKAEAD:{n:"[UAE Bank A]",t:"DUBAI",c:"AE",rma:1,ssi:{USD:["NOSTUS33","[USD Nostro bank], New York","890-0451"]}},
   SRVBAEAD:{n:"[UAE Bank B] · SRVA 보유",t:"DUBAI",c:"AE",rma:1,vos:{INR:["VOS-0007","SRVA","20150200100"]}},
   CABKCATT:{n:"[Canada Bank]",t:"TORONTO",c:"CA",rma:0,ssi:{USD:["CORRUS33","[Canada Bank USD correspondent], New York","36-7710-003"]}},
-  MMBKMMMY:{n:"[Myanmar Bank]",t:"YANGON",c:"MM",rma:1,hr:1,ssi:{USD:["CORRSGSG","[SG correspondent], Singapore","SG-4410"]}}};
-const BENPRESET = [["KRBAKRSE","Korea Bank A · RMA·SSI 있음 → Cover 후보"],["KRBBKRSE","Korea Bank B · RMA 없음 → Serial(중계 1)"],["AEBKAEAD","UAE Bank A · 코레스 = 당행 Nostro → Serial(중계 없음)"],
-  ["NOSTUS33","USD Nostro 은행 자체 → Direct"],["OURBKRSE","본점 서울 → Direct(본지점)"],["SRVBAEAD","UAE Bank B · INR SRVA → Vostro 입금"],["CABKCATT","Canada Bank · RMA 없음 → Serial"],["MMBKMMMY","고위험국 은행 → Cover 금지"],["","BIC 없음 · 청산코드(ABA 등)로 지정"]];
-// ROUTE_COVER_ENABLED / ROUTE_COVER_MIN_USD / ROUTE_COVER_MIN_CCY(통화별 예외) / HIGH_RISK_BLOCK — PM01에서 변경(적용시작일·Maker-Checker)
-const RTG_DEF = {hist:[{eff:"2026-04-01",coverOn:true,coverMin:100000,ccy:{},hrBlock:true,rsn:"최초 설정",mk:"FX01",ck:"FXM1",sts:"APPROVED"}]};
+  MMBKMMMY:{n:"[Myanmar Bank]",t:"YANGON",c:"MM",rma:1,hr:1,ssi:{USD:["CORRSGSG","[SG correspondent], Singapore","SG-4410"]}},
+  // 중계(코레스) 은행: 당행과의 관계 (Serial·COV 비교용)
+  CORRUS33:{n:"[USD correspondent]",t:"NEW YORK",c:"US",rma:1,gpi:1,rel:"당행 Nostro와 CHIPS 직접 참가, 당행 계좌 없음",ded:"USD 15~25 (SHA·BEN 시 공제)",tat:"보통 당일, 최근 90일 평균 4시간",rtn:"최근 90일 반송·조회 0건"},
+  CORRDEFF:{n:"[EUR correspondent]",t:"FRANKFURT",c:"DE",rma:0,gpi:1,rel:"TARGET2 참가, 당행과 RMA 없음",ded:"EUR 10~20 (SHA·BEN 시 공제)",tat:"보통 당일~익일",rtn:"최근 90일 조회 1건"},
+  CORRSGSG:{n:"[SG correspondent]",t:"SINGAPORE",c:"SG",rma:1,gpi:0,rel:"당행 거래 이력 적음",ded:"USD 20~40 (SHA·BEN 시 공제)",tat:"익일 이상, 지연 사례 있음",rtn:"최근 90일 지연 2건"}};
+const BENPRESET = [["KRBAKRSE","Korea Bank A · RMA·SSI 있음 → Serial/COV 조작자 선택"],["KRBBKRSE","Korea Bank B · RMA 없음 → Serial(중계 1)"],["AEBKAEAD","UAE Bank A · 코레스 = 당행 Nostro → Serial(중계 없음)"],
+  ["NOSTUS33","USD Nostro 은행 자체 → Direct"],["OURBKRSE","본점 서울 → Direct(본지점)"],["SRVBAEAD","UAE Bank B · INR SRVA → Vostro 입금"],["CABKCATT","Canada Bank · RMA 없음 → Serial"],["MMBKMMMY","고위험국 은행 → COV 금지"],["","BIC 없음 · 청산코드(ABA 등)로 지정"]];
+// ROUTE_COVER_ENABLED / ROUTE_COVER_HIGH_RISK_BLOCK — PM01에서 변경(적용시작일·Maker-Checker). Serial/COV 자체는 건별 조작자 선택(R-RTG-10)
+const RTG_DEF = {hist:[{eff:"2026-04-01",coverOn:true,hrBlock:true,rsn:"최초 설정",mk:"FX01",ck:"FXM1",sts:"APPROVED"}]};
 const RTG = JSON.parse(JSON.stringify(RTG_DEF));
-try{ const sv=JSON.parse(localStorage.getItem("gbs.rtg")||"null"); if(sv&&Array.isArray(sv.hist)&&sv.hist.length) RTG.hist=sv.hist; }catch(e){}
-function rtgSave(){ try{ localStorage.setItem("gbs.rtg",JSON.stringify(RTG)); }catch(e){} }
-// 거래일에 유효한 승인값 (R-RTG-09)
+try{ const sv=JSON.parse(localStorage.getItem("gbs.rtg2")||"null"); if(sv&&Array.isArray(sv.hist)&&sv.hist.length) RTG.hist=sv.hist; }catch(e){}
+function rtgSave(){ try{ localStorage.setItem("gbs.rtg2",JSON.stringify(RTG)); }catch(e){} }
 function rtgAt(d){ return RTG.hist.filter(x=>x.sts==="APPROVED"&&x.eff<=d).sort((a,b)=>a.eff<b.eff?1:-1)[0]||RTG_DEF.hist[0]; }
-function coverThr(ccy,d){ const h=rtgAt(d), c=h.ccy&&h.ccy[ccy]; return c?{ccy,amt:c,src:`${ccy} 통화별 예외`}:{ccy:"USD",amt:h.coverMin,src:"기본값, USD 환산"}; }
-const RM = {VOSTRO:["Vostro 입금","INR · 당행 장부","pacs.008 1건 (INGA)"],DIRECT:["Direct","수취은행 = Nostro","pacs.008 1건 (MT103)"],DIRECT_HO:["Direct 본지점","수취은행 = 본점","pacs.008 1건 · 을A 결제"],
-  COVER:["Cover","직접 통지 + 별도 자금","pacs.008 + pacs.009 COV (MT103 + MT202 COV)"],SERIAL:["Serial","Nostro 경유 연쇄","pacs.008 연쇄 (MT103 Serial)"]};
+const RM = {VOSTRO:["Vostro 입금","INR · 당행 장부 입금","pacs.008 1건 (INGA)"],DIRECT:["Direct","수취은행 = 당행 Nostro","pacs.008 1건 (MT103)"],DIRECT_HO:["Direct 본지점","수취은행 = 본점","pacs.008 1건 · 을A 결제"],
+  COVER:["COV","메시지 → 수취은행 직접","pacs.008 직접 + 자금 pacs.009 COV (MT103 + MT202 COV)"],SERIAL:["Serial","메시지 → Nostro·중계은행 경유","pacs.008이 Nostro → 중계 → 수취은행 순서로 전달 (MT103)"]};
+
+/* ---------- ISO 20022 구조화 주소 (PstlAdr) R-ADR-01~05 ---------- */
+const ADRF = [["Ctry","Country (Ctry)",2,1],["CtrySubDvsn","State / Province (CtrySubDvsn)",35,0],["DstrctNm","District (DstrctNm)",35,0],["TwnNm","Town (TwnNm)",35,1],["TwnLctnNm","Town Location (TwnLctnNm)",35,0],
+  ["PstCd","Post Code (PstCd)",16,0],["StrtNm","Street (StrtNm)",70,0],["BldgNb","Building No (BldgNb)",16,0],["BldgNm","Building Name (BldgNm)",35,0],["Flr","Floor (Flr)",70,0],["Room","Room (Room)",70,0],["PstBx","PO Box (PstBx)",16,0]];
+// CH11 고객 주소 (Dbtr/PstlAdr) - 예시
+const DADR = {"00000052":{Ctry:"IN",CtrySubDvsn:"HARYANA",DstrctNm:"GURUGRAM",TwnNm:"GURUGRAM",PstCd:"122001",StrtNm:"SECTOR 34",BldgNb:"PLOT 14"},
+  "00000038":{Ctry:"IN",CtrySubDvsn:"UTTAR PRADESH",DstrctNm:"GAUTAM BUDDHA NAGAR",TwnNm:"NOIDA",PstCd:"201301",StrtNm:"SECTOR 63",BldgNb:"C-41"},
+  "00000107":{Ctry:"IN",CtrySubDvsn:"UTTAR PRADESH",DstrctNm:"GAUTAM BUDDHA NAGAR",TwnNm:"NOIDA",PstCd:"201304",StrtNm:"SECTOR 50",BldgNb:"B-112",BldgNm:"ORCHID TOWER",Flr:"7"},
+  "00000233":{Ctry:"SG",TwnNm:"SINGAPORE",PstCd:"238874",StrtNm:"ORCHARD ROAD",BldgNb:"391",BldgNm:"NGEE ANN CITY TOWER B",Flr:"22"}};
+const adrStr = a => ADRF.map(f=>a[f[0]]?`${f[0]}=${a[f[0]]}`:"").filter(Boolean).concat((a.AdrLine||[]).map((l,i)=>`AdrLine${i+1}=${l}`)).join(", ");
+function adrRead(){ const a={}; ADRF.forEach(f=>{ const v=val("ba_"+f[0]).trim().toUpperCase(); if(v) a[f[0]]=v; });
+  if(val("batype")==="HYBR"){ a.AdrLine=[val("ba_l1"),val("ba_l2")].map(s=>s.trim().toUpperCase()).filter(Boolean); } return a; }
+function adrCheck(a,who,hybr){ const m=[];
+  if(!a.Ctry||!/^[A-Z]{2}$/.test(a.Ctry)) m.push(["err",`${who} 주소: 국가(Ctry) ISO 2자리 필수 <span class='rule'>R-ADR-01</span>`]);
+  if(!a.TwnNm) m.push(["err",`${who} 주소: 도시(TwnNm) 필수 <span class='rule'>R-ADR-01</span>`]);
+  ADRF.forEach(f=>{ if(a[f[0]]&&a[f[0]].length>f[2]) m.push(["err",`${who} 주소: ${f[0]} 최대 ${f[2]}자 <span class='rule'>R-ADR-02</span>`]); });
+  if(hybr && (a.AdrLine||[]).some(l=>l.length>70)) m.push(["err",`${who} 주소: AdrLine 줄당 70자 <span class='rule'>R-ADR-03</span>`]);
+  if(["US","CA","AU","IN","AE","CN","BR","MX"].includes(a.Ctry) && !a.CtrySubDvsn) m.push(["warn",`${who} 주소: ${a.Ctry}는 주(CtrySubDvsn) 입력 권장 <span class='rule'>R-ADR-04</span>`]);
+  if(!a.StrtNm && !a.PstBx && !(a.AdrLine||[]).length) m.push(["warn",`${who} 주소: 도로명(StrtNm) 또는 사서함(PstBx) 권장`]);
+  return m; }
+// MT option F (참고): 1/이름 2/주소 3/국가/도시
+function mtF(acct,name,a){ const l2=[[a.StrtNm,a.BldgNb].filter(Boolean).join(" "),[a.BldgNm,a.Flr&&("FL "+a.Flr),a.Room].filter(Boolean).join(", "),[a.DstrctNm,a.CtrySubDvsn,a.PstCd].filter(Boolean).join(", ")].concat(a.AdrLine||[]).filter(Boolean);
+  return [`/${acct}`,`1/${name}`.slice(0,35)].concat(l2.slice(0,2).map(s=>("2/"+s).slice(0,35))).concat([`3/${a.Ctry||"??"}/${a.TwnNm||""}`.slice(0,35)]); }
 
 function routeEval(x){
-  const n=NOSTRO[x.ccy], b=BICDIR[x.bic], ssi=b&&b.ssi&&b.ssi[x.ccy], vos=b&&b.vos&&b.vos[x.ccy], path=[], opt={};
-  const pol=rtgAt(x.td||BIZ), thr=coverThr(x.ccy,x.td||BIZ), cmp=thr.ccy==="USD"?x.usd:x.amt;
-  const isNos=!!(n&&b&&x.bic===n.bic&&!n.ho), isHO=!!(b&&b.own), inr=x.ccy==="INR", big=cmp>=thr.amt||x.urgent;
+  const b=BICDIR[x.bic], P=pickNostro(x,b), n=P.n, ssi=b&&b.ssi&&b.ssi[x.ccy], vos=b&&b.vos&&b.vos[x.ccy], path=[], opt={};
+  const pol=rtgAt(x.td||BIZ);
+  const isNos=!!(n&&b&&x.bic===n.bic&&!n.ho), isHO=!!(b&&b.own), inr=x.ccy==="INR";
+  const autoMid = ssi&&n&&ssi[0]!==n.bic ? ssi[0] : "", mid = x.imb || autoMid;
   opt.VOSTRO = vos?[1,`${b.n}의 ${vos[1]} ${vos[0]} (당행 보유)`]:[0,inr?"수취은행이 당행에 INR Vostro 없음":"INR 송금에만 해당"];
-  opt.DIRECT = inr?[0,"INR은 Vostro 경로만"]:isNos?[1,`수취은행 = ${x.ccy} Nostro`]:[0,"수취은행이 당행 Nostro가 아님"];
+  opt.DIRECT = inr?[0,"INR은 Vostro 경로만"]:isNos?[1,`수취은행 = ${x.ccy} Nostro ${n.bic}`]:[0,"수취은행이 당행 Nostro가 아님"];
   opt.DIRECT_HO = inr?[0,"INR은 Vostro 경로만"]:isHO?[1,"수취은행 = 본점 (을A 본지점 결제)"]:[0,"수취은행이 본점·당행 점포가 아님"];
-  opt.COVER = inr?[0,"INR은 Cover 불가"]:!pol.coverOn?[0,"Cover 미사용 (PM01 정책)"]:!b?[0,"수취은행 BIC가 필요"]:(isNos||isHO)?[0,"Direct 대상"]:!b.rma?[0,"RMA 없음 → 수취은행에 직접 송신 불가"]:
-    !ssi?[0,`수취은행 ${x.ccy} SSI 없음`]:ssi[0]===n.bic?[0,"수취은행 코레스 = 당행 Nostro → Serial 1건으로 충분"]:(b.hr&&pol.hrBlock)?[0,"고위험국: 지급투명성 위해 Serial만"]:[1,`RMA ✓ · SSI ${ssi[0]} ✓`];
+  opt.COVER = inr?[0,"INR은 COV 불가"]:!pol.coverOn?[0,"COV 미사용 (PM01 정책)"]:!b?[0,"수취은행 BIC가 필요"]:(isNos||isHO)?[0,"Direct 대상"]:!b.rma?[0,"RMA 없음 → 수취은행에 직접 송신 불가"]:
+    !ssi?[0,`수취은행 ${x.ccy} SSI 없음`]:!mid?[0,"수취은행 코레스 = 당행 Nostro → Serial 1건으로 충분"]:(b.hr&&pol.hrBlock)?[0,"고위험국: 지급투명성 위해 Serial만"]:[1,`RMA ✓ · 코레스 ${mid} ✓`];
   opt.SERIAL = inr?[0,"INR 해외은행은 Vostro 경로만"]:!n?[0,"해당 통화 Nostro 없음"]:!(b||x.clr)?[0,"수취은행 BIC 또는 청산코드 필요"]:(isNos||isHO)?[1,"가능하지만 Direct가 더 단순"]:
-    [1,ssi&&ssi[0]!==n.bic?`중계 ${ssi[0]} 경유`:ssi?"Nostro 안에서 대체 (중계 없음)":"Nostro가 청산망으로 지급"];
+    [1,mid?`${n.bic} → 중계 ${mid} 경유`:ssi?`${n.bic} 안에서 대체 (중계 없음)`:`${n.bic}가 청산망으로 지급`];
   const Q=(q,a,k,r)=>path.push([q,a,k,r]);
   Q("INR 송금인가?", inr?"예":"아니오", inr?(vos?"ok":"err"):"", inr?(vos?"수취은행 Vostro 입금 → VOSTRO":"해외은행 INR은 Vostro 보유 은행만. 국내 INR은 SF11"):"");
   if(!inr && n){
+    Q(`사용할 ${x.ccy} Nostro는?`, n.bic, "ok", P.why);
     Q(`수취은행이 ${x.ccy} Nostro(${n.bic})인가?`, isNos?"예":"아니오", isNos?"ok":"", isNos?"→ DIRECT":"");
     Q("수취은행이 본점·당행 점포인가?", isHO?"예":"아니오", isHO?"ok":"", isHO?"→ DIRECT 본지점 (을A)":"");
     if(!isNos && !isHO){
-      Q("수취은행과 RMA(지급전문 송신 권한)가 있는가?", b?(b.rma?"예":"아니오"):"BIC 없음", b&&b.rma?"ok":"warn", b&&b.rma?"직접 송신 가능":"수취은행에 직접 보낼 수 없음 → Serial");
-      Q(`수취은행의 ${x.ccy} 결제 코레스(SSI)는?`, ssi?ssi[0]:"없음", ssi?"ok":"warn", ssi?(ssi[0]===n.bic?"당행 Nostro와 같음 → 중계 없이 Serial":"Cover 가능 · Serial이면 중계은행"):"Nostro가 경로 결정");
-      Q("수취은행 국가가 고위험국인가?", b&&b.hr?"예":"아니오", b&&b.hr?"err":"", b&&b.hr?"Cover 금지 (FATF R.16)":"");
-      if(opt.COVER[0]) Q(`${thr.ccy} ${fmtC(thr.ccy,cmp,0)} ≥ 기준 ${thr.ccy} ${fmtC(thr.ccy,thr.amt,0)} (${thr.src}) 또는 긴급인가?`, big?"예":"아니오", big?"ok":"", big?"→ COVER 권장 (빠름·공제 없음)":"→ SERIAL 권장 (비용)");
+      Q("수취은행과 RMA(지급전문 송신 권한)가 있는가?", b?(b.rma?"예":"아니오"):"BIC 없음", b&&b.rma?"ok":"warn", b&&b.rma?"메시지를 수취은행에 직접 보낼 수 있음":"직접 송신 불가 → Serial");
+      Q(`수취은행의 ${x.ccy} 결제 코레스(SSI)는?`, ssi?ssi[0]:"없음", ssi?"ok":"warn", ssi?(ssi[0]===n.bic?"당행 Nostro와 같음 → 중계 없이 Serial":`중계은행 ${mid}${x.imb?" (조작자 지정)":""}`):"Nostro가 경로 결정");
+      Q("수취은행 국가가 고위험국인가?", b&&b.hr?"예":"아니오", b&&b.hr?"err":"", b&&b.hr?"COV 금지 (FATF R.16)":"");
+      if(opt.COVER[0]) Q("Serial과 COV 모두 가능한가?", "예", "warn", "→ 조작자가 중계은행 관계·공제·도착시간을 보고 건별 선택");
     }
   }
-  const rec=opt.VOSTRO[0]?"VOSTRO":opt.DIRECT[0]?"DIRECT":opt.DIRECT_HO[0]?"DIRECT_HO":(opt.COVER[0]&&big)?"COVER":opt.SERIAL[0]?"SERIAL":null;
-  return {n,b,ssi,vos,opt,path,rec,thr};
+  const rec=opt.VOSTRO[0]?"VOSTRO":opt.DIRECT[0]?"DIRECT":opt.DIRECT_HO[0]?"DIRECT_HO":opt.COVER[0]?"CHOICE":opt.SERIAL[0]?"SERIAL":null;
+  return {n,nwhy:P.why,b,ssi,vos,opt,path,rec,mid,autoMid,corr:mid?BICDIR[mid]||null:null};
 }
 
 function routeBuild(x,R,m){
-  const n=R.n, ssi=R.ssi, chgBr={OUR:"DEBT",SHA:"SHAR",BEN:"CRED"}[x.chg]||"SHAR";
+  const n=R.n, mid=R.mid, midN=(BICDIR[mid]||{}).n||(R.ssi&&R.ssi[0]===mid?R.ssi[1].split(",")[0]:"[Intermediary]"), chgBr={OUR:"DEBT",SHA:"SHAR",BEN:"CRED"}[x.chg]||"SHAR";
   const cdtr=x.bic||(x.clr?"//"+x.clr.replace(/\s+/g,""):"?"), bn=R.b?R.b.n:"[Beneficiary bank]";
-  const o={m,chgBr,sttl:"INDA",gl:"10105020000",glN:"Nostro (DUE FROM OVERSEA BANKS ON DEMAND)",msgs:[],info:[],fund:[]};
+  const o={m,chgBr,sttl:"INDA",gl:"10105020000",glN:`Nostro ${n?n.bic+" acct "+n.acct:""} (DUE FROM OVERSEA BANKS ON DEMAND)`,msgs:[],info:[],fund:[]};
   const me=["당행 Noida",OWNB.br], cust=["송금인","고객 계좌 출금"], ben=["수취인",x.bn||"-"];
-  const f008=(to,extra)=>({k:"pacs.008",mt:"MT103",to,f:Object.assign({InstdAgt:to,SttlmMtd:"INDA",ChrgBr:chgBr,CdtrAgt:cdtr},extra)});
+  const party={DbtrPstlAdr:adrStr(x.dadr),CdtrPstlAdr:adrStr(x.cadr)};
+  const f008=(to,extra)=>({k:"pacs.008",mt:"MT103",to,f:Object.assign({InstdAgt:to,SttlmMtd:"INDA",ChrgBr:chgBr},extra,{CdtrAgt:cdtr},party)});
   if(m==="VOSTRO"){ o.sttl="INGA"; o.gl=R.vos[2]; o.glN=`Vostro ${R.vos[1]} ${R.vos[0]} (당행 장부 입금)`;
     o.msgs=[f008(x.bic,{SttlmMtd:"INGA",SttlmAcct:R.vos[0]})];
     o.info=[cust,me,["pacs.008 (INGA)"],[bn,x.bic],ben]; o.fund=[me,["당행 장부"],[`Vostro ${R.vos[0]}`,"입금"]]; }
   else if(m==="DIRECT"){ o.msgs=[f008(x.bic,{SttlmAcct:n.acct})];
-    o.info=[cust,me,["pacs.008"],[bn+" (= Nostro)",x.bic],ben]; o.fund=[me,["당행 계좌 차기"],[n.name,`acct ${n.acct} → 같은 은행 내 입금`]]; }
+    o.info=[cust,me,["pacs.008"],[bn+" (= Nostro)",x.bic],ben]; o.fund=[me,["당행 계좌 차기"],[n.name.split(",")[0],`${n.bic} · acct ${n.acct}`]]; }
   else if(m==="DIRECT_HO"){ o.gl="21010000000"; o.glN="을A Due to HO (IO21 정산 대상)";
     o.msgs=[f008(x.bic,{})];
     o.info=[cust,me,["pacs.008"],["본점 서울",x.bic],ben]; o.fund=[me,["본지점 계정"],["을A 21010000000","IO21 정산배치"]]; }
   else if(m==="COVER"){ o.sttl="COVE";
-    o.msgs=[{k:"pacs.009 COV",mt:"MT202 COV",to:n.bic,f:{InstdAgt:n.bic,Dbtr:OWNB.br,CdtrAgt:ssi[0],Cdtr:x.bic,UndrlygCstmrCdtTrf:"Dbtr·DbtrAgt·CdtrAgt·Cdtr·RmtInf (원 고객정보)"}},
-      f008(x.bic,{SttlmMtd:"COVE",InstgRmbrsmntAgt:n.bic,InstdRmbrsmntAgt:ssi[0]})];
+    o.msgs=[{k:"pacs.009 COV",mt:"MT202 COV",to:n.bic,f:{InstdAgt:n.bic,Dbtr:OWNB.br,CdtrAgt:mid,Cdtr:x.bic,UndrlygCstmrCdtTrf:"Dbtr·PstlAdr·DbtrAgt·CdtrAgt·Cdtr·PstlAdr·RmtInf (원 고객정보)"}},
+      f008(x.bic,{SttlmMtd:"COVE",InstgRmbrsmntAgt:n.bic,InstdRmbrsmntAgt:mid})];
     o.info=[cust,me,["② pacs.008 (직접)"],[bn,x.bic],ben];
-    o.fund=[me,["① pacs.009 COV"],[n.name.split(",")[0],n.bic],["pacs.009"],[ssi[1].split(",")[0],ssi[0]],["입금"],[bn,x.bic]]; }
+    o.fund=[me,["① pacs.009 COV"],[n.name.split(",")[0],n.bic],["pacs.009"],[midN,mid],["입금"],[bn,x.bic]]; }
   if(n&&n.ho&&(m==="SERIAL"||m==="COVER")){ o.gl="21010000000"; o.glN="을A Due to HO (본점이 KRW Nostro, IO21 정산 대상)"; }
-  if(m==="SERIAL"){ const mid=ssi&&ssi[0]!==n.bic?ssi:null;
-    o.msgs=[f008(n.bic,Object.assign({SttlmAcct:n.acct},mid?{IntrmyAgt1:mid[0]}:{}))];
-    o.info=[cust,me,["pacs.008"],[n.name.split(",")[0],n.bic]].concat(mid?[["pacs.008"],[mid[1].split(",")[0],mid[0]]]:[]).concat([["pacs.008"],[bn,cdtr],ben]);
-    o.fund=[me,["Nostro 차기"],[n.name.split(",")[0],n.bic]].concat(mid?[["이체"],[mid[1].split(",")[0],mid[0]]]:[]).concat([["입금"],[bn,cdtr]]); }
+  if(m==="SERIAL"){
+    o.msgs=[f008(n.bic,Object.assign({SttlmAcct:n.acct},mid?{IntrmyAgt1:mid}:{}))];
+    o.info=[cust,me,["pacs.008"],[n.name.split(",")[0],n.bic]].concat(mid?[["pacs.008"],[midN,mid]]:[]).concat([["pacs.008"],[bn,cdtr],ben]);
+    o.fund=[me,["Nostro 차기"],[n.name.split(",")[0],n.bic]].concat(mid?[["이체"],[midN,mid]]:[]).concat([["입금"],[bn,cdtr]]); }
   return o;
 }
 
 const MTF = {InstdAgt:["수신은행","{2:} Receiver"],SttlmMtd:["결제방식","-"],SttlmAcct:["결제계좌","53B"],InstgRmbrsmntAgt:["송금측 상환은행(당행 Nostro)","53A"],InstdRmbrsmntAgt:["수취측 상환은행(수취은행 코레스)","54A"],
-  IntrmyAgt1:["중계은행","56A"],CdtrAgt:["수취은행","57A"],ChrgBr:["수수료부담","71A"],Dbtr:["지급은행(당행)","52A"],Cdtr:["수취 금융기관","58A"],UndrlygCstmrCdtTrf:["원 고객송금 정보","Seq B"]};
+  IntrmyAgt1:["중계은행","56A"],CdtrAgt:["수취은행","57A"],ChrgBr:["수수료부담","71A"],Dbtr:["지급은행(당행)","52A"],Cdtr:["수취 금융기관","58A"],UndrlygCstmrCdtTrf:["원 고객송금 정보","Seq B"],
+  DbtrPstlAdr:["송금인 구조화 주소 (Dbtr/PstlAdr)","50F 2/·3/"],CdtrPstlAdr:["수취인 구조화 주소 (Cdtr/PstlAdr)","59F 2/·3/"]};
 function mtText(x,o,msg,i){
   const d=x.vd.slice(2).replace(/-/g,""), a=x.amt.toFixed(2).replace(".",","), f=msg.f, L=[];
+  const f50=mtF(x.dacct,x.cnm,x.dadr), f59=mtF(x.ba,x.bn,x.cadr);
   if(msg.mt==="MT202 COV"){
     L.push(`{1:F01${OWNB.br.slice(0,8)}A${OWNB.br.slice(8)}0000000000}{2:I202${msg.to}XXXXN}{3:{119:COV}{121:${x.uetr}}}`,`:20:${x.ref}C`,`:21:${x.ref}`,`:32A:${d}${x.ccy}${a}`,`:57A:${f.CdtrAgt}`,`:58A:${f.Cdtr}`,
-      `:50K:/${x.dacct}`,`${x.cnm}`,`:59:/${x.ba}`,`${x.bn}`,`${x.bt} ${x.bc}`,`:70:${(x.t70||"").slice(0,35)}`); }
+      `:50F:${f50[0]}`,...f50.slice(1),`:59F:${f59[0]}`,...f59.slice(1),`:70:${(x.t70||"").slice(0,35)}`); }
   else {
-    L.push(`{1:F01${OWNB.br.slice(0,8)}A${OWNB.br.slice(8)}0000000000}{2:I103${msg.to}XXXXN}{3:{121:${x.uetr}}}`,`:20:${x.ref}`,`:23B:CRED`,`:32A:${d}${x.ccy}${a}`,`:50K:/${x.dacct}`,`${x.cnm}`);
+    L.push(`{1:F01${OWNB.br.slice(0,8)}A${OWNB.br.slice(8)}0000000000}{2:I103${msg.to}XXXXN}{3:{121:${x.uetr}}}`,`:20:${x.ref}`,`:23B:CRED`,`:32A:${d}${x.ccy}${a}`,`:50F:${f50[0]}`,...f50.slice(1));
     if(f.SttlmMtd==="COVE"){ L.push(`:53A:${f.InstgRmbrsmntAgt}`,`:54A:${f.InstdRmbrsmntAgt}`); }
     else if(f.SttlmAcct && f.SttlmMtd==="INGA") L.push(`:53B:/${f.SttlmAcct}`);
     if(f.IntrmyAgt1) L.push(`:56A:${f.IntrmyAgt1}`);
     if(f.CdtrAgt && f.CdtrAgt!==msg.to) L.push(`:57${f.CdtrAgt.startsWith("//")?"D":"A"}:${f.CdtrAgt}`);
-    L.push(`:59:/${x.ba}`,`${x.bn}`,`${x.bt} ${x.bc}`,`:70:${(x.t70||"").slice(0,35)}`,`:71A:${x.chg||"SHA"}`); }
+    L.push(`:59F:${f59[0]}`,...f59.slice(1),`:70:${(x.t70||"").slice(0,35)}`,`:71A:${x.chg||"SHA"}`); }
   return L.join("\n");
 }
 
-function benBlock(d){
+function benBlock(d){ const a=d.adr||{};
   return `<div id="st3" class="stp">`+SEC("③ Beneficiary &amp; Beneficiary Bank",
-    F({l:"Beneficiary Name",id:"bn",v:d.bn,rq:1,s:2,max:140})+F({l:"Account / IBAN",id:"ba",v:d.ba,rq:1})+F({l:"Town",id:"bt",v:d.bt,rq:1})+F({l:"Country",id:"bc",v:d.bc,rq:1,max:2})+
-    F({l:"Remittance Info (RmtInf)",id:"t70",v:d.t70||"",max:140})+
+    F({l:"Beneficiary Name",id:"bn",v:d.bn,rq:1,s:2,max:140})+F({l:"Account / IBAN",id:"ba",v:d.ba,rq:1})+
+    F({l:"Remittance Info (RmtInf)",id:"t70",v:d.t70||"",max:140,s:2})+F({l:"Instr. for Next Agent",id:"t72",v:"",max:210})+
     F({l:"Beneficiary Bank BIC",id:"bb",v:d.bic,rq:1,max:11,btn:"bic"})+F({l:"예시 수취은행",id:"rbp",t:"sel",o:BENPRESET.map(p=>[p[0]||"-",p[1]]),v:d.bic||"-",s:2})+
-    F({l:"Clearing Code",id:"bclr",v:d.clr||"",ph:"BIC 없을 때 USABA 026009593 등"})+`<div class="f s2" id="rbinfo" style="align-items:start"></div>`+
-    F({l:"Instr. for Next Agent",id:"t72",v:"",max:210,s:3}),3,"수취은행이 정해지면 ④에서 경로가 자동 판정됩니다")+`</div>`;
+    F({l:"Clearing Code",id:"bclr",v:d.clr||"",ph:"BIC 없을 때 USABA 026009593 등"})+`<div class="f s2" id="rbinfo" style="align-items:start"></div>`,3,"수취은행이 정해지면 ④에서 경로가 판정됩니다")+
+    SEC("Beneficiary Postal Address · ISO 20022 Cdtr/PstlAdr",
+      F({l:"Address Type",id:"batype",t:"sel",o:[["STRD","Structured (구조화)"],["HYBR","Hybrid (구조화 + AdrLine 2줄)"]],v:d.atype||"STRD",rq:1})+
+      ADRF.map(f=>F({l:f[1],id:"ba_"+f[0],v:f[0]==="Ctry"?(a.Ctry||d.bc||""):f[0]==="TwnNm"?(a.TwnNm||d.bt||""):(a[f[0]]||""),rq:f[3],max:f[2]})).join("")+
+      F({l:"Address Line 1 (AdrLine)",id:"ba_l1",v:"",max:70,s:2})+F({l:"Address Line 2 (AdrLine)",id:"ba_l2",v:"",max:70,s:2})+
+      `<input type="hidden" id="bt"><input type="hidden" id="bc"><div class="f s3" id="badrv"></div>`,4,"Ctry·TwnNm 필수 · 2026.11 CBPR+ 비구조화 주소 불가")+
+    SEC("Remitter Postal Address · Dbtr/PstlAdr (CH11 조회)",`<div id="dadrv" class="tw"></div>`,0,"고객 주소는 CH11에서 구조화로 관리")+`</div>`;
 }
 function routeBlock(d={}){
-  return `<div id="st4" class="stp"><section class="sec" id="rtsec"><h3>④ Payment Route &amp; SWIFT Messages<small>R-RTG-01~08 · TB_REMIT_ROUTE</small></h3>
+  return `<div id="st4" class="stp"><section class="sec" id="rtsec"><h3>④ Payment Route &amp; SWIFT Messages<small>R-RTG-01~12 · TB_REMIT_ROUTE</small></h3>
     <div class="grid" style="--c:4">${(d.chg?F({l:"Charges",id:"chg",t:"sel",o:["OUR","SHA","BEN"],v:d.chg,rq:1}):"")+
-      F({l:"Urgent (당일 도착)",id:"rurg",t:"sel",o:[["N","N"],["Y","Y - 긴급"]],v:"N"})+F({l:"접수시각 (IST)",id:"rnow",v:"11:20",max:5})+F({l:"Value Date",id:"rvd",ro:1})}</div>
+      F({l:"접수시각 (IST)",id:"rnow",v:"11:20",max:5})+F({l:"Value Date",id:"rvd",ro:1})}</div>
+    <div class="grid" style="--c:3;padding-top:0">${F({l:"당행 예치환계좌 (Nostro)",id:"rnos",t:"sel",o:[["","-"]],rq:1})+F({l:"Nostro BIC · 계좌",id:"rnb",ro:1})+F({l:"Nostro 결정 사유",id:"rnw",ro:1})+
+      F({l:"중계은행 BIC (IntrmyAgt1)",id:"rimb",max:11,ph:"SSI 자동 · 변경 가능"})+F({l:"수취은행 코레스 (SSI)",id:"rssi",ro:1})+F({l:"수취은행 BIC (CdtrAgt)",id:"rcab",ro:1})+
+      F({l:"메시지 수신은행 (pacs.008)",id:"rinst",ro:1})+F({l:"자금 전문 수신 (pacs.009 COV)",id:"rcovr",ro:1})}</div>
     <div id="rrec"></div>
     <div class="rm" id="rmc" role="radiogroup" aria-label="결제경로 선택"></div>
     <div id="rovr"></div>
     <div class="tabs" role="tablist">${[["flow","흐름도"],["why","판정 근거"],["msg","전문 미리보기"],["acc","회계·수수료"],["guide","방식 안내"]].map((t,i)=>`<button role="tab" data-rtab="${t[0]}" class="${i===0?"on":""}">${t[1]}</button>`).join("")}</div>
     <div id="rtab"></div></section></div>`;
 }
-const RT = {get:null, sel:null, tab:"flow", last:null, rsn:"", rsd:""};
+const RT = {get:null, sel:null, tab:"flow", last:null, rsn:"", rsd:"", cb:"", cbd:"", nos:"", imbMan:false, nosCcy:""};
 function routeInit(getter){
-  RT.get=getter; RT.sel=null; RT.tab="flow"; RT.rsn=""; RT.rsd="";
+  Object.assign(RT,{get:getter,sel:null,tab:"flow",rsn:"",rsd:"",cb:"",cbd:"",nos:"",imbMan:false,nosCcy:""});
   const up=()=>routeRender();
+  $("#rimb").addEventListener("input",()=>{ RT.imbMan=!!val("rimb").trim(); });   // 조작자 지정 중계은행: 재계산보다 먼저 반영
   $$("#st3 input,#st3 select,#rtsec input,#rtsec select").forEach(e=>e.addEventListener("input",up));
   ["amt","ccy","acct","nacc","rusd","rt","exf","rch","rinr","rate","chg"].forEach(i=>{ const e=$("#"+i); if(e) e.addEventListener("input",up); });
-  $("#rbp").addEventListener("change",()=>{ const v=val("rbp"); $("#bb").value=v==="-"?"":v; if(v==="-"&&!val("bclr")) $("#bclr").value="USABA 071000013"; RT.sel=null; up(); });
-  $("#bb").addEventListener("input",()=>{ RT.sel=null; });
+  const reset=()=>{ RT.sel=null; RT.cb=""; RT.imbMan=false; RT.nos=""; };
+  $("#rbp").addEventListener("change",()=>{ const v=val("rbp"); $("#bb").value=v==="-"?"":v; if(v==="-"&&!val("bclr")) $("#bclr").value="USABA 071000013"; reset(); up(); });
+  $("#bb").addEventListener("input",reset);
+  $("#rnos").addEventListener("change",()=>{ RT.nos=val("rnos"); RT.imbMan=false; RT.sel=null; up(); });
+  $("#batype").addEventListener("change",()=>{ const h=val("batype")==="HYBR"; ["ba_l1","ba_l2"].forEach(i=>{ $("#"+i).readOnly=!h; if(!h) $("#"+i).value=""; }); up(); });
+  ["ba_l1","ba_l2"].forEach(i=>{ $("#"+i).readOnly=val("batype")!=="HYBR"; });
   $$("[data-rtab]").forEach(b=>b.addEventListener("click",()=>{ RT.tab=b.dataset.rtab; $$("[data-rtab]").forEach(x=>x.classList.toggle("on",x===b)); routeRender(); }));
   up();
 }
@@ -394,61 +445,90 @@ function routeVd(n,ccy){ const cut=n?n.cut:"15:00", cal=n?n.cal:null; let d=BIZ;
   if(late) d=addD(d,1); while(!(isBiz("IN",d)&&(!cal||isBiz(cal,d)))) d=addD(d,1); return {d,cut,late}; }
 function routeRender(){
   const g=RT.get(), ccy=g.ccy, amt=g.amt, usd=ccy==="INR"?amt/RATE.USD:amt*(RATE[ccy]||1)/RATE.USD;
-  const x={ccy,amt,usd,bic:val("bb").trim().toUpperCase(),clr:val("bclr").trim(),urgent:val("rurg")==="Y",chg:val("chg")||"SHA",
-    bn:val("bn"),ba:val("ba"),bt:val("bt"),bc:val("bc"),t70:val("t70"),cnm:val("cnm"),dacct:val("acct")||val("nacc")||"-",ref:g.ref||"NOI011RO2611040001",uetr:"5f2c1e8a-7b34-4d1e-9a60-2c7e3b91d4aa"};
+  const cadr=adrRead(); $("#bt").value=cadr.TwnNm||""; $("#bc").value=cadr.Ctry||"";
+  const dadr=DADR[val("cno")]||DADR["00000052"];
+  const x={ccy,amt,usd,bic:val("bb").trim().toUpperCase(),clr:val("bclr").trim(),chg:val("chg")||"SHA",nos:RT.nos,imb:RT.imbMan?val("rimb").trim().toUpperCase():"",cadr,dadr,hybr:val("batype")==="HYBR",
+    bn:val("bn"),ba:val("ba"),bt:cadr.TwnNm||"",bc:cadr.Ctry||"",t70:val("t70"),cnm:val("cnm")||"SEOUL PRECISION PARTS INDIA LTD",dacct:val("acct")||val("nacc")||"-",ref:g.ref||"NOI011RO2611040001",uetr:"5f2c1e8a-7b34-4d1e-9a60-2c7e3b91d4aa"};
+  $("#badrv").innerHTML=`<span class="rule" style="grid-column:1/-1">Cdtr/PstlAdr → ${adrStr(cadr)||"-"}</span>`;
+  $("#dadrv").innerHTML=TABLE(ADRF.map(f=>f[0]),[TR(ADRF.map(f=>dadr[f[0]]||"-"))]);
   const b=BICDIR[x.bic];
-  $("#rbinfo").innerHTML = b ? `<span style="grid-column:2">${b.n}, ${b.t} (${b.c}) &nbsp;${[b.own?pill("본점·당행","info"):"",Object.keys(NOSTRO).some(k=>NOSTRO[k].bic===x.bic&&!NOSTRO[k].ho)?pill("당행 Nostro","info"):"",
+  $("#rbinfo").innerHTML = b ? `<span style="grid-column:2">${b.n}, ${b.t} (${b.c}) &nbsp;${[b.own?pill("본점·당행","info"):"",isOurNostro(x.bic)?pill("당행 Nostro","info"):"",
       b.rma?pill("RMA ✓","ok"):pill("RMA ✗","warn"),b.ssi&&b.ssi[ccy]?pill(`SSI ${ccy}: ${b.ssi[ccy][0]}`,"ok"):pill(`SSI ${ccy} 없음`,"warn"),b.vos?pill("INR Vostro "+Object.values(b.vos)[0][0],"info"):"",b.hr?pill("고위험국","err"):""].join(" ")}</span>`
     : `<span style="grid-column:2">${x.bic?pill("디렉터리에 없는 BIC","err"):x.clr?pill("BIC 없음 · 청산코드 "+x.clr,"warn"):pill("수취은행 미지정","err")}</span>`;
+  // Nostro 목록 (통화 변경 시 재구성)
+  if(RT.nosCcy!==ccy){ const L=NOSTROS[ccy]||[]; $("#rnos").innerHTML=L.length?L.map(a=>`<option value="${a.bic}" ${a.act?"":"disabled"}>${a.bic} · ${a.name} · acct ${a.acct}${a.act?"":" ("+(a.note||"비활성")+")"}</option>`).join(""):`<option value="">${ccy==="INR"?"INR: Nostro 미사용":"Nostro 없음"}</option>`; RT.nosCcy=ccy; }
   const R=routeEval(x); RT.last={x,R};
+  if(R.n) $("#rnos").value=R.n.bic;
+  $("#rnb").value=R.n?`${R.n.bic} · acct ${R.n.acct}`:"-"; $("#rnw").value=R.n?R.nwhy:"-";
+  if(!RT.imbMan) $("#rimb").value=R.autoMid;
+  $("#rssi").value=R.ssi?`${R.ssi[0]} · ${R.ssi[2]}`:"-"; $("#rcab").value=x.bic||(x.clr?"//"+x.clr:"-");
   if(RT.sel && !(R.opt[RT.sel]||[0])[0]) RT.sel=null;
-  const m=RT.sel||R.rec, vd=routeVd(R.n,ccy); x.vd=vd.d; $("#rvd").value=vd.d+(vd.late?" (마감 후)":"");
-  $("#rmc").innerHTML=["DIRECT","DIRECT_HO","VOSTRO","COVER","SERIAL"].filter(k=>k!=="VOSTRO"||ccy==="INR").filter(k=>!(k==="DIRECT_HO"&&ccy==="INR")).map(k=>{ const [ok,why]=R.opt[k];
-    return `<label class="${ok?"":"off"}"><input type="radio" name="rmeth" value="${k}" ${k===m?"checked":""} ${ok?"":"disabled"}><b>${RM[k][0]}${k===R.rec?` <span class="pill p-ok">권장</span>`:""}</b><small>${RM[k][2]}</small><small class="why">${ok?"✓ ":"✗ "}${why}</small></label>`; }).join("");
+  const choice=R.rec==="CHOICE", m=RT.sel||(choice?null:R.rec), vd=routeVd(R.n,ccy); x.vd=vd.d; $("#rvd").value=vd.d+(vd.late?" (마감 후)":"");
+  $("#rinst").value = !m?"경로 선택 후 결정":m==="SERIAL"?`${R.n.bic} (Nostro)`:x.bic;
+  $("#rcovr").value = m==="COVER"?`${R.n.bic} → 코레스 ${R.mid}`:"해당 없음";
+  $("#rmc").innerHTML=["DIRECT","DIRECT_HO","VOSTRO","SERIAL","COVER"].filter(k=>k!=="VOSTRO"||ccy==="INR").filter(k=>!(k==="DIRECT_HO"&&ccy==="INR")).map(k=>{ const [ok,why]=R.opt[k];
+    return `<label class="${ok?"":"off"}"><input type="radio" name="rmeth" value="${k}" ${k===m?"checked":""} ${ok?"":"disabled"}><b>${RM[k][0]}${k===R.rec?` <span class="pill p-ok">시스템 결정</span>`:choice&&ok&&(k==="SERIAL"||k==="COVER")?` <span class="pill p-warn">조작자 선택</span>`:""}</b><small><b style="font-size:11.5px">${RM[k][1]}</b></small><small>${RM[k][2]}</small><small class="why">${ok?"✓ ":"✗ "}${why}</small></label>`; }).join("");
   $$("input[name=rmeth]").forEach(e=>e.addEventListener("change",()=>{ RT.sel=e.value; routeRender(); }));
+  if(!m && choice){ $("#rrec").innerHTML=`<div class="msg warn">이 수취은행은 <b>Serial</b>(메시지를 Nostro·중계은행으로 전달)과 <b>COV</b>(메시지를 수취은행에 직접 전달) 모두 가능합니다. 아래 비교에서 중계은행 관계를 보고 이 건의 경로를 선택하세요. <span class="rule">R-RTG-10</span></div>`;
+    $("#rovr").innerHTML=routeCompare(x,R); $("#rtab").innerHTML=`<div class="msg info">경로를 선택하면 흐름도·전문 미리보기가 표시됩니다.</div>`; RT.last.m=null; stepMark("st3","ok"); stepMark("st4","warn"); return; }
   if(!m){ $("#rrec").innerHTML=`<div class="msg err">가능한 경로가 없습니다. ${ccy==="INR"?"해외은행 앞 INR 송금은 당행 Vostro 보유 은행만 가능합니다. 국내 INR 지급은 SF11(NEFT/RTGS)을 사용하세요.":"수취은행 BIC 또는 청산코드를 입력하세요."} <span class="rule">R-RTG-01</span></div>`;
     $("#rovr").innerHTML=""; $("#rtab").innerHTML=""; stepMark("st4","err"); stepMark("st3",x.bic||x.clr?"warn":"err"); return; }
   const o=routeBuild(x,R,m); RT.last.o=o; RT.last.m=m;
   const pair=o.msgs.map(q=>`<b>${q.k}</b> → ${q.to}`).join(" + ");
-  $("#rrec").innerHTML=`<div class="msg ${m===R.rec?"ok":"warn"}">${m===R.rec?"시스템 권장":"수동 선택"}: <b>${RM[m][0]}</b> · ${pair} · 결제 ${o.sttl} · 결제일 ${vd.d}${vd.late?` (마감 ${vd.cut} IST 경과 → 익영업일)`:` (마감 ${vd.cut} IST)`}${R.opt.COVER[0]?` · Cover 기준 ${R.thr.ccy} ${fmtC(R.thr.ccy,R.thr.amt,0)} <a href="#pm01" class="flink">변경</a>`:""}</div>`;
-  $("#rovr").innerHTML = m!==R.rec ? `<div class="grid" style="--c:3">${F({l:"변경 사유",id:"rrsn",t:"sel",rq:1,o:[["","선택"],["CUST","고객 지정 경로"],["SPEED","긴급·당일 도착"],["COST","중계수수료 절감"],["CORR","코레스·수취은행 지시"],["OTH","기타(서술)"]],v:RT.rsn||""})+F({l:"상세",id:"rrsd",s:2,v:RT.rsd||""})}</div><div class="msg warn">권장(${RM[R.rec][0]})과 다른 경로 → Checker 승인 필요 <span class="rule">R-RTG-05</span></div>` : "";
+  $("#rrec").innerHTML=`<div class="msg ${m===R.rec||choice?"ok":"warn"}">${choice?"조작자 선택":m===R.rec?"시스템 결정":"수동 변경"}: <b>${RM[m][0]}</b> · ${pair}${R.mid&&(m==="SERIAL"||m==="COVER")?` · 중계 ${R.mid}`:""} · 결제 ${o.sttl} · 결제일 ${vd.d}${vd.late?` (마감 ${vd.cut} IST 경과 → 익영업일)`:` (마감 ${vd.cut} IST)`}</div>`+
+    (x.imb&&x.imb!==R.autoMid?`<div class="msg warn">중계은행을 SSI(${R.autoMid||"없음"})와 다른 ${x.imb}로 지정했습니다. 수취은행 지시 근거를 확인하세요. <span class="rule">R-RTG-12</span></div>`:"");
+  $("#rovr").innerHTML = choice ? `<div class="grid" style="--c:3">${F({l:"선택 근거",id:"rcb",t:"sel",rq:1,o:CHOICE_RSN,v:RT.cb||""})+F({l:"상세",id:"rcbd",s:2,v:RT.cbd||"",ph:"예: 수취은행 요청으로 COV"})}</div><details style="padding:0 10px 8px"><summary style="cursor:pointer;font-size:12px;color:var(--brand)">Serial · COV 비교 다시 보기</summary>${routeCompare(x,R)}</details>`
+    : m!==R.rec ? `<div class="grid" style="--c:3">${F({l:"변경 사유",id:"rrsn",t:"sel",rq:1,o:[["","선택"],["CUST","고객 지정 경로"],["SPEED","긴급·당일 도착"],["COST","중계수수료 절감"],["CORR","코레스·수취은행 지시"],["OTH","기타(서술)"]],v:RT.rsn||""})+F({l:"상세",id:"rrsd",s:2,v:RT.rsd||""})}</div><div class="msg warn">시스템 결정(${RM[R.rec][0]})과 다른 경로 → Checker 승인 필요 <span class="rule">R-RTG-05</span></div>` : "";
   if($("#rrsn")){ $("#rrsn").addEventListener("change",()=>{ RT.rsn=val("rrsn"); }); $("#rrsd").addEventListener("input",()=>{ RT.rsd=val("rrsd"); }); }
-  stepMark("st3","ok"); stepMark("st4",m===R.rec?"ok":"warn");
+  if($("#rcb")){ $("#rcb").addEventListener("change",()=>{ RT.cb=val("rcb"); stepMark("st4",RT.cb?"ok":"warn"); }); $("#rcbd").addEventListener("input",()=>{ RT.cbd=val("rcbd"); }); }
+  stepMark("st3",adrCheck(cadr,"수취인",x.hybr).some(k=>k[0]==="err")?"err":"ok"); stepMark("st4",choice?(RT.cb?"ok":"warn"):m===R.rec?"ok":"warn");
   const node=(n)=>n.length===1?`<div class="ar">${n[0]}<i>──▶</i></div>`:`<div class="nd"><b>${n[0]}</b>${n[1]||""}</div>`;
   const lane=(t,arr)=>`<div class="lane"><span>${t}</span><div class="chain">${arr.map((n,i)=>node(n)+(n.length>1&&i<arr.length-1&&arr[i+1].length>1?`<div class="ar"><i>──▶</i></div>`:"")).join("")}</div></div>`;
   let h="";
   if(RT.tab==="flow"){
-    h=lane("전문 흐름 (정보)",o.info)+lane(m==="COVER"?"자금 흐름 (Cover)":"자금 흐름 (결제)",o.fund)+
+    h=lane("메시지 흐름",o.info)+lane(m==="COVER"?"자금 흐름 (COV)":"자금 흐름 (결제)",o.fund)+
       `<div class="msg info">${{VOSTRO:"수취은행이 당행에 가진 INR Vostro에 바로 입금합니다. 전문은 통지 1건, 자금은 당행 장부 안에서 끝납니다.",
         DIRECT:"수취인 계좌가 당행 Nostro 은행에 있습니다. Nostro 한 곳이 당행 계좌를 차기하고 같은 은행 안에서 입금하므로 전문 1건으로 끝납니다.",
         DIRECT_HO:"수취인 계좌가 본점에 있습니다. 본점 앞 전문 1건이며, 자금은 Nostro가 아닌 본지점 계정(을A)으로 결제되어 IO21 정산에 포함됩니다.",
-        COVER:"수취은행에는 고객 정보(pacs.008)를 직접 보내고, 자금은 당행 Nostro가 수취은행 코레스로 따로 보냅니다(pacs.009 COV). 수취은행은 정보를 먼저 받아 빠르지만, 자금 도착을 확인한 뒤 입금합니다.",
-        SERIAL:"같은 전문(pacs.008)이 Nostro → (중계은행) → 수취은행 순서로 전달되며 각 단계에서 자금도 함께 이동합니다. 정보와 자금이 한 줄로 움직여 단순하지만, SHA·BEN이면 중계은행 수수료가 공제될 수 있습니다."}[m]}</div>`;
+        COVER:"COV: 메시지(pacs.008)는 수취은행에 직접 보내고, 자금은 당행 Nostro가 수취은행 코레스(중계은행)로 따로 보냅니다(pacs.009 COV). 수취은행은 메시지를 먼저 받지만 자금 도착을 확인한 뒤 입금합니다.",
+        SERIAL:"Serial: 메시지(pacs.008)를 당행 Nostro로 보내면 Nostro → 중계은행 → 수취은행 순서로 같은 메시지와 자금이 함께 전달됩니다. 단순하지만 SHA·BEN이면 중계은행 수수료가 공제될 수 있습니다."}[m]}</div>`;
   } else if(RT.tab==="why"){
-    h=TABLE(["#","확인 항목","답","판정"],R.path.map((p,i)=>TR([`Q${i+1}`,p[0],p[2]?pill(p[1],p[2]):p[1],p[3]])))+`<div class="msg info">판정 결과와 적용 기준(${R.thr.ccy} ${fmtC(R.thr.ccy,R.thr.amt,0)}, ${R.thr.src})은 TB_REMIT_ROUTE에 스냅샷으로 저장됩니다. 기준 변경: <a href="#pm01" class="flink">PM01 Route Policy</a></div>`;
+    h=TABLE(["#","확인 항목","답","판정"],R.path.map((p,i)=>TR([`Q${i+1}`,p[0],p[2]?pill(p[1],p[2]):p[1],p[3]])))+`<div class="msg info">판정 경로, 사용 Nostro·중계은행, 조작자 선택·근거는 TB_REMIT_ROUTE에 스냅샷으로 저장됩니다. COV 사용·고위험국 정책: <a href="#pm01" class="flink">PM01</a></div>`;
   } else if(RT.tab==="msg"){
-    h=o.msgs.map((q,i)=>`<div class="mtw"><div><h5>${o.msgs.length>1?["① 먼저 송신","② 이어서 송신"][i]+" · ":""}${q.k} → ${q.to} (MX 주요 요소)</h5>${TABLE(["요소","의미","MT","값"],Object.entries(q.f).map(([k,v])=>TR([`<code>${k}</code>`,(MTF[k]||[k])[0],(MTF[k]||["",""])[1],v])))}</div><div><h5>${q.mt} 대응 (참고)</h5><pre class="mt">${mtText(x,o,q,i).replace(/</g,"&lt;")}</pre></div></div>`).join("")+
-      (m==="COVER"?`<div class="msg warn">두 전문은 같은 UETR(${x.uetr.slice(0,8)}…)을 쓰고, pacs.009 COV를 먼저(또는 동시) 송신합니다. COV에는 원 고객정보(UndrlygCstmrCdtTrf)가 반드시 들어갑니다. <span class="rule">R-RTG-04</span></div>`:"")+
-      `<div class="msg info">MX(CBPR+)로 송신하고 MT는 대조용입니다. 승인 시 SW11 큐에 ${o.msgs.length}건 생성.</div>`;
+    h=o.msgs.map((q,i)=>`<div class="mtw"><div><h5>${o.msgs.length>1?["① 먼저 송신","② 이어서 송신"][i]+" · ":""}${q.k} → ${q.to} (MX 주요 요소)</h5>${TABLE(["요소","의미","MT","값"],Object.entries(q.f).map(([k,v])=>TR([`<code>${k}</code>`,(MTF[k]||[k])[0],(MTF[k]||["",""])[1],/PstlAdr$/.test(k)?String(v).split(", ").join("<br>"):`<span style="white-space:normal">${v}</span>`])))}</div><div><h5>${q.mt} 대응 (참고)</h5><pre class="mt">${mtText(x,o,q,i).replace(/</g,"&lt;")}</pre></div></div>`).join("")+
+      (m==="COVER"?`<div class="msg warn">두 전문은 같은 UETR(${x.uetr.slice(0,8)}…)을 쓰고, pacs.009 COV를 먼저(또는 동시) 송신합니다. COV에는 원 고객정보와 구조화 주소가 반드시 들어갑니다. <span class="rule">R-RTG-04</span></div>`:"")+
+      `<div class="msg info">MX(CBPR+)로 송신하고 MT는 대조용입니다(주소는 option F). 승인 시 SW11 큐에 ${o.msgs.length}건 생성.</div>`;
   } else if(RT.tab==="acc"){
     const chgMsg={OUR:m==="SERIAL"?"OUR + Serial: Nostro·중계은행이 나중에 수수료를 청구(camt.106/MT191)할 수 있습니다 → 50510300000":"OUR: 당행이 해외 수수료 부담 (청구 시 50510300000)",SHA:m==="SERIAL"?"SHA + Serial: 중계은행 수수료가 송금액에서 공제될 수 있음을 고객에게 안내":"SHA: 수취측 수수료는 수취인 부담",BEN:"BEN: 모든 해외 수수료 수취인 부담"}[x.chg];
     h=TABLE(["구분","계정","내용"],[TR(["차변","고객 계좌 / 11200000000","고객 출금 · 환전 포지션 (금액·수수료 분개는 ⑤와 동일)"]),TR(["대변 (결제)",`<b>${o.gl}</b>`,o.glN]),
-      TR(["수수료부담",o.chgBr,chgMsg])])+`<div class="msg info">경로에 따라 바뀌는 것은 결제(대변) 계정뿐입니다. Direct 본지점은 을A, Vostro는 예금 계정으로 결제됩니다. <span class="rule">R-RTG-07/08 · 18.업무별분개 OUT-04/05</span></div>`;
+      TR(["수수료부담",o.chgBr,chgMsg])])+`<div class="msg info">경로에 따라 바뀌는 것은 결제(대변) 계정뿐입니다. Nostro가 2개 이상이면 같은 GL 아래 Nostro별 하위원장으로 대사합니다. <span class="rule">R-RTG-07/08 · 18.업무별분개 OUT-04/05</span></div>`;
   } else {
-    h=TABLE(["방식","보내는 전문","언제 쓰나","장점","주의"],[
-      TR(["<b>Direct</b>","pacs.008 1건 (MT103)","수취은행 = 당행 Nostro 또는 본점","가장 빠르고 수수료 적음","수취은행 BIC 정확히 확인"]),
-      TR(["<b>Serial</b>","pacs.008 → Nostro → (중계) → 수취은행","RMA 없음, 소액, 고위험국","정보·자금이 함께 이동해 단순·투명","중계 단계마다 시간·수수료"]),
-      TR(["<b>Cover</b>","pacs.008 수취은행 직접 + pacs.009 COV Nostro","RMA·SSI 있음, 고액·긴급","수취은행이 정보를 먼저 받음, 공제 없음","같은 UETR, COV 먼저, 고객정보 포함"]),
-      TR(["<b>Vostro</b>","pacs.008 1건 (INGA)","INR 무역결제 (SRVA)","당행 장부 입금, 즉시","해외은행 INR만"])]);
+    h=TABLE(["방식","메시지 전달","보내는 전문","언제 쓰나","주의"],[
+      TR(["<b>Direct</b>","수취은행(=당행 Nostro·본점)","pacs.008 1건 (MT103)","수취인 계좌가 Nostro·본점에 있음","수취은행 BIC 정확히 확인"]),
+      TR(["<b>Serial</b>","Nostro → 중계은행 → 수취은행","pacs.008 연쇄","RMA 없음, 고위험국, 또는 조작자 선택","중계 단계마다 시간·수수료"]),
+      TR(["<b>COV</b>","수취은행 직접","pacs.008 직접 + 자금 pacs.009 COV","RMA·SSI 있음 + 조작자 건별 선택","같은 UETR, COV 먼저, 고객정보 포함"]),
+      TR(["<b>Vostro</b>","수취은행 (INGA)","pacs.008 1건","INR 무역결제 (SRVA)","해외은행 INR만"])]);
   }
   $("#rtab").innerHTML=h;
 }
+const CHOICE_RSN=[["","선택"],["CORR_OK","중계은행 관계 양호·공제 적음 (Serial)"],["SPEED","긴급·당일 도착 필요"],["FULL","전액 도착 필요 (공제 회피)"],["CORR_NG","중계은행 지연·반송 이력"],["CUST","고객 지정"],["BENBK","수취은행 요청·SSI 지시"],["OTH","기타 (상세 기재)"]];
+function routeCompare(x,R){ const n=R.n, mid=R.mid, c=R.corr||{}, rel=`${mid} ${c.n||""} · ${c.rel||"관계 정보 없음"} · gpi ${c.gpi?"✓":"✗"} · 당행 RMA ${c.rma?"✓":"✗"}`;
+  return TABLE(["비교 항목","Serial · 메시지를 Nostro·중계은행으로","COV · 메시지를 수취은행에 직접"],[
+    TR(["보내는 전문",`pacs.008 1건 → ${n.bic}`,`① pacs.009 COV → ${n.bic} + ② pacs.008 → ${x.bic}`]),
+    TR(["경유 BIC",`${n.bic} → ${mid} → ${x.bic} (메시지·자금 함께)`,`메시지: ${x.bic} 직접 / 자금: ${n.bic} → ${mid} → ${x.bic}`]),
+    TR(["중계은행 관계",rel,`자금만 ${mid} 경유 (고객정보는 COV에 포함)`]),
+    TR(["해외 공제 (SHA·BEN)",c.ded||"정보 없음","고객 송금액에서 공제 없음"]),
+    TR(["수취인 입금",c.tat||"-","수취은행이 메시지를 먼저 받지만 자금 도착 확인 후 입금"]),
+    TR(["최근 이력",c.rtn||"-","자금 미도착 시 수취은행 조회(camt.110) 발생 가능"])])+
+    `<div class="msg info">중계은행과의 관계는 건마다 달라 일괄 기준을 두지 않습니다. 이 건의 경로를 조작자가 선택하고 근거를 남깁니다. <span class="rule">R-RTG-10</span></div>`; }
 function routeCheck(){ const L=RT.last, m=[]; if(!L) return m;
-  if(!L.m) m.push(["err","결제경로를 정할 수 없습니다 (④ 확인) <span class='rule'>R-RTG-01</span>"]);
-  else { if(L.m!==L.R.rec && !val("rrsn")) m.push(["err","권장과 다른 경로: 변경 사유를 선택하세요 <span class='rule'>R-RTG-05</span>"]);
-    if(!L.x.bc || !L.x.bt) m.push(["err","수취인 Town/Country는 구조화주소 필수입니다"]);
+  m.push(...adrCheck(L.x.cadr,"수취인",L.x.hybr), ...adrCheck(L.x.dadr,"송금인(CH11)",false));
+  if(!L.m) m.push(L.R&&L.R.rec==="CHOICE"?["err","Serial 또는 COV 중 이 건의 경로를 선택하세요 (④) <span class='rule'>R-RTG-10</span>"]:["err","결제경로를 정할 수 없습니다 (④ 확인) <span class='rule'>R-RTG-01</span>"]);
+  else { if(L.R.rec!=="CHOICE" && L.m!==L.R.rec && !val("rrsn")) m.push(["err","시스템 결정과 다른 경로: 변경 사유를 선택하세요 <span class='rule'>R-RTG-05</span>"]);
+    if(L.R.rec==="CHOICE" && !val("rcb")) m.push(["err","Serial/COV 선택 근거를 고르세요 <span class='rule'>R-RTG-10</span>"]);
+    if(L.x.imb && !/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/.test(L.x.imb)) m.push(["err","중계은행 BIC 형식 오류 (8 또는 11자리)"]);
     if(L.R.b&&L.R.b.hr) m.push(["warn","고위험국 수취은행: EDD·제재 필터 결과 확인"]);
-    m.push(["info",`경로 ${RM[L.m][0]} · ${L.o.msgs.map(q=>q.k+"→"+q.to).join(" + ")} · 결제일 ${L.x.vd}`]); }
+    m.push(["info",`경로 ${RM[L.m][0]} · Nostro ${L.R.n?L.R.n.bic:"-"}${L.R.mid&&(L.m==="SERIAL"||L.m==="COVER")?" · 중계 "+L.R.mid:""} · ${L.o.msgs.map(q=>q.k+"→"+q.to).join(" + ")} · 결제일 ${L.x.vd}`]); }
   return m; }
 function stepBar(steps){ return `<nav class="steps" aria-label="입력 단계">${steps.map((s,i)=>`<button type="button" data-step="${s[0]}" id="sb-${s[0]}"><b>${i+1}</b>${s[1]}</button>`).join("")}</nav>`; }
 function stepMark(id,k){ const e=$("#sb-"+id); if(e){ e.classList.remove("ok","warn","err"); e.classList.add(k); } }
@@ -463,6 +543,7 @@ S.ch11 = {id:"CH11", t:"Customer FX Profile", g:"고객", tag:"변경", d:"PAN·
       F({l:"Residency",id:"rs",t:"sel",o:[["R","Resident"],["NR","Non-Resident"]],v:"R",rq:1})+F({l:"CIN / LLPIN",id:"cin",v:"U01403UP2016FTC084512"}))+
     SEC("Regulatory IDs",F({l:"PAN",id:"pan",v:"AAACH4821K",rq:1,max:10,ph:"AAAAA9999A"})+F({l:"IEC (10자리)",id:"iec",v:"AAACH4821K",max:10})+F({l:"GSTIN",id:"gst",v:"09AAACH4821K1Z5",max:15})+
       F({l:"LEI (20자리)",id:"lei",v:"5493001KJTIIGC8Y1R12",max:20})+F({l:"LEI Next Renewal",id:"leiExp",t:"date",v:"2026-08-14"})+F({l:"EEFC Account",id:"eefc",v:"6015907100013"}),3,"외부검증: PAN(Protean) · IEC(DGFT) · LEI(GLEIF)")+
+    SEC("Registered Address · ISO 20022 PstlAdr",ADRF.map(f=>F({l:f[1],id:"ca_"+f[0],v:(DADR["00000038"]||{})[f[0]]||"",rq:f[3],max:f[2]})).join(""),4,"송금 시 Dbtr/PstlAdr로 매핑 · Ctry·TwnNm 필수 (R-ADR-01)")+
     `<section class="sec"><h3>Validation Result</h3><div id="ch11r"></div></section>`,
   chk(){
     const out=[], pan=val("pan"), lei=val("lei"), iec=val("iec"), exp=val("leiExp"), ct=val("ct");
@@ -476,14 +557,14 @@ S.ch11 = {id:"CH11", t:"Customer FX Profile", g:"고객", tag:"변경", d:"PAN·
     show(out.filter(o=>o[0]!=="ok").length?out.filter(o=>o[0]!=="ok"):[["ok","PAN·IEC·LEI·GSTIN 검증 통과"]]);
   }};
 
-S.rt11 = {id:"RT11", t:"Outward Remittance (General)", g:"당발송금", tag:"변경", d:"기업 무역외 일반송금(서비스 대가, 기타). 위 단계 순서대로 입력하면 ④에서 수취은행과 당행 관계(Nostro·본점·RMA·SSI)를 보고 Direct / Serial / Cover 중 경로를 자동으로 정하고, 보낼 전문(pacs.008, 필요 시 pacs.009 COV)을 미리 보여줍니다. 개인 LRS는 RT12.",
+S.rt11 = {id:"RT11", t:"Outward Remittance (General)", g:"당발송금", tag:"변경", d:"기업 무역외 일반송금(서비스 대가, 기타). 위 단계 순서대로 입력하면 ④에서 수취은행과 당행 관계(Nostro·본점·RMA·SSI)로 가능한 경로를 가려내고, Serial(메시지 → Nostro·중계은행)과 COV(메시지 → 수취은행 직접)가 모두 가능하면 중계은행 관계를 비교해 조작자가 건별로 선택합니다. 사용 Nostro·중계은행 BIC와 ISO 20022 구조화 주소를 함께 보여주고, 보낼 전문(pacs.008, COV면 pacs.009 COV)을 미리 보여줍니다. 개인 LRS는 RT12.",
   html:()=>stepBar([["st1","고객·출금계좌"],["st2","금액·목적·세금"],["st3","수취인·수취은행"],["st4","결제경로·전문"],["st5","환율·딜"]])+
     STEP("st1",custBlock("00000052","① Remitter (CH11)"))+STEP("st2",SEC("② Remit Information",
       F({l:"Amount",id:"ccy",t:"sel",o:[...ccyOpt,"INR"],v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="620,000.00">`,s:2})+F({l:"INR Equivalent",id:"inr",ro:1,t:"num"})+
       purposeField("S1004")+F({l:"Remit Country",id:"rc",t:"sel",o:["KR","US","SG","AE","JP","DE"],v:"KR",rq:1})+
       F({l:"Charge Type",id:"chg",t:"sel",o:["OUR","SHA","BEN"],v:"SHA",rq:1}))+
     SEC("Tax (Income-tax Act s.195)",F({l:"Form 15CA Ack No",id:"ca",v:"",ph:"15자리",max:15})+F({l:"Form 15CB UDIN",id:"cb",v:"",max:18})+F({l:"Exempt (Rule 37BB)",id:"ex",t:"sel",o:[["N","해당없음"],["Y","면제목록 해당"]],v:"N"})))+
-    benBlock({bn:"HANBIT ENGINEERING CO LTD",ba:"1002-334-551200",bt:"SEOUL",bc:"KR",bic:"KRBAKRSE",t70:"INV 2026-0912 ENGINEERING FEE"})+routeBlock()+
+    benBlock({bn:"HANBIT ENGINEERING CO LTD",ba:"1002-334-551200",bic:"KRBAKRSE",t70:"INV 2026-0912 ENGINEERING FEE",adr:{Ctry:"KR",CtrySubDvsn:"SEOUL",DstrctNm:"GANGNAM-GU",TwnNm:"SEOUL",PstCd:"06236",StrtNm:"TEHERAN-RO",BldgNb:"152",BldgNm:"GANGNAM FINANCE CENTER",Flr:"21"}})+routeBlock()+
     STEP("st5",dealingBlock(620000,"USD")),
   init(){ const u=()=>{$("#inr").value=fmt(num("amt")*(RATE[val("ccy")]||1));}; ["amt","ccy"].forEach(i=>$("#"+i).addEventListener("input",u)); u();
     routeInit(()=>({ccy:val("ccy"),amt:num("amt"),ref:"NOI011RO2611040001"})); stepMark("st1","ok"); },
@@ -502,7 +583,7 @@ S.rt12 = {id:"RT12", t:"LRS Outward Remittance", g:"당발송금", tag:"신규",
     SEC("Amount",F({l:"Amount",id:"ccy",t:"sel",o:ccyOpt,v:"USD",rq:1,suf:`<input id="amt" class="n rq" value="45,000.00">`,s:2})+F({l:"INR Equivalent",id:"inr",ro:1})+
       F({l:"Form A2 징구",id:"a2",t:"sel",o:[["Y","Y"],["N","N"]],v:"Y",rq:1})+F({l:"타행 기송금 신고(USD)",id:"ob",t:"num",v:fmt(CUST["00000107"].otherBank)})+F({l:"Fiscal Year",id:"fy",v:fy(BIZ),ro:1}))+
     `<section class="sec"><h3>LRS Limit &amp; TCS <small>TB_LRS_FY_SUM (PAN 행잠금)</small></h3><div id="lrsbox"></div></section></div>`+
-    benBlock({bn:"UNIVERSITY OF TORONTO",ba:"00012-004-1234567",bt:"TORONTO",bc:"CA",bic:"CABKCATT",t70:"TUITION FEE STUDENT ID 1009876543"})+routeBlock({chg:"OUR"}),
+    benBlock({bn:"UNIVERSITY OF TORONTO",ba:"00012-004-1234567",bic:"CABKCATT",t70:"TUITION FEE STUDENT ID 1009876543",adr:{Ctry:"CA",CtrySubDvsn:"ON",TwnNm:"TORONTO",PstCd:"M5S 1A1",StrtNm:"KING'S COLLEGE CIRCLE",BldgNb:"27"}})+routeBlock({chg:"OUR"}),
   init(){ const u=()=>this.calc(); $$("#st2 input,#st2 select").forEach(e=>e.addEventListener("input",u)); $$("input[name=lc]").forEach(e=>e.addEventListener("change",u)); u();
     routeInit(()=>({ccy:val("ccy"),amt:num("amt"),ref:"NOI012RO2611040007"})); stepMark("st1","ok"); },
   calc(){ const c=CUST["00000107"], usd=num("amt")*RATE[val("ccy")]/RATE.USD, inr=num("amt")*RATE[val("ccy")];
@@ -531,7 +612,7 @@ S.rt13 = {id:"RT13", t:"Remittance (Trade Finance)", g:"당발송금", tag:"변�
       purposeField("S0101")+F({l:"Country",id:"rc",t:"sel",o:["KR","CN","US","DE","JP"],v:"KR",rq:1})+F({l:"Nationality",id:"nat",v:"KR"})+
       F({l:"Charge Type",id:"chg",t:"sel",o:["OUR","SHA","BEN"],v:"OUR",rq:1})+F({l:"TCS Y/N",id:"tcs",t:"sel",o:["N","Y"],v:"N"})+F({l:"Value Date",id:"vd",t:"date",v:BIZ,rq:1}))+
     `<section class="sec"><div class="tabs" role="tablist">${[[1,"Product Type"],[2,"Amount Limit"],[3,"Dealing Information"]].map(([i,t])=>`<button role="tab" data-tab="${i}" class="${i===2?"on":""}">${t}</button>`).join("")}</div><div id="tabc"></div></section></div>`+
-    benBlock({bn:"HANBIT SEED CO LTD",ba:"301-0221-7781-21",bt:"ANSEONG",bc:"KR",bic:"KRBBKRSE",t70:"ADVANCE PAYMENT PI INV-2026-0912"})+routeBlock()+
+    benBlock({bn:"HANBIT SEED CO LTD",ba:"301-0221-7781-21",bic:"KRBBKRSE",t70:"ADVANCE PAYMENT PI INV-2026-0912",adr:{Ctry:"KR",CtrySubDvsn:"GYEONGGI-DO",TwnNm:"ANSEONG",PstCd:"17579",StrtNm:"SEED VALLEY-RO",BldgNb:"45"}})+routeBlock()+
     STEP("st5",SEC("⑤ Fee / Tax (CM-CMGL)",`<div id="fee"></div>`,0,"Commission·Cable + 환전가치(32(2)) 과세표준 × 18%")); },
   tabs(i){ const c=$("#tabc");
     if(i===1) c.innerHTML=`<div class="grid">${F({l:"Capital Goods",id:"cap",t:"sel",o:[["N","N - 일반재 (6개월)"],["Y","Y - 자본재 (3년)"]],v:"N"})+F({l:"BG / SBLC No",id:"bg",v:""})+F({l:"BG Expiry",id:"bgx",t:"date"})+F({l:"Shipment Date (B/L)",id:"shp",t:"date",v:"2026-08-30"})+F({l:"Incoterms",id:"inc",t:"sel",o:["EXW","FCA","FAS","FOB","CFR","CIF","CPT","CIP","DAP","DPU","DDP"],v:"CIF"})+F({l:"Form A2",id:"a2",t:"sel",o:["Y","N"],v:"Y"})}</div><div id="advbox"></div>`;
@@ -730,7 +811,7 @@ S.fd12 = {id:"FD12", t:"FDI Refund Remittance", g:"FDI", tag:"신규", d:"60일 
       F({l:"Original INR",id:"oinr",v:"250,000,000.00",ro:1})+F({l:"Allotted INR",id:"ainr",v:"200,000,000.00",ro:1})+F({l:"Unallotted INR",id:"uinr",v:"50,000,000.00",ro:1}))+
     SEC("Refund",F({l:"Refund Type",id:"rt",t:"sel",o:[["NONALLOT","미배정분 (INR → 외화 환전 반환)"],["EXCESS","초과입금 (환전 없이 원통화 반환)"],["REJECT","투자불허/KYC"]],v:"NONALLOT"})+F({l:"Excess USD (외화 미지급금)",id:"exf",t:"num",v:"22,585.38"})+F({l:"Return Charge USD (BEN)",id:"rch",t:"num",v:"25.00"})+F({l:"Refund Date",id:"fd",t:"date",v:BIZ})+F({l:"Refund INR (확정)",id:"rinr",t:"num",v:"50,000,000.00"})+
       F({l:"CCY",id:"ccy",v:"USD",ro:1})+F({l:"Rate",id:"rate",t:"num",v:"88.4200"})+F({l:"Refund USD",id:"rusd",ro:1})+F({l:"RBI Approval Ref",id:"rbi"}))+`<div id="r12"></div>`+
-    benBlock({bn:"SEOUL PRECISION CO LTD",ba:"110-482-339901",bt:"SEOUL",bc:"KR",bic:"KRBAKRSE",t70:"REFUND SHARE APPLICATION MONEY FDI2609010007"})+routeBlock({chg:"OUR"}),
+    benBlock({bn:"SEOUL PRECISION CO LTD",ba:"110-482-339901",bic:"KRBAKRSE",t70:"REFUND SHARE APPLICATION MONEY FDI2609010007",adr:{Ctry:"KR",CtrySubDvsn:"SEOUL",DstrctNm:"GEUMCHEON-GU",TwnNm:"SEOUL",PstCd:"08594",StrtNm:"GASAN DIGITAL 1-RO",BldgNb:"88"}})+routeBlock({chg:"OUR"}),
   init(){ this.calc(); routeInit(()=>({ccy:"USD",amt:num("rusd"),ref:"NOI061RO2611040012"}));
     const u=()=>{ this.calc(); routeRender(); }; ["rt","exf","rch","fd","rinr","rate","rbi"].forEach(i=>$("#"+i).addEventListener("input",u)); },
   calc(){ if(val("rt")==="EXCESS"){ const net=r2(num("exf")-num("rch")), due=addBiz("IN",val("rd"),5), late=val("fd")>due;
@@ -808,7 +889,7 @@ S.rt14 = {id:"RT14", t:"Non-Resident Outward Remittance", g:"당발송금", tag:
       F({l:"Nature of Funds",id:"nat",t:"sel",rq:1,s:2,o:[["CAP","잔액·자산매각대금 (USD 1M/FY 한도)"],["CUR","경상소득 - 임대·배당·연금 (세후, 한도 외)"],["SAL","외국인 급여 (세후, 한도 외)"]],v:"CAP"})+F({l:"NRO FY 누적(USD)",id:"cum",t:"num",v:"380,000.00",ro:1})+
       F({l:"Form 15CA Ack",id:"ca",v:"[Ack No.]"})+F({l:"Form 15CB UDIN",id:"cb",v:"[UDIN]"})+F({l:"Source Evidence",id:"src",v:"Sale deed 2026-08-14, tax paid"}))+
     `<section class="sec"><h3>Limit &amp; Charges <small>TB_NR_REPAT_SUM · R-NR-01~05</small></h3><div id="r14"></div></section>`+
-    benBlock({bn:"ANAND KRISHNAN",ba:"AE070331234567890123456",bt:"DUBAI",bc:"AE",bic:"AEBKAEAD",t70:"OWN FUNDS REPATRIATION"})+routeBlock({chg:"SHA"}),
+    benBlock({bn:"ANAND KRISHNAN",ba:"AE070331234567890123456",bic:"AEBKAEAD",t70:"OWN FUNDS REPATRIATION",atype:"HYBR",adr:{Ctry:"AE",CtrySubDvsn:"DUBAI",DstrctNm:"JUMEIRAH LAKE TOWERS",TwnNm:"DUBAI",PstBx:"123456",BldgNm:"CLUSTER D TOWER 2",Flr:"14"}})+routeBlock({chg:"SHA"}),
   init(){ const u=()=>this.calc(); ["nacc","ccy","amt","nat","ca","cb","src"].forEach(i=>$("#"+i).addEventListener("input",u)); u();
     routeInit(()=>({ccy:val("ccy"),amt:num("amt"),ref:"NOI014RO2611040021"})); },
   calc(){ const usd=num("amt")*RATE[val("ccy")]/RATE.USD, inr=num("amt")*RATE[val("ccy")], acc=val("nacc"), nat=val("nat"); $("#inr").value=fmt(inr);
@@ -1018,35 +1099,29 @@ S.sw12 = {id:"SW12", t:"SWIFT Compose", g:"SWIFT", tag:"신규", d:"메시지 �
     $("#mtp").innerHTML=`<div class="mtw"><div><h5>{2:I${t.slice(2)}${val("rcv")}XXXXN}</h5><pre class="mt">{4:\n${body}\n-}</pre></div><div>${m.map(([k,x])=>`<div class="msg ${k}">${x}</div>`).join("")||`<div class="msg ok">형식 검증 통과 → Checker 승인 후 송신</div>`}</div></div>`; },
   chk(){ this.calc(); return show($("#mtp .msg.err")?[["err","메시지 검증 오류"]]:[["ok","작성 완료 · VERIFY 상태로 SW11 큐 등록 (2인 승인)"]]); }};
 
-S.pm01 = {id:"PM01", t:"Route Policy (Cover 기준)", g:"SWIFT", tag:"신규", d:"당발 결제경로 판정 기준을 관리합니다. Cover 권장 기준금액은 기본값(USD 환산)과 통화별 예외(거래통화 금액)로 바꿀 수 있습니다. 변경은 적용시작일 기준 이력으로 쌓이고 Maker 등록 → Checker 승인 후 효력이 생깁니다. 송금은 거래일에 유효한 값을 쓰고 적용값을 스냅샷으로 남깁니다.",
-  CC:["USD","EUR","JPY","GBP","AED","KRW"],
-  html(){ const h=rtgAt(BIZ), ex=e=>Object.entries(e||{}).map(([k,v])=>k+" "+fmtC(k,v,0)).join(" · ");
-    return SEC("현재 적용값 ("+BIZ+" 기준)",`<div class="kpis"><div class="kpi"><span>Cover 사용</span><b>${h.coverOn?"Y":"N"}</b></div><div class="kpi"><span>기본 기준 (USD 환산)</span><b>${fmtC("USD",h.coverMin,0)}</b></div><div class="kpi"><span>통화별 예외</span><b style="font-size:14px">${ex(h.ccy)||"없음"}</b></div><div class="kpi"><span>고위험국 Cover 금지</span><b>${h.hrBlock?"Y":"N"}</b></div><div class="kpi"><span>적용시작</span><b style="font-size:14px">${h.eff}</b></div></div>`,0,"승인된 최신값")+
-      SEC("변경 등록 (Maker)",F({l:"Cover 사용",id:"pon",t:"sel",o:[["Y","Y - 사용"],["N","N - 모두 Serial"]],v:h.coverOn?"Y":"N",rq:1})+
-        F({l:"기본 기준 (USD)",id:"pmin",t:"num",v:fmtC("USD",h.coverMin,0),rq:1})+F({l:"고위험국 Cover 금지",id:"phr",t:"sel",o:[["Y","Y"],["N","N (컴플라이언스 승인 필요)"]],v:h.hrBlock?"Y":"N"})+
-        F({l:"적용시작일",id:"peff",t:"date",v:addD(BIZ,1),rq:1})+F({l:"변경 사유",id:"prsn",rq:1,s:2,ph:"예: 코레스 수수료 변경으로 기준 조정"}),3,"ROUTE_COVER_ENABLED · ROUTE_COVER_MIN_USD · ROUTE_COVER_HIGH_RISK_BLOCK")+
-      SEC("통화별 예외 (거래통화 금액, 비우면 기본값 사용)",TABLE(["통화","Nostro","현재 적용",["새 기준 (거래통화)","n"]],this.CC.map(c=>TR([c,(NOSTRO[c]||{}).bic||"-",h.ccy&&h.ccy[c]?`${c} ${fmtC(c,h.ccy[c],0)}`:"기본값",[`<input class="n" id="pc_${c}" value="${h.ccy&&h.ccy[c]?fmtC(c,h.ccy[c],0):""}" style="width:140px" aria-label="${c} 기준금액">`,"n"]]))),0,"ROUTE_COVER_MIN_CCY")+
+S.pm01 = {id:"PM01", t:"Route Policy (COV 정책)", g:"SWIFT", tag:"신규", d:"당발 결제경로의 정책값을 관리합니다. Serial(메시지를 Nostro·중계은행으로 전달)·COV(메시지를 수취은행에 직접 전달) 선택은 중계은행 관계가 건마다 달라 금액 기준을 두지 않고 송금 화면에서 조작자가 건별로 정합니다. 여기서는 COV 사용 여부와 고위험국 COV 금지만 관리하며, 변경은 적용시작일 이력으로 쌓이고 Maker 등록 → Checker 승인 후 효력이 생깁니다.",
+  html(){ const h=rtgAt(BIZ);
+    return SEC("현재 적용값 ("+BIZ+" 기준)",`<div class="kpis"><div class="kpi"><span>COV 사용</span><b>${h.coverOn?"Y":"N"}</b></div><div class="kpi"><span>고위험국 COV 금지</span><b>${h.hrBlock?"Y":"N"}</b></div><div class="kpi"><span>Serial·COV 결정</span><b style="font-size:14px">건별 조작자 선택</b></div><div class="kpi"><span>적용시작</span><b style="font-size:14px">${h.eff}</b></div></div>`,0,"승인된 최신값")+
+      SEC("변경 등록 (Maker)",F({l:"COV 사용",id:"pon",t:"sel",o:[["Y","Y - 조작자 선택 허용"],["N","N - 모두 Serial"]],v:h.coverOn?"Y":"N",rq:1})+
+        F({l:"고위험국 COV 금지",id:"phr",t:"sel",o:[["Y","Y"],["N","N (컴플라이언스 승인 필요)"]],v:h.hrBlock?"Y":"N"})+
+        F({l:"적용시작일",id:"peff",t:"date",v:addD(BIZ,1),rq:1})+F({l:"변경 사유",id:"prsn",rq:1,s:3,ph:"예: COV 일시 중단 (코레스 결제 장애)"}),3,"ROUTE_COVER_ENABLED · ROUTE_COVER_HIGH_RISK_BLOCK")+
       `<section class="sec"><h3>변경 이력 <small>적용시작일 기준 · 승인 전에는 효력 없음</small></h3><div id="phist"></div></section>`+
-      `<div class="msg info">예: RT11 USD 620,000 · Korea Bank A는 현재 기준으로 ${620000>=(h.ccy&&h.ccy.USD||h.coverMin)?"Cover":"Serial"} 권장. 시안에서는 변경값을 이 브라우저에만 저장합니다. <button type="button" id="preset">기본값으로 초기화</button></div>`; },
-  init(){ this.exec=false; this.hist(); $("#preset").addEventListener("click",()=>{ RTG.hist=JSON.parse(JSON.stringify(RTG_DEF.hist)); rtgSave(); go("pm01"); log(`<span class="pill p-info">INFO</span> 기본값(USD 100,000)으로 초기화`); }); },
-  hist(){ const ex=e=>Object.entries(e||{}).map(([k,v])=>k+" "+fmtC(k,v,0)).join(", ")||"-";
-    $("#phist").innerHTML=TABLE(["적용시작","Cover",["기본 기준(USD)","n"],"통화별 예외","고위험 금지","사유","Maker","Checker","상태",""],RTG.hist.map((x,i)=>TR([x.eff,x.coverOn?"Y":"N",[fmtC("USD",x.coverMin,0),"n"],ex(x.ccy),x.hrBlock?"Y":"N",x.rsn,x.mk,x.ck||"-",
+      `<div class="msg info">중계은행 관계 정보(gpi·RMA·예상 공제·도착시간·반송 이력)는 은행 디렉터리(TB_BIC_DIR)에서 관리하며 송금 화면 ④의 Serial·COV 비교에 표시됩니다. 시안에서는 변경값을 이 브라우저에만 저장합니다. <button type="button" id="preset">기본값으로 초기화</button></div>`; },
+  init(){ this.exec=false; this.hist(); $("#preset").addEventListener("click",()=>{ RTG.hist=JSON.parse(JSON.stringify(RTG_DEF.hist)); rtgSave(); go("pm01"); log(`<span class="pill p-info">INFO</span> 기본값으로 초기화`); }); },
+  hist(){ $("#phist").innerHTML=TABLE(["적용시작","COV 사용","고위험 금지","사유","Maker","Checker","상태",""],RTG.hist.map((x,i)=>TR([x.eff,x.coverOn?"Y":"N",x.hrBlock?"Y":"N",x.rsn,x.mk,x.ck||"-",
       pill(x.sts==="APPROVED"?"승인":x.sts==="REJECTED"?"반려":"승인대기",x.sts==="APPROVED"?"ok":x.sts==="REJECTED"?"err":"warn"),x.sts==="PENDING"?`<button type="button" data-pa="${i}">Checker 승인</button> <button type="button" data-pr="${i}">반려</button>`:""])).reverse());
     $$("[data-pa]").forEach(b=>b.addEventListener("click",()=>{ const x=RTG.hist[+b.dataset.pa]; x.sts="APPROVED"; x.ck="FXM1"; rtgSave(); go("pm01");
-      log(`<span class="pill p-ok">OK</span> ${x.eff}부터 Cover 기준 USD ${fmtC("USD",x.coverMin,0)} 적용 (Checker 승인) <span class="rule">R-RTG-09</span>`); }));
+      log(`<span class="pill p-ok">OK</span> ${x.eff}부터 COV 사용 ${x.coverOn?"Y":"N"} · 고위험 금지 ${x.hrBlock?"Y":"N"} 적용 (Checker 승인) <span class="rule">R-RTG-09</span>`); }));
     $$("[data-pr]").forEach(b=>b.addEventListener("click",()=>{ RTG.hist[+b.dataset.pr].sts="REJECTED"; rtgSave(); this.hist(); })); },
-  read(){ const ccy={}; this.CC.forEach(c=>{ const v=num("pc_"+c); if(v>0) ccy[c]=v; });
-    return {eff:val("peff"),coverOn:val("pon")==="Y",coverMin:num("pmin"),ccy,hrBlock:val("phr")==="Y",rsn:val("prsn").trim()}; },
-  chk(){ const x=this.read(), m=[], go_=this.exec; this.exec=false;
-    if(!(x.coverMin>0)) m.push(["err","기본 기준금액은 0보다 커야 합니다"]);
+  chk(){ const x={eff:val("peff"),coverOn:val("pon")==="Y",hrBlock:val("phr")==="Y",rsn:val("prsn").trim()}, m=[], go_=this.exec; this.exec=false;
     if(x.eff<=BIZ) m.push(["err",`적용시작일은 영업일(${BIZ}) 다음 날 이후여야 합니다 (당일·소급 변경 불가)`]);
     if(!x.rsn) m.push(["err","변경 사유를 입력하세요"]);
-    if(!x.hrBlock) m.push(["warn","고위험국 Cover 허용: 컴플라이언스 승인 근거를 사유에 기재"]);
+    if(!x.hrBlock) m.push(["warn","고위험국 COV 허용: 컴플라이언스 승인 근거를 사유에 기재"]);
     if(RTG.hist.some(h=>h.sts==="PENDING")) m.push(["err","승인대기 중인 변경이 있습니다. 먼저 승인 또는 반려하세요"]);
     if(m.some(k=>k[0]==="err")) return show(m);
     if(!go_) return show([...m,["ok","검증 통과. Execute로 등록하세요"]]);
     RTG.hist.push(Object.assign(x,{mk:"FX02",ck:"",sts:"PENDING"})); rtgSave(); this.hist();
-    return show([...m,["ok",`변경 등록(Maker): ${x.eff}부터 기본 USD ${fmtC("USD",x.coverMin,0)}${Object.keys(x.ccy).length?" · 예외 "+Object.entries(x.ccy).map(([k,v])=>k+" "+fmtC(k,v,0)).join(", "):""} → Checker 승인 대기 <span class='rule'>R-RTG-09</span>`]]); }};
+    return show([...m,["ok",`변경 등록(Maker): ${x.eff}부터 COV 사용 ${x.coverOn?"Y":"N"} → Checker 승인 대기 <span class='rule'>R-RTG-09</span>`]]); }};
 
 S.ra11 = {id:"RA11", t:"Reimbursement (RA / Claim)", g:"본지점", tag:"신규", d:"본점이 개설한 신용장의 상환수권(MT740)을 받아 지점이 상환은행으로서 청구(MT742)를 지급(대지급)하고, 본점 정산 대상(Due from HO)으로 기장합니다. 지급기한은 인도 영업일 3일, 결제일은 통화국 영업일로 계산합니다.",
   html:()=>SEC("Authorisations (MT740)",TABLE(["RA No","LC No","Issuing (HO)","Claiming Bank","CCY",["RA Amt","n"],["Available","n"],"Expiry","Charges","Status"],[
