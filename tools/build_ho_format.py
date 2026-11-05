@@ -105,7 +105,7 @@ def write_summary(ws, rs):
         ("인도 재무제표 줄", "BR Act Third Schedule 기준 참고 줄(Sch.3 예금, Sch.16 영업비용 등). 최종은 결산 grouping"),
         ("각주(첫 자리 6)", "요약표의 '각주 6'은 Level 6이 아니라 첫 자리(Level1) 코드 6 = 난외 계정군(우발채무·약정·파생 명목·비망). "
          "인도 신설 비망계정(미인식 이자·기술적 상각)은 이 군의 L2 60300000000 아래. 현행 인도 GBS의 난외 대응계정(7xxxxxxx)은 0930 단식 체계라 별도 계정 없음"),
-        ("Level", "본점 산식(D열)과 동일: 코드 1+2+2+2+2+2자리에서 끝에서부터 '00'이 아닌 첫 구간이 Level. 신설 계정 161개 전부 산식 Level·상위 계정 존재를 자동 검증"),
+        ("Level", "본점 산식(D열)과 동일: 코드 1+2+2+2+2+2자리에서 끝에서부터 '00'이 아닌 첫 구간이 Level. 신설 계정 전부 산식 Level·상위 계정 존재를 자동 검증"),
         ("0930 구조 오류", "20510100000~20510500000(L4)의 산식상 상위 20510000000이 없음 — 실제 상위 L3가 20501000000으로 채번됨. 정정 권고 열에 표시(TDS·GST 계정이 이 아래)"),
         ("근거 자료", "상세 판단·결산 증거·용어 정의는 검토서(05_CoA검토_RBI보고속성.xlsx) 시트 01~17"),
     ]
@@ -145,6 +145,24 @@ if __name__ == "__main__":
     s2 = wb.create_sheet("통합표준CoA_계정상태표")
     rs = write_status_sheet(s2)
     write_summary(s1, rs)
+    ws = wb.create_sheet("결정사항_모범안")
+    import decisions_model as D
+    ws["A1"] = "결정사항 — 인도지점 모범안 (전 항목 확정)"
+    ws["A1"].font = Font(name=FN, size=14, bold=True)
+    hd = [("ID", 6), ("영역", 10), ("결정 사항", 24), ("검토한 선택지", 26), ("확정안(모범안)", 70), ("근거", 44), ("반영 위치", 20), ("본점 조치 요청", 24)]
+    for i, (h, w) in enumerate(hd, 1):
+        c = ws.cell(row=3, column=i, value=h)
+        c.font = Font(name=FN, size=10, bold=True, color="FFFFFF"); c.fill = IN_HDR; c.border = BOX
+        c.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        ws.column_dimensions[get_column_letter(i)].width = w
+    for r, d in enumerate(D.FINAL, 4):
+        for i, v in enumerate(d[:8], 1):
+            c = ws.cell(row=r, column=i, value=v); c.font = Font(name=FN, size=9, bold=(i == 8 and v != "-")); c.border = BOX
+            c.alignment = Alignment(wrap_text=True, vertical="top")
+            if i == 8 and v != "-":
+                c.fill = PatternFill("solid", fgColor="FCE4D6")
+    ws.freeze_panes = "A4"
+    ws.auto_filter.ref = f"A3:H{3 + len(D.FINAL)}"
     write_glossary(wb.create_sheet("인도용어정의"))
     wb.save(out)
     print("saved", out, len(rs), Counter(x["status"] for x in rs))
