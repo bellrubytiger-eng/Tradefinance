@@ -4,7 +4,7 @@
 const fs = require("fs");
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, ShadingType, AlignmentType,
-  HeadingLevel, TableOfContents, Header, Footer, PageNumber, BorderStyle, LevelFormat, PageBreak, VerticalAlign,
+  HeadingLevel, TableOfContents, Header, Footer, PageNumber, BorderStyle, LevelFormat, PageBreak, VerticalAlign, TableLayoutType,
 } = require("docx");
 
 const D = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
@@ -15,9 +15,11 @@ const NAVY = "1F4E79", ORANGE = "C55A11", GREY = "595959";
 const FILL = { navy: "1F4E79", lnavy: "DDEBF7", lorange: "FCE4D6", lgreen: "E2EFDA", lyellow: "FFF2CC", lgrey: "F2F2F2", white: "FFFFFF" };
 
 // ---------- 기본 요소 ----------
+// 긴 코드 문자열(예: 20150000000·20160000000)이 셀에서 줄바꿈되도록 구분자 뒤에 줄바꿈 기회(ZWSP) 삽입
+const soft = (t) => String(t).replace(/([·\/~,→=+])(?=\S)/g, "$1\u200B").replace(/(\d{11})(?=\d)/g, "$1\u200B");
 function runs(x, base = {}) {
-  if (typeof x === "string") return [new TextRun({ text: x, font: FONT, ...base })];
-  return x.map((s) => (typeof s === "string" ? new TextRun({ text: s, font: FONT, ...base }) : new TextRun({ font: FONT, ...base, text: s.t, bold: s.b, color: s.c, italics: s.i })));
+  if (typeof x === "string") return [new TextRun({ text: soft(x), font: FONT, ...base })];
+  return x.map((s) => (typeof s === "string" ? new TextRun({ text: soft(s), font: FONT, ...base }) : new TextRun({ font: FONT, ...base, text: soft(s.t), bold: s.b, color: s.c, italics: s.i })));
 }
 const P = (x, o = {}) => new Paragraph({ children: runs(x, { size: o.size || 20, color: o.color }), alignment: o.align, spacing: { before: o.before ?? 0, after: o.after ?? 120, line: 300 }, keepNext: o.keepNext });
 const H1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text: t, font: FONT })] });
@@ -47,26 +49,27 @@ function table(headers, rows, widths, o = {}) {
   const total = widths.reduce((a, b) => a + b, 0);
   const hdr = new TableRow({ tableHeader: true, children: headers.map((h, i) => cell(h, widths[i], { fill: o.hfill || NAVY, color: "FFFFFF", bold: true, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER })) });
   const body = rows.map((r, ri) => new TableRow({ cantSplit: true, children: r.map((v, i) => cell(v, widths[i], { fill: (o.zebra && ri % 2) ? FILL.lgrey : (o.colFill && o.colFill[i]) })) }));
-  return new Table({ width: { size: total, type: WidthType.DXA }, columnWidths: widths, rows: [hdr, ...body] });
+  return new Table({ layout: TableLayoutType.FIXED, width: { size: total, type: WidthType.DXA }, columnWidths: widths, rows: [hdr, ...body] });
 }
 function note(x, fill = FILL.lnavy, label = "참고") {
-  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [cell([[{ t: label + "  ", b: true, c: NAVY }, ...(typeof x === "string" ? [x] : x)]], W, { fill, size: 19 })] })] });
+  return new Table({ layout: TableLayoutType.FIXED, width: { size: W, type: WidthType.DXA }, columnWidths: [W], rows: [new TableRow({ children: [cell([[{ t: label + "  ", b: true, c: NAVY }, ...(typeof x === "string" ? [x] : x)]], W, { fill, size: 19 })] })] });
 }
 
 // ---------- 순서도 (표로 그린 도형: 본점 PC에서 편집 가능) ----------
 // item: {box, fill} | {arrow} | {dec, yes, no} | {row:[...], fill}
 function flow(items, width = 7200) {
   const side = Math.round((W - width) / 2);
-  const cols = [side, width, side];
+  const side2 = W - side - width;
+  const cols = [side, width, side2];
   const rows = [];
   for (const it of items) {
     if (it.arrow) {
-      rows.push(new TableRow({ children: [cell("", side, { borders: noBorders }), cell([[{ t: it.arrow === true ? "▼" : "▼  " + it.arrow, c: GREY }]], width, { borders: noBorders, align: AlignmentType.CENTER, size: 16 }), cell("", side, { borders: noBorders })] }));
+      rows.push(new TableRow({ children: [cell("", side, { borders: noBorders }), cell([[{ t: it.arrow === true ? "▼" : "▼  " + it.arrow, c: GREY }]], width, { borders: noBorders, align: AlignmentType.CENTER, size: 16 }), cell("", side2, { borders: noBorders })] }));
     } else if (it.dec) {
       rows.push(new TableRow({ cantSplit: true, children: [
         cell([[{ t: "예 ◀ ", b: true, c: "2E7D32" }, it.yes]], side, { fill: FILL.lgreen, size: 16 }),
         cell([[{ t: "◆ ", c: ORANGE }, { t: it.dec, b: true }]], width, { fill: FILL.lyellow, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER }),
-        cell([[it.no, { t: " ▶ 아니오", b: true, c: "C00000" }]], side, { fill: FILL.lorange, size: 16 }),
+        cell([[it.no, { t: " ▶ 아니오", b: true, c: "C00000" }]], side2, { fill: FILL.lorange, size: 16 }),
       ] }));
     } else if (it.row) {
       const n = it.row.length, w = Math.floor(W / n);
@@ -74,7 +77,7 @@ function flow(items, width = 7200) {
       rows.push(new TableRow({ cantSplit: true, children: it.row.map((t, i) => cell([[{ t, b: i === 0 && it.firstBold }]], widths[i], { fill: it.fill || FILL.lnavy, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER, size: 16 })).concat([]) }));
       continue;
     } else {
-      rows.push(new TableRow({ cantSplit: true, children: [cell("", side, { borders: noBorders }), cell([[{ t: it.box, b: !!it.bold }]], width, { fill: it.fill || FILL.lnavy, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER }), cell("", side, { borders: noBorders })] }));
+      rows.push(new TableRow({ cantSplit: true, children: [cell("", side, { borders: noBorders }), cell([[{ t: it.box, b: !!it.bold }]], width, { fill: it.fill || FILL.lnavy, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER }), cell("", side2, { borders: noBorders })] }));
     }
   }
   // row 항목은 열 수가 달라 별도 표로 분리
@@ -83,13 +86,13 @@ function flow(items, width = 7200) {
 function flowTables(items, width) {
   const out = [];
   let buf = [];
-  const push = () => { if (buf.length) { out.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round((W - (width || 7200)) / 2), width || 7200, W - 2 * Math.round((W - (width || 7200)) / 2)], rows: flow(buf, width) })); buf = []; } };
+  const push = () => { if (buf.length) { out.push(new Table({ layout: TableLayoutType.FIXED, width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round((W - (width || 7200)) / 2), width || 7200, W - Math.round((W - (width || 7200)) / 2) - (width || 7200)], rows: flow(buf, width) })); buf = []; } };
   for (const it of items) {
     if (it.row) {
       push();
       const n = it.row.length, w = Math.floor(W / n);
       const widths = it.row.map((_, i) => (i === n - 1 ? W - w * (n - 1) : w));
-      out.push(new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: widths, rows: [new TableRow({ children: it.row.map((t, i) => cell([[{ t, b: !!it.bold }]], widths[i], { fill: (it.fills && it.fills[i]) || it.fill || FILL.lnavy, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER, size: 16 })) })] }));
+      out.push(new Table({ layout: TableLayoutType.FIXED, width: { size: W, type: WidthType.DXA }, columnWidths: widths, rows: [new TableRow({ children: it.row.map((t, i) => cell([[{ t, b: !!it.bold }]], widths[i], { fill: (it.fills && it.fills[i]) || it.fill || FILL.lnavy, align: AlignmentType.CENTER, valign: VerticalAlign.CENTER, size: 16 })) })] }));
     } else buf.push(it);
   }
   push();
@@ -164,7 +167,7 @@ C.push(CAP("그림 2. 인도 은행의 IFRS 수렴 일정"));
   const mk = (arr, fill, bold, keep) => new TableRow({ cantSplit: true, children: arr.map((t, i) => new TableCell({
     children: [new Paragraph({ keepNext: keep, alignment: AlignmentType.CENTER, children: runs(t, { size: 16, bold }) })],
     width: { size: ws[i], type: WidthType.DXA }, borders, shading: { fill, type: ShadingType.CLEAR, color: "auto" }, margins: { top: 60, bottom: 60, left: 80, right: 80 } })) });
-  return [new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: ws, rows: [mk(yrs, FILL.lorange, true, true), mk(ev, FILL.lnavy, false, false)] })];
+  return [new Table({ layout: TableLayoutType.FIXED, width: { size: W, type: WidthType.DXA }, columnWidths: ws, rows: [mk(yrs, FILL.lorange, true, true), mk(ev, FILL.lnavy, false, false)] })];
 })().forEach((t) => C.push(t));
 C.push(H2("2.4 원장 운영 원칙 — 인도 원장은 인도 GAAP, IFRS는 본점 조정"));
 C.push(CAP("그림 3. 인도 원장과 본점 IFRS 조정의 흐름"));
