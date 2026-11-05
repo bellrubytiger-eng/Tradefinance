@@ -8,6 +8,7 @@ from openpyxl.utils import get_column_letter
 import coa_model as CM
 import coa_review_model as M
 import coa_migration_model as MG
+import lcr_model as L
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "../docs/05_CoA검토_RBI보고속성.xlsx"
 
@@ -93,13 +94,15 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "2차 (2026-11-05) — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "3차 (2026-11-05) — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
      + f". 잔액 있는 {len(nz)}개 중 {nz_fix}개는 0930 대응을 고쳐야 함 (시트 09, 대차 검증 포함)"),
-    ("발견 1 (0930 GBS열 오류)", "0930의 GBS코드 열이 현행 인도 계정을 잘못 가리킴: 저축(20121001)→법인 요구불, 정기(20122001)→법인 정기 전액, RD→AOB, 비거주자 예금→은행 예금, "
-     "GST 매출→원천세, TDS 미수→FX SPOT 미수, 비용 미지급→신용카드, 국내송금 미지급→AOB, 법정·기타준비금 뒤바뀜, 투자 Sch.8 분류를 순서대로 대응(주식→외국정부채), 통화·금리스왑 뒤바뀜"),
+    ("발견 1 (0930 GBS열 오류)", "0930 GBS코드 열이 현행 인도 계정을 엉뚱한 계정에 대응시킨 사례(✗ = 0930이 가리킨 계정, → = 권고 이행 대상): "
+     "개인 저축 20121001 ✗법인 요구불 → 개인 저축 L5 20150300100 / RD 20124001 ✗AOB(NH올원뱅크) 예금 → RD L5 20160300600 / "
+     "GST 매출 ✗원천세 → GST 세목 L5 / TDS 미수 ✗FX SPOT 미수(자금) → TDS 미수 10810200000 / Legal Reserve ✗기타준비금 → Statutory Reserve 31110300000 / "
+     "비용 미지급 ✗신용카드, 국내송금 미지급 ✗AOB / 투자 Sch.8 분류 순서 대응(주식 ✗외국정부채) / 통화·금리스왑 뒤바뀜"),
     ("발견 2 (금액 큼)", "은행 정기예치 ₹208.9 crore(총자산 35%)과 그 이자 ₹6.59 crore·미수 ₹3.74 crore이 0930에서 'CD PURCHASE'(유가증권 성격)에 매핑 → DUE FROM BANKS ON TIME(Sch.7)으로 정정 권고(E1)"),
     ("발견 3 (ECL)", "ECL 명세서가 '미사용'이라 한 10690003~5는 현행 BS에 증권·사모사채·콜론 충당금으로 존재. 부외 ECL 충당부채(2096 그룹)는 0930에 이미 있음(20910000000~20930000000). "
      "11자리로 Stage 1·2·3 L5, 전환조정 자본, EIR 조정만 신설 (시트 10)"),
@@ -108,6 +111,8 @@ summary = [
     ("유지되는 1차 결론", "Sch.3 L5 순도(저축 분리), PSL·BSR·LCR 등은 속성, INR 결제계좌 L5, 에스크로 3개 L5, TDS 신고서별(24Q·26Q·27Q·27EQ) L5 + 조문은 속성(2026.4.1 신법 조문 변경에도 GL 불변)"),
     ("검토의견 건수", " · ".join(f"{k} {v}" for k, v in kinds.items()) + f" / 이번 차수 신규 {len(MG.NEW2)} / 속성 {len(M.ATTRS)}개 / 보고서 {len(M.RETURNS)}종"),
     ("표시", "주황=신규, 노랑=변경·확인, 분홍=0930 대응 수정, 파랑=속성, 회색=비활성·철회·미매핑 / VERIFY=Y(빨강)는 규정 확인 필요"),
+    ("3차 (LCR·정정)", "은행 정기예치는 은행/비은행만 GL(10106010000), 상대은행 유형·만기·운영 여부는 속성. LCR 분류(개인·소규모사업자·비금융법인·기타법적실체·금융기관·본점)는 "
+     "GL이 아닌 계좌 속성 + 일자 유효 파라미터(TB_LCR_*) (시트 11). TDS 미수는 10810200000 신설(선납법인세와 분리). 법정준비금 = Statutory Reserve(31110300000)"),
     ("다음 단계", "시트 08 결정사항 중 '권고'·'미결' 확정 → coa_model.py 반영, 이행표(시트 09)를 본점 CoA 담당에 전달, ECL·RWA 개발명세의 계정코드를 11자리로 교체"),
 ]
 ws = wb.create_sheet("00 요약")
@@ -258,6 +263,48 @@ for r, n in enumerate(MG.NEW2, st2 + 2):
         c = ws.cell(row=r, column=i, value=v); c.font = Font(name=F, size=9); c.alignment = WRAP; c.border = BOX
         c.fill = PatternFill("solid", fgColor=FILL["신규"])
 
-wb.move_sheet("08 결정사항", offset=2)
+# ---- 11 LCR -----------------------------------------------------------------------
+def section(ws, start, title, headers, rows, color_col=None, verify_col=None):
+    ws.cell(row=start, column=1, value=title).font = Font(name=F, size=12, bold=True)
+    for i, h in enumerate(headers, 1):
+        c = ws.cell(row=start + 1, column=i, value=h)
+        c.font = Font(name=F, size=10, bold=True, color="FFFFFF"); c.fill = HDR; c.border = BOX
+        c.alignment = Alignment(wrap_text=True, vertical="center")
+    for r, row in enumerate(rows, start + 2):
+        for i, v in enumerate(row, 1):
+            c = ws.cell(row=r, column=i, value=v)
+            red = verify_col is not None and i - 1 == verify_col and v == "Y"
+            c.font = Font(name=F, size=9, bold=red, color="C00000" if red else "000000")
+            c.alignment = WRAP; c.border = BOX
+            if isinstance(v, (int, float)) and not isinstance(v, bool):
+                c.number_format = '#,##0'
+            if color_col is not None and str(row[color_col]).startswith("GL"):
+                c.fill = PatternFill("solid", fgColor=FILL["신규"])
+            elif color_col is not None and row[color_col] == "속성":
+                c.fill = PatternFill("solid", fgColor=FILL["속성전환"])
+    return start + len(rows) + 3
+
+
+ws = wb.create_sheet("11 LCR분류·파라미터")
+ws["A1"] = "LCR 대비 — 은행/고객 구분, RBI 상대방 분류, 유출·유입률 파라미터"
+ws["A1"].font = Font(name=F, size=14, bold=True)
+ws["A2"] = ("계정은 재무제표 줄(은행분/기타분, 은행 예치/기타)까지만 나누고, 개인·소규모사업자·비금융법인·금융기관 및 안정/불안정·운영예금은 고객·계좌 속성으로 "
+            "보고일마다 산출. 비율은 일자 유효 파라미터(TB_LCR_*)로 관리 — VERIFY=Y 값은 현행 RBI Master Direction으로 확정 후 적재.")
+ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP
+ws.merge_cells("A2:H2"); ws.row_dimensions[2].height = 42
+r = 4
+r = section(ws, r, "① 계정 vs 속성", ["대상", "판정", "계정·속성", "이유"], L.GL_DECISION, color_col=1)
+r = section(ws, r, "② RBI LCR 상대방 분류 (유출)", ["코드", "대분류", "정의", "판정 규칙(속성)", "유출률", "디지털 가산", "비고", "VERIFY"], L.CPTY_CLASS, verify_col=7)
+r = section(ws, r, "③ 고객 구성 → 기본 분류 (TB_LCR_CPTY_MAP 초기값)", ["constitution", "기본 분류", "비고", "VERIFY"], L.CONSTITUTION_MAP, verify_col=3)
+r = section(ws, r, "④ 유입률", ["대상", "계정", "유입률", "비고", "VERIFY"], L.INFLOW, verify_col=4)
+r = section(ws, r, "⑤ 난외 유출", ["대상", "계정", "유출률", "비고", "VERIFY"], L.OFFBS, verify_col=4)
+r = section(ws, r, "⑥ HQLA", ["항목", "계정", "수준", "헤어컷·한도", "비고", "VERIFY"], L.HQLA, verify_col=5)
+r = section(ws, r, "⑦ 파라미터 (TB_LCR_THRESHOLD)", ["코드", "의미", "초기값", "단위", "근거", "VERIFY"], L.PARAMS, verify_col=5)
+r = section(ws, r, "⑧ 파라미터·스냅샷 테이블", ["테이블", "키", "주요 컬럼", "용도"], L.MASTERS)
+r = section(ws, r, "⑨ 현행 잔액(2026-07-07) 적용 예", ["항목", "계정(현행 → 11자리)", "잔액(INR)", "LCR 처리", "추가로 필요한 데이터"], L.CURRENT)
+for i, w in enumerate([30, 22, 40, 50, 12, 16, 30, 8], 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
+
+wb.move_sheet("08 결정사항", offset=3)
 wb.save(OUT)
 print("saved", OUT)

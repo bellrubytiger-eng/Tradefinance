@@ -159,6 +159,19 @@ rv("매핑", "20140200000", 4, "20140000000", "DUE FROM OVERSEA BANKS ON DEMAND 
 rv("매핑", "10107090000", 4, "10107000000", "CCP SWAP MARGIN DEPOSIT → CCIL MARGIN / DEFAULT FUND", "CCIL 증거금·결제기금",
    "인도 CCP(CCIL: 외환·TREPS·국채 결제) 증거금을 통합 CCP 계정에 매핑. 신규 계정 불필요, 속성 ccp_segment", "Sch.11 또는 Sch.7(확인), LCR(담보제공)", "Y")
 
+rv("변경", "10106010000", 4, "10106000000", "TERM DEPOSITS PLACED WITH BANKS IN INDIA", "인도 내 은행 정기예치",
+   "(3차) 은행 정기예치 ₹208.9 crore 이행 대상. Sch.7 I(i)(b). 은행 상대 예치만 이 계정 — 법인·기타 대상 예치는 Sch.7이 아니고 대출 성격이므로 인도 미사용. "
+   "상대은행 유형(SCB·외국은행 지점·협동조합 등)·만기·운영예치 여부는 LCR 유입률·ECL 범주(vi)·RWA(은행 익스포저) 속성", "Sch.7, Form A(은행시스템 자산), LCR 유입, ECL, RWA")
+rv("신규", "10107010400", 5, "10107010000", "TREPS / MONEY MARKET LENDING - OTHER INSTITUTIONS (CCIL)", "TREPS 등 기타기관 콜론(선택)",
+   "(3차) Sch.7 '콜·단기 — (b) 기타기관'. CCIL TREPS를 운용할 때만 신설", "Sch.7, LCR 유입")
+rv("비활성", "10107050100", 5, "10107050000", "CD PURCHASE - DOMESTIC BANKS", "CD 매입(인도 내 은행)",
+   "(3차) 본점 매핑은 '외화정기예치금'이나 영문명은 CD. 인도에서 CD 매입은 투자(Sch.8, 발행자=은행, AC/AFS) → 투자 계정 사용, 은행 예치는 10106010000으로 일원화", "Sch.8")
+rv("변경", "10810100000", 4, "10810000000", "ADVANCE INCOME TAX (PREPAID)", "선납법인세(Advance Tax)", "(3차) 선납 분기납부분만. 원천징수당한 TDS는 10810200000", "Sch.11")
+rv("신규", "10810200000", 4, "10810000000", "TDS RECEIVABLE (TAX DEDUCTED AT SOURCE BY PAYERS)", "TDS 미수(원천징수당한 세액)",
+   "(3차) 현행 TDS Receivable·Prepaid TDS 이행. 26AS/AIS 대사 → 법인세 신고 시 공제. TDS 예수금(20510400xxx, 당행이 원천징수한 부채)과 반대 방향", "Sch.11, 법인세 신고")
+rv("비활성", "20180000000", 3, "20100000000", "AOB DEPOSITS (NH ALL ONE BANK)", "AOB(NH올원뱅크) 예금",
+   "AOB = NH농협 모바일뱅킹 '올원뱅크'(0930 본점 매핑명 '올원뱅크(국외정산대금)'). 인도지점 미취급 → 1차부터 비활성. 현행 RD 계정이 여기에 잘못 대응돼 있음", "")
+
 # ---- 3-2 여신 --------------------------------------------------------------
 rv("신규", "10330304000", 5, "10330300000", "CASH CREDIT / OVERDRAFT", "당좌대월(CC/OD)",
    "Sch.9 A(ii). 통합 CoA에 CC/OD 자산계정 없음(이자수익 40110100000만 존재). 예금명세서 LN-01 제안코드 10630001*은 0930 GBS코드에서 "
@@ -247,8 +260,9 @@ rv("신규", "10490930000", 4, "10490000000", "AMOUNT RECEIVABLE FROM DEAF (CLAI
    "DEAF 이전 후 예금주에게 지급한 금액을 RBI에 청구. 이전 자체는 예금 직접 차감", "DEAF 월보, Sch.11")
 
 # ---- 3-6 자본·충당금 ----------------------------------------------------------
-rv("변경", "31110300000", 4, "31110000000", "STATUTORY RESERVE", "법정준비금",
-   "인도 영업 순이익의 25% 적립(외국은행 지점 포함) 확인 후 표시명 변경", "Sch.2", "Y")
+rv("변경", "31110300000", 4, "31110000000", "STATUTORY RESERVE", "법정준비금(Statutory Reserve)",
+   "통합명 RETAINED PROFIT(본점 매핑 '이익준비금' = 한국 상법상 법정적립금) → 인도 표시명 STATUTORY RESERVE(BR Act s.17, RBI는 외국은행 지점도 순이익 25% 이상 적립 요구). "
+   "현행 Legal Reserve(28810004)·Statutory Reserves(30110011)를 이리로. 기타준비금은 31110400000", "Sch.2", "Y")
 rv("신규", "31110500000", 4, "31110000000", "CAPITAL RESERVE", "자본준비금", "HTM 매각익 등 적립", "Sch.2", "Y")
 rv("신규", "31110600000", 4, "31110000000", "INVESTMENT FLUCTUATION RESERVE (IFR)", "투자변동준비금", "AFS·HFT 보유분 기준 적립", "Sch.2, CRAR", "Y")
 rv("신규", "31110700000", 4, "31110000000", "REMITTABLE SURPLUS RETAINED IN INDIA FOR CRAR", "자본비율용 인도 유보 송금가능잉여금",
@@ -378,8 +392,12 @@ ATTRS = [
     ("예금", "product_type / residency / currency", "SB·CA·TD·RD / RES·NRE·NRO·FCNR·RFC·EEFC·SNRR / 통화", "계좌", "GL 결정(시트 4 매핑)", "예금명세서 16·17", "예금명세서 17", "N"),
     ("예금", "nr_subtype", "NRI·PIO·FN", "계좌", "NRD-CSR, 외국인 비거주자 출국 6개월 규칙", "FEMA Deposit Regs", "신규", "N"),
     ("예금", "sb_demand_portion", "저축예금 요구불·정기 부분 산정비율(행태 분석)", "GL", "Form A(저축의 요구불/정기 분할)", "RBI Act s.42", "신규", "Y"),
-    ("예금", "lcr_depositor_class / operational_flag", "RETAIL·SMALL_BUSINESS·NFC·SOVEREIGN·PSE·FINANCIAL·BANK / 운영예금", "계좌",
-     "LCR(BLR-1) 유출률", "Basel III LCR", "예금명세서 23(에스크로만)", "N"),
+    ("예금", "lcr_class / stable_amt / less_stable_amt", "RT_S·RT_L·SB_S·SB_L·NFC_OP·NFC_NOP·OLE_NF·FI_OP·FI_NOP·IG_HO·TD_EXCL (시트 11)", "계좌(보고일별)",
+     "LCR(BLR-1) 유출률. 고객 분류 + 부보 + 관계로 보고일마다 산출, 스냅샷 저장", "RBI LCR 지침", "신규(예금명세서는 에스크로만)", "Y"),
+    ("예금", "operational_flag / operational_agreement_ref / operational_amt", "Y/N, 약정번호, 운영 인정액", "계좌", "LCR 25% 적용분", "RBI LCR 지침", "신규", "Y"),
+    ("예금", "withdrawable_30d", "Y/N (callability·잔존만기·중도해지 벌칙에서 산출)", "계좌", "LCR 유출 제외 판정", "RBI LCR 지침", "신규(callability 태그 연계)", "Y"),
+    ("고객", "is_financial / fin_entity_type", "Y/N, BANK·NBFC·INSURER·MF·PENSION·OTHER_FI", "고객", "LCR 금융기관 100%, ECL 범주(vi), LEF", "RBI LCR·ECL", "신규", "N"),
+    ("고객", "relationship_start_dt / transactional_acct_yn", "최초 거래일, 급여·자동이체 등 거래계좌", "고객/계좌", "소매 안정 판정", "RBI LCR 지침", "신규", "N"),
     ("예금", "digital_enabled_flag", "인터넷·모바일뱅킹 이체 가능 여부", "계좌", "LCR 소매예금 추가 유출률(2.5%p)", "LCR 개정(2026.4.1 시행)", "신규", "Y"),
     ("예금", "dicgc_insurable / insured_amt", "부보대상 여부, 예금자별 한도(₹5 lakh) 내 금액", "고객", "DICGC 보험료 기준, 부보예금 공시", "DICGC Act", "부분", "N"),
     ("예금", "original_maturity / residual_bucket / size_band", "원만기, 잔존만기 구간, 금액구간(₹3crore Bulk)", "계좌", "BSR-2, ALM(SLS), Form A 면제항목, NRD-CSR", "-", "부분", "N"),
@@ -506,7 +524,9 @@ DECISIONS = [
     ("D5", "정상자산 충당금", "ECL Directions 2026(2027-04-01) 기준 Stage별", "Stage별 L5 3개 + 부외 ECL은 0930 기존 계정 + 전환조정 자본(시트 10)", "결정(2026-11-05)"),
     ("D6", "INR 결제계좌 L5", "① L5 신설 ② 통화+속성만", "① (하위원장 대사·Form A 차감 근거 명확)", "권고"),
     ("D7", "규정 확인(VERIFY=Y)", "-", "PSL 목표, Form A 은행시스템 범위, LBS, 법정준비금·IFR, PSLC 손익 표시, s.11(2)(b) 예치 계좌, ECL 적용 범위(은행예치·HTM)", "미결"),
-    ("E1", "은행 정기예치 ₹208.9 crore 계정", "① DUE FROM BANKS ON TIME(10106010000) ② 0930대로 CD PURCHASE", "① — Sch.7 '기타예금'. 이자·미수이자도 같이 재매핑", "권고"),
+    ("E1", "은행 정기예치 ₹208.9 crore 계정", "① DUE FROM BANKS ON TIME(10106010000) ② 0930대로 CD PURCHASE", "① — Sch.7 '은행 기타예금'. 은행/비은행은 GL, 상대은행 유형·만기·운영 여부는 LCR·ECL 속성. CD 매입은 투자 계정", "권고"),
+    ("L1", "LCR 분류 방식", "① GL(예금 L5를 개인/소규모/법인/금융으로) ② 고객·계좌 속성 + 일자 유효 파라미터", "② — Sch.3에 없는 구분이고 합산·부보·운영 여부로 보고일마다 변함(시트 11)", "권고"),
+    ("L2", "LCR 파라미터 값", "-", "유출·유입률, 소규모사업자 한도, 디지털 가산, HQLA 인정비율을 현행 RBI Master Direction 원문으로 확정해 TB_LCR_* 적재", "미결"),
     ("E2", "0930 GBS코드 열 정정", "-", "시트 09 '수정' 57건을 본점 CoA 담당에 전달(8자리→11자리 이행표의 원본)", "요청"),
     ("E3", "ECL 명세서 신규코드", "① 11자리로 신설 ② 8자리 10690003~5", "① — 8자리 10690003~5는 현행 증권·사모사채·콜론 충당금이 이미 사용 중", "권고"),
     ("E4", "EIR 조정계정(10370300000)", "① 신설 ② LOF·LOC 상각만", "LOF·LOC 잔액이 0이면 ②로 시작 가능. ECL팀 확인", "미결"),
