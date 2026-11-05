@@ -123,6 +123,11 @@ def rows():
     fix = {}
     for c, m in CM.FIX:
         fix.setdefault(c, []).append(m)
+    for a in CM.BASE:
+        p = parent_of(a["code"])
+        if p and p not in BASE_BY:
+            fix.setdefault(a["code"], []).append(
+                f"코드 구조: 산식상 상위 {p}가 없음(실제 상위 L3는 20501000000 OTHER LIABILITIES). L3 코드를 20510000000으로 바꾸거나 하위를 2050xxxxxxx로 재채번 요청")
     live = _live_index()
     lvl = {}
     out = []
@@ -164,7 +169,40 @@ def rows():
     return out
 
 
+def level_of(code):
+    """본점 Level 산식과 동일: 끝에서부터 '00'이 아닌 첫 구간 (1+2+2+2+2+2)."""
+    segs = [code[0]] + [code[i:i + 2] for i in range(1, 11, 2)]
+    n = 6
+    while n > 1 and segs[n - 1] == "00":
+        n -= 1
+    return n
+
+
+def parent_of(code):
+    lv = level_of(code)
+    k = 1 + 2 * (lv - 2)
+    return code[:k].ljust(11, "0") if lv > 1 else None
+
+
+def check(rs=None):
+    """(우리 신설 오류, 0930 원안 구조 오류). Level은 본점 산식, 상위는 산식상 상위 코드 존재 여부."""
+    rs = rs or rows()
+    codes = {r["code"] for r in rs}
+    ours, base = [], []
+    for r in rs:
+        tgt = base if r["code"] in BASE_BY else ours
+        if r["lv"] != level_of(r["code"]):
+            tgt.append(f'Level 불일치 {r["code"]} 선언 {r["lv"]} / 산식 {level_of(r["code"])}')
+        p = parent_of(r["code"])
+        if p and p not in codes:
+            tgt.append(f'상위 없음 {r["code"]} → 산식상 상위 {p}')
+    return ours, base
+
+
 if __name__ == "__main__":
+    o, b = check()
+    print("신설 계정 Level·상위:", o or "오류 없음")
+    print("0930 원안 구조:", b)
     from collections import Counter
     rs = rows()
     print(len(rs), Counter(r["status"] for r in rs))
