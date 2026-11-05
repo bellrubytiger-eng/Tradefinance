@@ -279,18 +279,26 @@ const BICDIR = {
   MMBKMMMY:{n:"[Myanmar Bank]",t:"YANGON",c:"MM",rma:1,hr:1,ssi:{USD:["CORRSGSG","[SG correspondent], Singapore","SG-4410"]}}};
 const BENPRESET = [["KRBAKRSE","Korea Bank A · RMA·SSI 있음 → Cover 후보"],["KRBBKRSE","Korea Bank B · RMA 없음 → Serial(중계 1)"],["AEBKAEAD","UAE Bank A · 코레스 = 당행 Nostro → Serial(중계 없음)"],
   ["NOSTUS33","USD Nostro 은행 자체 → Direct"],["OURBKRSE","본점 서울 → Direct(본지점)"],["SRVBAEAD","UAE Bank B · INR SRVA → Vostro 입금"],["CABKCATT","Canada Bank · RMA 없음 → Serial"],["MMBKMMMY","고위험국 은행 → Cover 금지"],["","BIC 없음 · 청산코드(ABA 등)로 지정"]];
-const RTG = {coverOn:true, coverMin:100000, hrBlock:true};    // ROUTE_COVER_ENABLED / MIN_USD / HIGH_RISK_BLOCK
+// ROUTE_COVER_ENABLED / ROUTE_COVER_MIN_USD / ROUTE_COVER_MIN_CCY(통화별 예외) / HIGH_RISK_BLOCK — PM01에서 변경(적용시작일·Maker-Checker)
+const RTG_DEF = {hist:[{eff:"2026-04-01",coverOn:true,coverMin:100000,ccy:{},hrBlock:true,rsn:"최초 설정",mk:"FX01",ck:"FXM1",sts:"APPROVED"}]};
+const RTG = JSON.parse(JSON.stringify(RTG_DEF));
+try{ const sv=JSON.parse(localStorage.getItem("gbs.rtg")||"null"); if(sv&&Array.isArray(sv.hist)&&sv.hist.length) RTG.hist=sv.hist; }catch(e){}
+function rtgSave(){ try{ localStorage.setItem("gbs.rtg",JSON.stringify(RTG)); }catch(e){} }
+// 거래일에 유효한 승인값 (R-RTG-09)
+function rtgAt(d){ return RTG.hist.filter(x=>x.sts==="APPROVED"&&x.eff<=d).sort((a,b)=>a.eff<b.eff?1:-1)[0]||RTG_DEF.hist[0]; }
+function coverThr(ccy,d){ const h=rtgAt(d), c=h.ccy&&h.ccy[ccy]; return c?{ccy,amt:c,src:`${ccy} 통화별 예외`}:{ccy:"USD",amt:h.coverMin,src:"기본값, USD 환산"}; }
 const RM = {VOSTRO:["Vostro 입금","INR · 당행 장부","pacs.008 1건 (INGA)"],DIRECT:["Direct","수취은행 = Nostro","pacs.008 1건 (MT103)"],DIRECT_HO:["Direct 본지점","수취은행 = 본점","pacs.008 1건 · 을A 결제"],
   COVER:["Cover","직접 통지 + 별도 자금","pacs.008 + pacs.009 COV (MT103 + MT202 COV)"],SERIAL:["Serial","Nostro 경유 연쇄","pacs.008 연쇄 (MT103 Serial)"]};
 
 function routeEval(x){
   const n=NOSTRO[x.ccy], b=BICDIR[x.bic], ssi=b&&b.ssi&&b.ssi[x.ccy], vos=b&&b.vos&&b.vos[x.ccy], path=[], opt={};
-  const isNos=!!(n&&b&&x.bic===n.bic&&!n.ho), isHO=!!(b&&b.own), inr=x.ccy==="INR", big=x.usd>=RTG.coverMin||x.urgent;
+  const pol=rtgAt(x.td||BIZ), thr=coverThr(x.ccy,x.td||BIZ), cmp=thr.ccy==="USD"?x.usd:x.amt;
+  const isNos=!!(n&&b&&x.bic===n.bic&&!n.ho), isHO=!!(b&&b.own), inr=x.ccy==="INR", big=cmp>=thr.amt||x.urgent;
   opt.VOSTRO = vos?[1,`${b.n}의 ${vos[1]} ${vos[0]} (당행 보유)`]:[0,inr?"수취은행이 당행에 INR Vostro 없음":"INR 송금에만 해당"];
   opt.DIRECT = inr?[0,"INR은 Vostro 경로만"]:isNos?[1,`수취은행 = ${x.ccy} Nostro`]:[0,"수취은행이 당행 Nostro가 아님"];
   opt.DIRECT_HO = inr?[0,"INR은 Vostro 경로만"]:isHO?[1,"수취은행 = 본점 (을A 본지점 결제)"]:[0,"수취은행이 본점·당행 점포가 아님"];
-  opt.COVER = inr?[0,"INR은 Cover 불가"]:!RTG.coverOn?[0,"Cover 미사용 (파라미터)"]:!b?[0,"수취은행 BIC가 필요"]:(isNos||isHO)?[0,"Direct 대상"]:!b.rma?[0,"RMA 없음 → 수취은행에 직접 송신 불가"]:
-    !ssi?[0,`수취은행 ${x.ccy} SSI 없음`]:ssi[0]===n.bic?[0,"수취은행 코레스 = 당행 Nostro → Serial 1건으로 충분"]:(b.hr&&RTG.hrBlock)?[0,"고위험국: 지급투명성 위해 Serial만"]:[1,`RMA ✓ · SSI ${ssi[0]} ✓`];
+  opt.COVER = inr?[0,"INR은 Cover 불가"]:!pol.coverOn?[0,"Cover 미사용 (PM01 정책)"]:!b?[0,"수취은행 BIC가 필요"]:(isNos||isHO)?[0,"Direct 대상"]:!b.rma?[0,"RMA 없음 → 수취은행에 직접 송신 불가"]:
+    !ssi?[0,`수취은행 ${x.ccy} SSI 없음`]:ssi[0]===n.bic?[0,"수취은행 코레스 = 당행 Nostro → Serial 1건으로 충분"]:(b.hr&&pol.hrBlock)?[0,"고위험국: 지급투명성 위해 Serial만"]:[1,`RMA ✓ · SSI ${ssi[0]} ✓`];
   opt.SERIAL = inr?[0,"INR 해외은행은 Vostro 경로만"]:!n?[0,"해당 통화 Nostro 없음"]:!(b||x.clr)?[0,"수취은행 BIC 또는 청산코드 필요"]:(isNos||isHO)?[1,"가능하지만 Direct가 더 단순"]:
     [1,ssi&&ssi[0]!==n.bic?`중계 ${ssi[0]} 경유`:ssi?"Nostro 안에서 대체 (중계 없음)":"Nostro가 청산망으로 지급"];
   const Q=(q,a,k,r)=>path.push([q,a,k,r]);
@@ -302,11 +310,11 @@ function routeEval(x){
       Q("수취은행과 RMA(지급전문 송신 권한)가 있는가?", b?(b.rma?"예":"아니오"):"BIC 없음", b&&b.rma?"ok":"warn", b&&b.rma?"직접 송신 가능":"수취은행에 직접 보낼 수 없음 → Serial");
       Q(`수취은행의 ${x.ccy} 결제 코레스(SSI)는?`, ssi?ssi[0]:"없음", ssi?"ok":"warn", ssi?(ssi[0]===n.bic?"당행 Nostro와 같음 → 중계 없이 Serial":"Cover 가능 · Serial이면 중계은행"):"Nostro가 경로 결정");
       Q("수취은행 국가가 고위험국인가?", b&&b.hr?"예":"아니오", b&&b.hr?"err":"", b&&b.hr?"Cover 금지 (FATF R.16)":"");
-      if(opt.COVER[0]) Q(`USD ${fmtC("USD",x.usd,0)} ≥ ${fmtC("USD",RTG.coverMin,0)} 또는 긴급인가?`, big?"예":"아니오", big?"ok":"", big?"→ COVER 권장 (빠름·공제 없음)":"→ SERIAL 권장 (비용)");
+      if(opt.COVER[0]) Q(`${thr.ccy} ${fmtC(thr.ccy,cmp,0)} ≥ 기준 ${thr.ccy} ${fmtC(thr.ccy,thr.amt,0)} (${thr.src}) 또는 긴급인가?`, big?"예":"아니오", big?"ok":"", big?"→ COVER 권장 (빠름·공제 없음)":"→ SERIAL 권장 (비용)");
     }
   }
   const rec=opt.VOSTRO[0]?"VOSTRO":opt.DIRECT[0]?"DIRECT":opt.DIRECT_HO[0]?"DIRECT_HO":(opt.COVER[0]&&big)?"COVER":opt.SERIAL[0]?"SERIAL":null;
-  return {n,b,ssi,vos,opt,path,rec};
+  return {n,b,ssi,vos,opt,path,rec,thr};
 }
 
 function routeBuild(x,R,m){
@@ -402,7 +410,7 @@ function routeRender(){
     $("#rovr").innerHTML=""; $("#rtab").innerHTML=""; stepMark("st4","err"); stepMark("st3",x.bic||x.clr?"warn":"err"); return; }
   const o=routeBuild(x,R,m); RT.last.o=o; RT.last.m=m;
   const pair=o.msgs.map(q=>`<b>${q.k}</b> → ${q.to}`).join(" + ");
-  $("#rrec").innerHTML=`<div class="msg ${m===R.rec?"ok":"warn"}">${m===R.rec?"시스템 권장":"수동 선택"}: <b>${RM[m][0]}</b> · ${pair} · 결제 ${o.sttl} · 결제일 ${vd.d}${vd.late?` (마감 ${vd.cut} IST 경과 → 익영업일)`:` (마감 ${vd.cut} IST)`}</div>`;
+  $("#rrec").innerHTML=`<div class="msg ${m===R.rec?"ok":"warn"}">${m===R.rec?"시스템 권장":"수동 선택"}: <b>${RM[m][0]}</b> · ${pair} · 결제 ${o.sttl} · 결제일 ${vd.d}${vd.late?` (마감 ${vd.cut} IST 경과 → 익영업일)`:` (마감 ${vd.cut} IST)`}${R.opt.COVER[0]?` · Cover 기준 ${R.thr.ccy} ${fmtC(R.thr.ccy,R.thr.amt,0)} <a href="#pm01" class="flink">변경</a>`:""}</div>`;
   $("#rovr").innerHTML = m!==R.rec ? `<div class="grid" style="--c:3">${F({l:"변경 사유",id:"rrsn",t:"sel",rq:1,o:[["","선택"],["CUST","고객 지정 경로"],["SPEED","긴급·당일 도착"],["COST","중계수수료 절감"],["CORR","코레스·수취은행 지시"],["OTH","기타(서술)"]],v:RT.rsn||""})+F({l:"상세",id:"rrsd",s:2,v:RT.rsd||""})}</div><div class="msg warn">권장(${RM[R.rec][0]})과 다른 경로 → Checker 승인 필요 <span class="rule">R-RTG-05</span></div>` : "";
   if($("#rrsn")){ $("#rrsn").addEventListener("change",()=>{ RT.rsn=val("rrsn"); }); $("#rrsd").addEventListener("input",()=>{ RT.rsd=val("rrsd"); }); }
   stepMark("st3","ok"); stepMark("st4",m===R.rec?"ok":"warn");
@@ -417,7 +425,7 @@ function routeRender(){
         COVER:"수취은행에는 고객 정보(pacs.008)를 직접 보내고, 자금은 당행 Nostro가 수취은행 코레스로 따로 보냅니다(pacs.009 COV). 수취은행은 정보를 먼저 받아 빠르지만, 자금 도착을 확인한 뒤 입금합니다.",
         SERIAL:"같은 전문(pacs.008)이 Nostro → (중계은행) → 수취은행 순서로 전달되며 각 단계에서 자금도 함께 이동합니다. 정보와 자금이 한 줄로 움직여 단순하지만, SHA·BEN이면 중계은행 수수료가 공제될 수 있습니다."}[m]}</div>`;
   } else if(RT.tab==="why"){
-    h=TABLE(["#","확인 항목","답","판정"],R.path.map((p,i)=>TR([`Q${i+1}`,p[0],p[2]?pill(p[1],p[2]):p[1],p[3]])))+`<div class="msg info">판정 결과는 TB_REMIT_ROUTE.DECISION_PATH에 스냅샷으로 저장됩니다. Cover 기준금액 USD ${fmtC("USD",RTG.coverMin,0)} (ROUTE_COVER_MIN_USD)</div>`;
+    h=TABLE(["#","확인 항목","답","판정"],R.path.map((p,i)=>TR([`Q${i+1}`,p[0],p[2]?pill(p[1],p[2]):p[1],p[3]])))+`<div class="msg info">판정 결과와 적용 기준(${R.thr.ccy} ${fmtC(R.thr.ccy,R.thr.amt,0)}, ${R.thr.src})은 TB_REMIT_ROUTE에 스냅샷으로 저장됩니다. 기준 변경: <a href="#pm01" class="flink">PM01 Route Policy</a></div>`;
   } else if(RT.tab==="msg"){
     h=o.msgs.map((q,i)=>`<div class="mtw"><div><h5>${o.msgs.length>1?["① 먼저 송신","② 이어서 송신"][i]+" · ":""}${q.k} → ${q.to} (MX 주요 요소)</h5>${TABLE(["요소","의미","MT","값"],Object.entries(q.f).map(([k,v])=>TR([`<code>${k}</code>`,(MTF[k]||[k])[0],(MTF[k]||["",""])[1],v])))}</div><div><h5>${q.mt} 대응 (참고)</h5><pre class="mt">${mtText(x,o,q,i).replace(/</g,"&lt;")}</pre></div></div>`).join("")+
       (m==="COVER"?`<div class="msg warn">두 전문은 같은 UETR(${x.uetr.slice(0,8)}…)을 쓰고, pacs.009 COV를 먼저(또는 동시) 송신합니다. COV에는 원 고객정보(UndrlygCstmrCdtTrf)가 반드시 들어갑니다. <span class="rule">R-RTG-04</span></div>`:"")+
@@ -1010,6 +1018,36 @@ S.sw12 = {id:"SW12", t:"SWIFT Compose", g:"SWIFT", tag:"신규", d:"메시지 �
     $("#mtp").innerHTML=`<div class="mtw"><div><h5>{2:I${t.slice(2)}${val("rcv")}XXXXN}</h5><pre class="mt">{4:\n${body}\n-}</pre></div><div>${m.map(([k,x])=>`<div class="msg ${k}">${x}</div>`).join("")||`<div class="msg ok">형식 검증 통과 → Checker 승인 후 송신</div>`}</div></div>`; },
   chk(){ this.calc(); return show($("#mtp .msg.err")?[["err","메시지 검증 오류"]]:[["ok","작성 완료 · VERIFY 상태로 SW11 큐 등록 (2인 승인)"]]); }};
 
+S.pm01 = {id:"PM01", t:"Route Policy (Cover 기준)", g:"SWIFT", tag:"신규", d:"당발 결제경로 판정 기준을 관리합니다. Cover 권장 기준금액은 기본값(USD 환산)과 통화별 예외(거래통화 금액)로 바꿀 수 있습니다. 변경은 적용시작일 기준 이력으로 쌓이고 Maker 등록 → Checker 승인 후 효력이 생깁니다. 송금은 거래일에 유효한 값을 쓰고 적용값을 스냅샷으로 남깁니다.",
+  CC:["USD","EUR","JPY","GBP","AED","KRW"],
+  html(){ const h=rtgAt(BIZ), ex=e=>Object.entries(e||{}).map(([k,v])=>k+" "+fmtC(k,v,0)).join(" · ");
+    return SEC("현재 적용값 ("+BIZ+" 기준)",`<div class="kpis"><div class="kpi"><span>Cover 사용</span><b>${h.coverOn?"Y":"N"}</b></div><div class="kpi"><span>기본 기준 (USD 환산)</span><b>${fmtC("USD",h.coverMin,0)}</b></div><div class="kpi"><span>통화별 예외</span><b style="font-size:14px">${ex(h.ccy)||"없음"}</b></div><div class="kpi"><span>고위험국 Cover 금지</span><b>${h.hrBlock?"Y":"N"}</b></div><div class="kpi"><span>적용시작</span><b style="font-size:14px">${h.eff}</b></div></div>`,0,"승인된 최신값")+
+      SEC("변경 등록 (Maker)",F({l:"Cover 사용",id:"pon",t:"sel",o:[["Y","Y - 사용"],["N","N - 모두 Serial"]],v:h.coverOn?"Y":"N",rq:1})+
+        F({l:"기본 기준 (USD)",id:"pmin",t:"num",v:fmtC("USD",h.coverMin,0),rq:1})+F({l:"고위험국 Cover 금지",id:"phr",t:"sel",o:[["Y","Y"],["N","N (컴플라이언스 승인 필요)"]],v:h.hrBlock?"Y":"N"})+
+        F({l:"적용시작일",id:"peff",t:"date",v:addD(BIZ,1),rq:1})+F({l:"변경 사유",id:"prsn",rq:1,s:2,ph:"예: 코레스 수수료 변경으로 기준 조정"}),3,"ROUTE_COVER_ENABLED · ROUTE_COVER_MIN_USD · ROUTE_COVER_HIGH_RISK_BLOCK")+
+      SEC("통화별 예외 (거래통화 금액, 비우면 기본값 사용)",TABLE(["통화","Nostro","현재 적용",["새 기준 (거래통화)","n"]],this.CC.map(c=>TR([c,(NOSTRO[c]||{}).bic||"-",h.ccy&&h.ccy[c]?`${c} ${fmtC(c,h.ccy[c],0)}`:"기본값",[`<input class="n" id="pc_${c}" value="${h.ccy&&h.ccy[c]?fmtC(c,h.ccy[c],0):""}" style="width:140px" aria-label="${c} 기준금액">`,"n"]]))),0,"ROUTE_COVER_MIN_CCY")+
+      `<section class="sec"><h3>변경 이력 <small>적용시작일 기준 · 승인 전에는 효력 없음</small></h3><div id="phist"></div></section>`+
+      `<div class="msg info">예: RT11 USD 620,000 · Korea Bank A는 현재 기준으로 ${620000>=(h.ccy&&h.ccy.USD||h.coverMin)?"Cover":"Serial"} 권장. 시안에서는 변경값을 이 브라우저에만 저장합니다. <button type="button" id="preset">기본값으로 초기화</button></div>`; },
+  init(){ this.exec=false; this.hist(); $("#preset").addEventListener("click",()=>{ RTG.hist=JSON.parse(JSON.stringify(RTG_DEF.hist)); rtgSave(); go("pm01"); log(`<span class="pill p-info">INFO</span> 기본값(USD 100,000)으로 초기화`); }); },
+  hist(){ const ex=e=>Object.entries(e||{}).map(([k,v])=>k+" "+fmtC(k,v,0)).join(", ")||"-";
+    $("#phist").innerHTML=TABLE(["적용시작","Cover",["기본 기준(USD)","n"],"통화별 예외","고위험 금지","사유","Maker","Checker","상태",""],RTG.hist.map((x,i)=>TR([x.eff,x.coverOn?"Y":"N",[fmtC("USD",x.coverMin,0),"n"],ex(x.ccy),x.hrBlock?"Y":"N",x.rsn,x.mk,x.ck||"-",
+      pill(x.sts==="APPROVED"?"승인":x.sts==="REJECTED"?"반려":"승인대기",x.sts==="APPROVED"?"ok":x.sts==="REJECTED"?"err":"warn"),x.sts==="PENDING"?`<button type="button" data-pa="${i}">Checker 승인</button> <button type="button" data-pr="${i}">반려</button>`:""])).reverse());
+    $$("[data-pa]").forEach(b=>b.addEventListener("click",()=>{ const x=RTG.hist[+b.dataset.pa]; x.sts="APPROVED"; x.ck="FXM1"; rtgSave(); go("pm01");
+      log(`<span class="pill p-ok">OK</span> ${x.eff}부터 Cover 기준 USD ${fmtC("USD",x.coverMin,0)} 적용 (Checker 승인) <span class="rule">R-RTG-09</span>`); }));
+    $$("[data-pr]").forEach(b=>b.addEventListener("click",()=>{ RTG.hist[+b.dataset.pr].sts="REJECTED"; rtgSave(); this.hist(); })); },
+  read(){ const ccy={}; this.CC.forEach(c=>{ const v=num("pc_"+c); if(v>0) ccy[c]=v; });
+    return {eff:val("peff"),coverOn:val("pon")==="Y",coverMin:num("pmin"),ccy,hrBlock:val("phr")==="Y",rsn:val("prsn").trim()}; },
+  chk(){ const x=this.read(), m=[], go_=this.exec; this.exec=false;
+    if(!(x.coverMin>0)) m.push(["err","기본 기준금액은 0보다 커야 합니다"]);
+    if(x.eff<=BIZ) m.push(["err",`적용시작일은 영업일(${BIZ}) 다음 날 이후여야 합니다 (당일·소급 변경 불가)`]);
+    if(!x.rsn) m.push(["err","변경 사유를 입력하세요"]);
+    if(!x.hrBlock) m.push(["warn","고위험국 Cover 허용: 컴플라이언스 승인 근거를 사유에 기재"]);
+    if(RTG.hist.some(h=>h.sts==="PENDING")) m.push(["err","승인대기 중인 변경이 있습니다. 먼저 승인 또는 반려하세요"]);
+    if(m.some(k=>k[0]==="err")) return show(m);
+    if(!go_) return show([...m,["ok","검증 통과. Execute로 등록하세요"]]);
+    RTG.hist.push(Object.assign(x,{mk:"FX02",ck:"",sts:"PENDING"})); rtgSave(); this.hist();
+    return show([...m,["ok",`변경 등록(Maker): ${x.eff}부터 기본 USD ${fmtC("USD",x.coverMin,0)}${Object.keys(x.ccy).length?" · 예외 "+Object.entries(x.ccy).map(([k,v])=>k+" "+fmtC(k,v,0)).join(", "):""} → Checker 승인 대기 <span class='rule'>R-RTG-09</span>`]]); }};
+
 S.ra11 = {id:"RA11", t:"Reimbursement (RA / Claim)", g:"본지점", tag:"신규", d:"본점이 개설한 신용장의 상환수권(MT740)을 받아 지점이 상환은행으로서 청구(MT742)를 지급(대지급)하고, 본점 정산 대상(Due from HO)으로 기장합니다. 지급기한은 인도 영업일 3일, 결제일은 통화국 영업일로 계산합니다.",
   html:()=>SEC("Authorisations (MT740)",TABLE(["RA No","LC No","Issuing (HO)","Claiming Bank","CCY",["RA Amt","n"],["Available","n"],"Expiry","Charges","Status"],[
       TR(["RA2610280002","LC26KR004417","[HOBIC]","Any bank","USD",["500,000.00","n"],["251,500.00","n"],"2027-01-31","CLM",pill("OPEN","ok")],"sel"),
@@ -1329,7 +1367,7 @@ function show(m){
 }
 
 /* ---------- 라우팅/메뉴 ---------- */
-const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","sm11","fx21","rt73","xp73","tf11","tf31","tf41","lc11","bg11","tf81","sf11","fd11","fd12","fd13","vs11","vs31","sw11","sw12","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
+const order=["ch11","rt11","rt12","rt13","rt14","rt21","rt22","rt25","fx11","sm11","fx21","rt73","xp73","tf11","tf31","tf41","lc11","bg11","tf81","sf11","fd11","fd12","fd13","vs11","vs31","sw11","sw12","pm01","ra11","io11","io21","io31","cm21","dc01","mn01","if01"];
 function buildNav(){ let g="", h=""; order.forEach(k=>{ const s=S[k]; if(s.g!==g){ h+=`<h4>${s.g}</h4>`; g=s.g; } h+=`<a href="#${k}" data-k="${k}"><span>${s.id}</span>${s.t}${s.tag==="신규"?"<em>NEW</em>":""}</a>`; });
   h+=`<h4>서식</h4><a href="forms.html" target="_blank" rel="noopener"><span>FORM</span>Customer Forms ↗</a>`;
   $("#nav").innerHTML=h; $("#msel").innerHTML=order.map(k=>`<option value="${k}">${S[k].id} · ${S[k].t}</option>`).join(""); }
@@ -1348,7 +1386,7 @@ window.addEventListener("hashchange",()=>go(location.hash.slice(1)));
 $("#msel").addEventListener("change",e=>{ location.hash=e.target.value; });
 $("#trx").addEventListener("keydown",e=>{ if(e.key==="Enter"){ const k=e.target.value.trim().toLowerCase(); if(S[k]) location.hash=k; else log(`<span class="pill p-err">ERR</span> ${e.target.value} 화면이 없습니다.`);} });
 $("#bChk").addEventListener("click",()=>{ const s=S[cur]; s.chk?s.chk.call(s):log(`<span class="pill p-ok">OK</span> 조회 화면입니다.`); });
-$("#bExe").addEventListener("click",()=>{ const s=S[cur]; if(s.chk) s.chk.call(s); if(!$("#log .p-err") && $("#modal").hidden) log($("#log").innerHTML+` · <b>Maker 등록 완료 → Checker 승인 대기</b>`); });
+$("#bExe").addEventListener("click",()=>{ const s=S[cur]; if(cur==="pm01") s.exec=true; if(s.chk) s.chk.call(s); if(!$("#log .p-err") && $("#modal").hidden) log($("#log").innerHTML+` · <b>Maker 등록 완료 → Checker 승인 대기</b>`); });
 $("#bClr").addEventListener("click",()=>go(cur));
 document.addEventListener("click",e=>{ const sp=e.target.closest("[data-step]"); if(sp){ const t=document.getElementById(sp.dataset.step); if(t) t.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); return; }
   const sm=e.target.closest("[data-sim]"); if(sm){ try{ sessionStorage.setItem("simPreset",sm.dataset.sim); }catch(x){} }

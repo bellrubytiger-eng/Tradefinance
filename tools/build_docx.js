@@ -305,7 +305,9 @@ C.push(H3("조작자 화면 구성 (④ Payment Route & SWIFT Messages)"));
   "탭: 흐름도(전문 흐름과 자금 흐름을 두 줄로 그림) / 판정 근거(Q1~Q7 표) / 전문 미리보기(MX 주요 요소 + MT 대응문) / 회계·수수료 / 방식 안내",
   "수취은행 예시 목록으로 경로별 결과를 바로 확인할 수 있음(교육·테스트용)",
 ].forEach((t) => C.push(B(t)));
-C.push(NOTE("Cover 기준금액(USD 100,000)과 고위험국 Cover 금지는 은행 정책 파라미터입니다. 운영 Nostro·SSI·RMA는 SWIFTRef와 SWIFT RMA 데이터로 매일 갱신해야 합니다(VERIFY)."));
+C.push(B("기준 변경(PM01): Cover 사용 여부, 기준금액(기본 USD 환산 + 통화별 예외 금액), 고위험국 Cover 금지를 적용시작일(다음 영업일 이후)로 등록 → Checker 승인 후 효력. 송금은 거래일 유효값을 쓰고 적용 기준을 스냅샷으로 저장(R-RTG-09)"));
+C.push(B("고객 확인서(FM-OUT-01)에는 결제경로(Serial·Cover 등)를 표시하지 않고, 고객에게 보낸 SWIFT 전문 유형(pacs.008 / MT103)·송신일과 UETR만 표시"));
+C.push(NOTE("Cover 기준금액(기본 USD 100,000)과 고위험국 Cover 금지는 은행 정책 파라미터이며 PM01에서 바꿀 수 있습니다. 운영 Nostro·SSI·RMA는 SWIFTRef와 SWIFT RMA 데이터로 매일 갱신해야 합니다(VERIFY)."));
 
 // ---------------- 4. 화면 ----------------
 C.push(H1("4. 화면 설계"));

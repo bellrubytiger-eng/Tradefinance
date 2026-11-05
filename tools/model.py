@@ -106,7 +106,8 @@ PARAMS = [
     ("KYC_REQ_FORMAT", "FDI 송금인 KYC 요청 형식", "MX", "MX/MT", "FDI KYC", "SWIFT ISO 20022 (MX 전환 완료)", "N", "MX = camt.110 요청 / camt.111 응답(기본), MT = MT199 (상대은행 사정 시)"),
     ("OBLIG_ALERT_DAYS", "기한관리 사전알림 시점", "30,15,7,0", "일전", "공통", "은행 내부정책", "N", "D-30/D-15/D-7/D-day"),
     ("ROUTE_COVER_ENABLED", "당발 Cover 방식 사용", "Y", "Y/N", "당발 경로", "은행 내부정책", "N", "N이면 RMA가 있어도 Serial"),
-    ("ROUTE_COVER_MIN_USD", "Cover 권장 최소금액", "100000", "USD", "당발 경로", "은행 내부정책", "N", "미만은 비용상 Serial 권장(긴급 지정 시 예외)"),
+    ("ROUTE_COVER_MIN_USD", "Cover 권장 최소금액(기본, USD 환산)", "100000", "USD", "당발 경로", "은행 내부정책", "N", "PM01에서 변경(적용시작일·Maker-Checker). 미만은 비용상 Serial 권장(긴급 지정 시 예외)"),
+    ("ROUTE_COVER_MIN_CCY", "Cover 권장 최소금액(통화별 예외)", "없음", "거래통화", "당발 경로", "은행 내부정책", "N", "예: EUR=150000. 지정 통화는 거래통화 금액으로 비교, 나머지는 기본값"),
     ("ROUTE_COVER_HIGH_RISK_BLOCK", "고위험국 수취은행 Cover 금지", "Y", "Y/N", "당발 경로", "FATF R.16 / Wolfsberg 지급투명성", "N", "FATF 고위험·제재 관련국은 Serial만"),
     ("ROUTE_COVER_RELEASE", "Cover 송신 순서", "COV_FIRST", "-", "당발 경로", "CBPR+ Cover 지침", "N", "pacs.009 COV를 먼저(또는 동시) 송신, 같은 UETR"),
     ("ROUTE_OVERRIDE_APPROVAL", "경로 수동변경 승인", "CHECKER", "-", "당발 경로", "은행 내부정책", "N", "권장 경로와 다르면 사유 + Checker 승인"),
@@ -1415,6 +1416,8 @@ table("TB_REMIT_ROUTE", "당발 결제경로·전문 판정", "당발 경로", "
     ("SETTLE_GL", "결제계정", "VARCHAR2(11)", "NN", "10105020000 / 21010000000 / 20150200100·200", "GL"),
     ("VALUE_DT", "결제일", "DATE", "NN", "마감시각·IN+통화 캘린더 반영", ""),
     ("CUTOFF_MISS_YN", "마감 경과", "VARCHAR2(1)", "NN", "Y면 익영업일", ""),
+    ("COVER_THR_CCY", "적용 Cover 기준 통화", "VARCHAR2(3)", "", "USD(기본) 또는 예외 통화", ""),
+    ("COVER_THR_AMT", "적용 Cover 기준금액", "NUMBER(18,2)", "", "거래일 유효값 스냅샷 (R-RTG-09)", ""),
 ] + AUD)
 
 table("TB_COA_ACCT", "계정과목(통합 표준 CoA)", "회계공통", "차세대 GBS 통합 표준 CoA(0930) + 인도지점 적용 상태. 모든 GL_CODE의 참조 마스터. 신규 계정은 본점 채번 전 임시코드.", [
@@ -1559,6 +1562,7 @@ RULES = [
     ("R-RTG-06", "당발 경로", "RT11~14", "결제일·마감", "Nostro 통화별 마감(IST) 이후 또는 IN·통화국 휴일이면 결제일을 양쪽 영업일로 이동, 고객에게 표시", "AUTO", "CM21", "", "N"),
     ("R-RTG-07", "당발 경로", "RT11~14", "결제계정", "SERIAL·COVER·DIRECT = Nostro 10105020000, DIRECT_HO(또는 본점 Nostro) = 을A 21010000000(IO21 정산 대상), VOSTRO = 20150200100(SRVA)/20150200200", "AUTO", "통합 CoA", "", "N"),
     ("R-RTG-08", "당발 경로", "RT11~14", "수수료부담 매핑", "OUR→DEBT, SHA→SHAR, BEN→CRED. OUR + Serial은 중계·수취은행 청구(camt.106/MT191) 예상 표시", "AUTO", "CBPR+", "", "N"),
+    ("R-RTG-09", "당발 경로", "PM01", "기준 변경", "Cover 사용·기준금액(기본 USD, 통화별 예외)·고위험 금지는 적용시작일(영업일 다음날 이후) 이력으로 등록, Maker 등록 → Checker 승인 후 효력. 승인대기 1건만 허용, 소급 불가. 송금은 거래일에 유효한 승인값을 쓰고 TB_REMIT_ROUTE.COVER_THR_*에 스냅샷", "ERR", "은행 내부정책", "ROUTE_COVER_MIN_USD, ROUTE_COVER_MIN_CCY", "N"),
     ("R-ACC-01", "회계", "공통", "CoA 참조", "모든 분개 계정은 TB_COA_ACCT에 존재하고 POSTABLE_YN=Y. 상위(L4)에 L5가 있으면 직접 기장 금지(예: 20150100000, 20510500000)", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-02", "회계", "공통", "비활성 계정", "BR_STATUS=INACT 계정(NAPAS·AOB·TOKEN·갑기금 이자) 기장 차단", "ERR", "통합 CoA", "", "N"),
     ("R-ACC-03", "회계", "공통", "통화별 대차", "전표 단위로 통화별 차변합 = 대변합. 환전은 11200000000 포지션으로 통화 간 연결(난외 OB+/OB- 제외)", "ERR", "회계원칙", "", "N"),
@@ -1741,6 +1745,7 @@ SCREENS = [
     ("FX11", "Currency Exchange", "개인/기업/비거주자/지점", "신규", "계좌간(EEFC↔INR)·외화간(KRW/USD/EUR/JPY)·외화현찰 매입/판매·지점 자기계정 환전, GST 32(2), 딜 맵핑", "TB_FX_EXCHANGE", "fx11"),
     ("FX21", "Rate Card & Cash Stock", "내부", "신규", "고시환율 회차 게시, 외화현찰 권종별 시재·일마감", "TB_FX_RATE_CARD, TB_FX_CASH_STOCK", "fx21"),
     ("SW11", "SWIFT Message Center", "내부", "신규", "MT/MX 송수신 큐, 상태(작성→승인→송신→ACK/NAK), 수신 라우팅, Repair·재발송, 카탈로그", "TB_SWIFT_MSG, TB_SWIFT_MSG_TYPE", "sw11"),
+    ("PM01", "Route Policy (Cover 기준)", "내부", "신규", "당발 결제경로 기준 관리: Cover 사용, 기준금액(기본 USD·통화별 예외), 고위험국 금지. 적용시작일 이력·Maker-Checker", "TB_FX_PARAM", "pm01"),
     ("SW12", "SWIFT Compose", "내부", "신규", "유형별 템플릿 수기작성(MT950 수기 포함), 필드 검증, MT↔MX 미리보기", "TB_SWIFT_MSG", "sw12"),
     ("RA11", "Reimbursement (RA / Claim)", "본지점", "신규", "MT740 수권 등록, MT742 청구 검증·지급(대지급), 지급기한(인도 영업일 3일), 본점 MT756 통보", "TB_RA_AUTH, TB_RA_CLAIM", "ra11"),
     ("IO11", "Interoffice Rate Management", "본지점", "신규", "통화간 기준환율+스프레드, 기금별 금리(갑 0% / 을A / 을B 기간구간·우대), 유효기간·본점 승인", "TB_IO_RATE", "io11"),

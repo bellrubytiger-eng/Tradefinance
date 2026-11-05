@@ -17,7 +17,7 @@ const DOM = {
 const SCR = {}; // id → [name, domain]
 const GROUP = { ch11: "고객", rt11: "당발송금", rt12: "당발송금", rt13: "당발송금", rt14: "당발송금", rt21: "타발송금", rt22: "타발송금", rt25: "타발송금",
   fx11: "환전", sm11: "환전", fx21: "환전", rt73: "수출입서류", xp73: "수출입서류", tf11: "무역금융", tf31: "무역금융", tf41: "무역금융", lc11: "무역금융", bg11: "무역금융", tf81: "무역금융", sf11: "무역금융",
-  fd11: "FDI", fd12: "FDI", fd13: "FDI", vs11: "INR Vostro", vs31: "INR Vostro", sw11: "SWIFT", sw12: "SWIFT", ra11: "본지점", io11: "본지점", io21: "본지점", io31: "본지점", cm21: "본지점",
+  fd11: "FDI", fd12: "FDI", fd13: "FDI", vs11: "INR Vostro", vs31: "INR Vostro", sw11: "SWIFT", sw12: "SWIFT", pm01: "SWIFT", ra11: "본지점", io11: "본지점", io21: "본지점", io31: "본지점", cm21: "본지점",
   dc01: "서식·보고", mn01: "서식·보고", if01: "서식·보고" };
 M.SCREENS.forEach((s) => { SCR[s[0]] = { name: s[1], tag: s[3], func: s[4], dom: GROUP[s[6]] || "서식·보고" }; });
 

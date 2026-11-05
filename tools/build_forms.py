@@ -164,13 +164,13 @@ function render(){
   const meta=F.sections[0], body=F.sections.slice(1);
   const keyAmt = {firc:["INR Amount Credited","inr","inr_words"], out:["Total Amount Debited","total","total_words"], in:["Net Amount Credited","net","net_words"], fx:["You Received","buy","buy_words"]}[F.key];
   const copyTxt = dup?"DUPLICATE":d.copy;
-  const metaF = meta.f.filter(show).filter(f=>f[0]!=="uetr");
+  const metaF = meta.f.filter(show).filter(f=>f[0]!=="uetr"&&f[0]!=="swift");
   let h=`<div class="wm"><span>SPECIMEN</span></div>
   <header class="head"><div class="bank"><b>${esc(B.bank)}</b><div>${esc(B.branch)} · Authorised Dealer Category-I</div><div>${esc(B.addr)}</div><div>AD Code ${esc(B.ad_code)} · SWIFT ${esc(B.bic)} · GSTIN ${esc(B.gstin)}</div></div>
     <div class="badge"><span class="fid">${F.id}</span><span class="copy ${dup?"dup":""}">${copyTxt}</span></div></header>
   <div class="title"><h1>${esc(F.title)}</h1><p>${esc(F.subtitle)}</p></div>
   <div class="strip" style="--n:${metaF.length}">${metaF.map(f=>`<div><span class="lab">${esc(f[1])}</span><div class="val m">${value(f[0],d)}</div><div class="map">${esc(f[2])} · ${esc(f[3])}</div></div>`).join("")}</div>`+
-    (d.uetr&&meta.f.some(f=>f[0]==="uetr")?`<div class="uetr">UETR (SWIFT gpi tracking) <span>${esc(d.uetr)}</span></div>`:"");
+    (d.uetr&&meta.f.some(f=>f[0]==="uetr")?`<div class="uetr">${d.swift?`SWIFT <span>${esc(d.swift)}</span> · `:""}UETR (SWIFT gpi tracking) <span>${esc(d.uetr)}</span></div>`:"");
   body.forEach(sec=>{
     const fs=sec.f.filter(show).filter(f=>!(f[0]===keyAmt[1]||f[0]===keyAmt[2]));
     if(sec.t.startsWith("Remittance and")||sec.t==="Amount"||sec.t==="Exchange") h+=`<div class="key"><div><span class="lab">${keyAmt[0]}</span><div class="big">${value(keyAmt[1],d)}</div></div><div class="words">${value(keyAmt[2],d)}</div></div>`;
