@@ -95,7 +95,7 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "5차 (2026-11-05) — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "6차 (2026-11-05) — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
@@ -123,6 +123,9 @@ summary = [
      "복리비는 Sch.16 I, Service Commission ₹2.62 crore는 총수익 1% 초과 별도 공시 (시트 14)"),
     ("5차 (5단계)", "시스템은 L5까지 → 4차의 L6은 모두 파라미터 또는 L5로. TDS·TCS = 챌린 납부 성격 L5 20개(TCS 기타 20510402000 포함), GST = 세목 L5, 수수료/환전·고령자·신고서는 파라미터. "
      "0930 자체의 L6 36개(사무경비)도 L5 기장 + EP 코드 파라미터. 협회비 50940022700, CSR 50940029100·미집행 부채 20441000000, PF·ESIC·상여·Gratuity·연차·급여 미지급 L5 신설"),
+    ("6차 (TDS·수수료)", "3/31 미경과 예금이자 TDS: 이자비용 차변, 미지급이자(순액)·TDS 예금이자 대변 → 4/30까지 RBI 계좌로 납부. 신규 계정 불필요. "
+     "현행 'Prepaid TDS on Accrued Interest'(10920014)는 고객 몫 선급 TDS → 4차의 'TDS 미수' 매핑을 정정, 순액법 전환 시 미지급이자와 상계(시트 12 ④). "
+     "수수료: 취급·SWIFT 전신료는 0930 상품별 L4 사용, 중계은행 실비는 pure agent 통과계정 20441100000 또는 과세 수익 40570110000 (시트 15)"),
     ("다음 단계", "시트 08 결정사항 중 '권고'·'미결' 확정 → coa_model.py 반영, 이행표(시트 09)를 본점 CoA 담당에 전달, ECL·RWA 개발명세의 계정코드를 11자리로 교체"),
 ]
 ws = wb.create_sheet("00 요약")
@@ -336,7 +339,9 @@ for m in sorted(tax_live, key=lambda m: m["tgt"]):
     rows.append((m["code"], m["name"], m["amt"] or None, m["tgt"], nm, m["kind"], m["note"]))
 r = section(ws, r, "② 현행 세무 계정 → 11자리", ["현행코드", "현행 계정명", "잔액(INR)", "11자리", "11자리 계정명", "판정", "비고"], rows)
 r = section(ws, r, "③ 세금 L5 ↔ 파라미터 (TAX_GL_PARAM, 일자 유효)", ["L5", "세목", "신고서", "구 조문", "신 조문(2025법)", "파라미터로 관리할 하위 구분"], TF.TAX_GL_PARAM)
-r = section(ws, r, "④ 신설 세무 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"],
+r = section(ws, r, "④ 연말(3/31) 미경과 예금이자 TDS — 순액법 (예: 거주자 FD 미경과 이자 ₹60,000, TDS 10%)",
+            ["ID", "시점", "차변", "대변", "비고"], TF.YE_TDS)
+r = section(ws, r, "⑤ 신설 세무 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"],
             [n[:6] for n in TF.NEW3 if n[6] == "세무"])
 for i, w in enumerate([14, 36, 16, 40, 44, 12, 60], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
@@ -426,6 +431,18 @@ r = section(ws, r, "④ 경비(EP) 코드 → 현행 GL → 11자리 → Sch.16 
 for i, w in enumerate([14, 44, 8, 34, 22, 16, 10, 60], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
 
-wb.move_sheet("08 결정사항", offset=6)
+# ---- 15 송금·무역 수수료 ------------------------------------------------------------
+ws = wb.create_sheet("15 송금·무역수수료")
+ws["A1"] = "송금·무역금융 수수료 구분 — 취급수수료 / 중계은행 수수료 / SWIFT 전신료"
+ws["A1"].font = Font(name=F, size=14, bold=True)
+ws["A2"] = ("Sch.14에서는 모두 'Commission, exchange and brokerage' 한 줄이지만, GST 과세가액(GSTR-1 ↔ GL 대사), pure agent 실비의 과세 제외, "
+            "회수·지급 마진 관리 때문에 수수료 종류별 계정이 필요. 0930은 상품별 L4에 취급·전신료가 이미 나뉘어 있어 신설은 2개. 금액·부담자·SAC·과세 여부는 Charge code 파라미터.")
+ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:G2"); ws.row_dimensions[2].height = 42
+r = section(ws, 4, "① 수수료 종류 × 계정", ["수수료 종류", "상품", "수익 계정", "비용·상대 계정", "GST", "TDS·RCM", "비고"], TF.FEE_MATRIX)
+r = section(ws, r, "② 신설 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"], [n[:6] for n in TF.NEW3 if n[6] == "수수료"])
+for i, w in enumerate([30, 26, 40, 40, 24, 30, 50], 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
+
+wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
 wb.save(OUT)
 print("saved", OUT)
