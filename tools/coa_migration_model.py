@@ -272,12 +272,6 @@ def migrate():
                 kind, note = ("AUTO 일치", "") if best >= 0.34 else ("AUTO 확인", "이름 유사도 낮음")
             else:
                 tgt, kind, note = "", "미매핑", "0930 GBS열에 대응 없음"
-        if tgt and not tgt.startswith("→"):
-            parts = [x.strip() for x in tgt.split("/")]
-            fl = [(x[:9] + "00") if (x in CM.ALL and CM.ALL[x]["lv"] == 6) else x for x in parts]
-            if fl != parts:
-                tgt = " / ".join(dict.fromkeys(fl))
-                note = (note + " " if note else "") + "(0930 L6 → L5, 세부는 EP 코드 파라미터)"
         if tgt.startswith("→"):
             twin = tgt[1:]
             base = OVR.get(twin, (None,))[0] or (GBS.get(twin, [{}])[0].get("code") if GBS.get(twin) else "")

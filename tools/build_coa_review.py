@@ -10,6 +10,8 @@ import coa_review_model as M
 import coa_migration_model as MG
 import lcr_model as L
 import tax_fa_model as TF
+import sheet_doc_model as SD
+import re as _re
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "../docs/05_CoA검토_RBI보고속성.xlsx"
 
@@ -95,7 +97,7 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "6차 (2026-11-05) — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "7차 (2026-11-05) — 6단계 재분류, 중계은행 회수 과세, 시트별 변경 근거(FY25-26 결산 증거) / 6차 — 연말 미경과 이자 TDS 분개, 송금·무역 수수료 구분 / 5차 — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
@@ -121,8 +123,9 @@ summary = [
     ("4차 (고정자산·비용)", "표시는 BR Act Third Schedule(Sch.10·16), 인식은 인도 AS(은행 Ind AS 미적용), 내용연수는 Companies Act Schedule II, 세무는 감가상각 블록. "
      "컴퓨터 단말·서버·전기설비·가구비품 계정 신설, FA 코드에 GL·내용연수·세무율 연결(시트 13). 감사보수·법률비용이 Service Commission에 섞여 Sch.16 VII·VIII을 GL로 못 냄 → L5 분리, "
      "복리비는 Sch.16 I, Service Commission ₹2.62 crore는 총수익 1% 초과 별도 공시 (시트 14)"),
-    ("5차 (5단계)", "시스템은 L5까지 → 4차의 L6은 모두 파라미터 또는 L5로. TDS·TCS = 챌린 납부 성격 L5 20개(TCS 기타 20510402000 포함), GST = 세목 L5, 수수료/환전·고령자·신고서는 파라미터. "
-     "0930 자체의 L6 36개(사무경비)도 L5 기장 + EP 코드 파라미터. 협회비 50940022700, CSR 50940029100·미집행 부채 20441000000, PF·ESIC·상여·Gratuity·연차·급여 미지급 L5 신설"),
+    ("7차 (6단계·근거)", "6단계 사용 확인 → 세금은 L6(TDS·TCS 납부 성격 21개, GST 수수료/환전), 감사·법률·전문가 수수료는 SERVICE FEES 아래 L6, 0930 L6 36개도 기장 계정(5차 의견 철회). "
+     "중계은행 수수료 고객 회수분 = 과세 수익 40570110000(C1 결정, pure agent 통과계정 철회). 모든 시트 상단에 '본점 원안 / 우리측 변경 / 이유 / FY25-26 결산 증거', "
+     "계정 표에 '0930 원안' 열 추가, 결산 증거 20건을 시트 16에 정리"),
     ("6차 (TDS·수수료)", "3/31 미경과 예금이자 TDS: 이자비용 차변, 미지급이자(순액)·TDS 예금이자 대변 → 4/30까지 RBI 계좌로 납부. 신규 계정 불필요. "
      "현행 'Prepaid TDS on Accrued Interest'(10920014)는 고객 몫 선급 TDS → 4차의 'TDS 미수' 매핑을 정정, 순액법 전환 시 미지급이자와 상계(시트 12 ④). "
      "수수료: 취급·SWIFT 전신료는 0930 상품별 L4 사용, 중계은행 실비는 pure agent 통과계정 20441100000 또는 과세 수익 40570110000 (시트 15)"),
@@ -324,10 +327,33 @@ CUR_NAME = {c: CM.ALL[c].get("br_name") or CM.ALL[c]["name"].strip() for c in CM
 CUR_NAME.update({n[0]: n[3] for n in MG.NEW2})
 CUR_NAME.update({r["code"]: r["en"] for r in M.R if r["code"] != "-" and r["kind"] not in ("철회", "비활성")})
 CUR_NAME.update({n[0]: n[3] for n in TF.NEW3})
+NEW_ANY = {n[0] for n in TF.NEW3} | {n[0] for n in MG.NEW2} | {r["code"] for r in M.R if r["kind"] == "신규"}
+
+
+_BASE_BY = {a["code"]: a for a in CM.BASE}
+
+
+def ho_view(text):
+    """문자열 속 11자리 코드마다 0930 원안(명칭·본점 매핑·GBS코드) 또는 신설 표시."""
+    out = []
+    for c in dict.fromkeys(_re.findall(r"\b\d{11}\b", str(text))):
+        if c in _BASE_BY:
+            a = _BASE_BY[c]
+            out.append(f'{c} {a["name"].strip()} [{a["ho_name"] or "-"} / GBS {a["gbs"] or "-"}]')
+        elif c in NEW_ANY:
+            anc = next((c[:k].ljust(11, "0") for k in (9, 7, 5, 3) if c[:k].ljust(11, "0") in _BASE_BY and c[:k].ljust(11, "0") != c), None)
+            if anc:
+                a = _BASE_BY[anc]
+                out.append(f'{c} 0930에 없음(신설) — 0930 상위 {anc} {a["name"].strip()} [{a["ho_name"] or "-"} / GBS {a["gbs"] or "-"}]')
+            else:
+                out.append(f"{c} 0930에 없음(신설)")
+    return "\n".join(out)
+
+
 ws = wb.create_sheet("12 세무계정(TDS·TCS·GST)")
 ws["A1"] = "TDS·TCS·GST 계정 — 11자리 (소득세법 2025, GST 2.0)"
 ws["A1"].font = Font(name=F, size=14, bold=True)
-ws["A2"] = "시스템 5단계: L5가 기장 단위. TDS·TCS L5 = 챌린 납부 성격, GST L5 = 세목. 신고서·조문·세율·한도·수수료/환전 구분은 파라미터(③) — TDS 산출물 Rate Master와 GST Charge Code 마스터(일자 유효)에서 관리하고 GL 이름에 넣지 않음."
+ws["A2"] = "6단계: TDS·TCS L5 = 신고서, L6 = 챌린 납부 성격 / GST L5 = 세목, L6 = 수수료·환전. 조문(구/신)·세율·한도·고령자 여부는 파라미터(③) — TDS 산출물 Rate Master와 GST Charge Code 마스터(일자 유효)에서 관리하고 GL 이름에 넣지 않음."
 ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:F2"); ws.row_dimensions[2].height = 30
 r = 4
 r = section(ws, r, "① 개정 대응·설계 판단", ["항목", "내용"], TF.TAX_NOTES)
@@ -336,8 +362,8 @@ rows = []
 for m in sorted(tax_live, key=lambda m: m["tgt"]):
     t = MG.targets_of(m["tgt"])
     nm = " / ".join(CUR_NAME.get(x, x) for x in t)
-    rows.append((m["code"], m["name"], m["amt"] or None, m["tgt"], nm, m["kind"], m["note"]))
-r = section(ws, r, "② 현행 세무 계정 → 11자리", ["현행코드", "현행 계정명", "잔액(INR)", "11자리", "11자리 계정명", "판정", "비고"], rows)
+    rows.append((m["code"], m["name"], m["amt"] or None, m["tgt"], nm, ho_view(m["tgt"]), m["kind"], m["note"]))
+r = section(ws, r, "② 현행 세무 계정 → 11자리", ["현행코드", "현행 계정명", "잔액(INR)", "11자리", "11자리 계정명", "0930 원안 [본점매핑 / GBS]", "판정", "비고"], rows)
 r = section(ws, r, "③ 세금 L5 ↔ 파라미터 (TAX_GL_PARAM, 일자 유효)", ["L5", "세목", "신고서", "구 조문", "신 조문(2025법)", "파라미터로 관리할 하위 구분"], TF.TAX_GL_PARAM)
 r = section(ws, r, "④ 연말(3/31) 미경과 예금이자 TDS — 순액법 (예: 거주자 FD 미경과 이자 ₹60,000, TDS 10%)",
             ["ID", "시점", "차변", "대변", "비고"], TF.YE_TDS)
@@ -385,7 +411,7 @@ ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP;
 r = 4
 r = section(ws, r, "① Sch.16 줄", ["줄", "명칭"], list(TF.SCH16_LINES.items()))
 mig_by = {m["code"]: m for m in MIG}
-_lv = {a["code"]: a["lv"] for a in CM.BASE if a["lv"] <= 5}  # 시스템 5단계
+_lv = {a["code"]: a["lv"] for a in CM.BASE}
 _lv.update({n[0]: n[1] for n in TF.NEW3}); _lv.update({n[0]: n[1] for n in MG.NEW2})
 
 
@@ -398,13 +424,13 @@ def _is_parent(c):
 opex = []
 for a in CM.BASE + [dict(code=n[0], name=n[3], lv=n[1]) for n in TF.NEW3 if n[6] in ("비용", "고정자산")] + [dict(code=n[0], name=n[3], lv=n[1]) for n in MG.NEW2 if n[0].startswith("509")]:
     c = a["code"]
-    if (c.startswith(("509", "5101", "51204", "51211"))) and 4 <= a.get("lv", 0) <= 5 and not c.startswith(("509202001", "509202002", "509202099", "5101004")) and not _is_parent(c):
+    if (c.startswith(("509", "5101", "51204", "51211"))) and a.get("lv", 0) >= 4 and not c.startswith(("509202001", "509202002", "509202099", "5101004")) and not _is_parent(c):
         line = TF.sch16_of(c)
         note = next((v for k, v in TF.SCH16_NOTE.items() if c.startswith(k)), "")
         live = [m for m in MIG if c in MG.targets_of(m["tgt"]) and m["stmt"] == "PL"]
         amt = sum(m["amt"] for m in live if MG.targets_of(m["tgt"])[0] == c)  # 분할 계정은 첫 대상에만 (EP 기준 재배분 전)
         opex.append((c, a["name"].strip(), line, TF.SCH16_LINES.get(line, "확인"), ", ".join(m["code"] for m in live), amt or None,
-                     "신규" if (c in NEWALL or c in {n[0] for n in MG.NEW2}) else "", note))
+                     "신규" if (c in NEWALL or c in {n[0] for n in MG.NEW2}) else "", note, ho_view(c)))
 opex.sort(key=lambda x: (list(TF.SCH16_LINES).index(x[2]) if x[2] in TF.SCH16_LINES else 99, x[0]))
 _tot = sum(x[5] or 0 for x in opex)
 _live_tot = sum(m["amt"] for m in MIG if m["code"].startswith(("5201", "5202", "5203", "52043")) and m["stmt"] == "PL")
@@ -414,7 +440,7 @@ for x in opex:
     by_line[x[2]] = by_line.get(x[2], 0) + (x[5] or 0)
 r = section(ws, r, f"② Sch.16 줄별 합계 (현행 영업비용 ₹{_live_tot:,.0f} = 이행 후 합계, 분할 계정은 EP 재배분 전)",
             ["줄", "명칭", "금액(INR)"], [(k, TF.SCH16_LINES[k], round(by_line.get(k, 0))) for k in TF.SCH16_LINES])
-r = section(ws, r, "③ 11자리 비용 계정 → Sch.16 줄 (현행 잔액 2026-07-07)", ["11자리", "계정명", "줄", "Sch.16 명칭", "현행 계정", "현행 잔액", "구분", "비고"], opex)
+r = section(ws, r, "③ 11자리 비용 계정 → Sch.16 줄 (현행 잔액 2026-07-07)", ["11자리", "계정명", "줄", "Sch.16 명칭", "현행 계정", "현행 잔액", "구분", "비고", "0930 원안 [본점매핑 / GBS]"], opex)
 ep_rows = []
 for e in TF.EP_LIST:
     if not e["gl"]:
@@ -436,13 +462,64 @@ ws = wb.create_sheet("15 송금·무역수수료")
 ws["A1"] = "송금·무역금융 수수료 구분 — 취급수수료 / 중계은행 수수료 / SWIFT 전신료"
 ws["A1"].font = Font(name=F, size=14, bold=True)
 ws["A2"] = ("Sch.14에서는 모두 'Commission, exchange and brokerage' 한 줄이지만, GST 과세가액(GSTR-1 ↔ GL 대사), pure agent 실비의 과세 제외, "
-            "회수·지급 마진 관리 때문에 수수료 종류별 계정이 필요. 0930은 상품별 L4에 취급·전신료가 이미 나뉘어 있어 신설은 2개. 금액·부담자·SAC·과세 여부는 Charge code 파라미터.")
+            "회수·지급 마진 관리 때문에 수수료 종류별 계정이 필요. 0930은 상품별 L4에 취급·전신료가 이미 나뉘어 있어 신설은 중계은행 회수분 1개(과세). 금액·부담자·SAC는 Charge code 파라미터.")
 ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:G2"); ws.row_dimensions[2].height = 42
-r = section(ws, 4, "① 수수료 종류 × 계정", ["수수료 종류", "상품", "수익 계정", "비용·상대 계정", "GST", "TDS·RCM", "비고"], TF.FEE_MATRIX)
+r = section(ws, 4, "① 수수료 종류 × 계정", ["수수료 종류", "상품", "수익 계정", "비용·상대 계정", "GST", "TDS·RCM", "비고", "0930 원안 [본점매핑 / GBS]"],
+            [tuple(f) + (ho_view(f[2] + " " + f[3]),) for f in TF.FEE_MATRIX])
 r = section(ws, r, "② 신설 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"], [n[:6] for n in TF.NEW3 if n[6] == "수수료"])
 for i, w in enumerate([30, 26, 40, 40, 24, 30, 50], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
 
+# ---- 16 결산 증거 -------------------------------------------------------------------
+ws = wb.create_sheet("16 FY25-26 결산근거")
+ws["A1"] = "FY2025-26 재무제표 작업파일에서 확인한 근거 → 변경 연결"
+ws["A1"].font = Font(name=F, size=14, bold=True)
+ws["A2"] = ("원천: 20260609_Financials_NH_Bank_FY_2025-26.xlsx — Grouping(GBS 계정 → Third Schedule 줄), Adjustment Entries(결산 수정분개), "
+            "Law Charges & Insurance(재분류 내역). 결산에서 수작업으로 고치는 항목이 곧 계정 체계가 놓친 부분.")
+ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:F2"); ws.row_dimensions[2].height = 30
+r = section(ws, 4, "결산 증거 20건", ["결산 자료", "내용", "금액(INR)", "시사점", "관련 변경", "시트"], SD.EVIDENCE)
+for i, w in enumerate([22, 50, 16, 40, 46, 8], 1):
+    ws.column_dimensions[get_column_letter(i)].width = w
+
 wb.move_sheet("08 결정사항", offset=len(wb.sheetnames) - 1 - wb.sheetnames.index("08 결정사항"))
+
+# ---- 시트별 변경 근거 블록 (상단 삽입) ------------------------------------------------
+from openpyxl.worksheet.cell_range import CellRange
+
+DOC_FILL = {SD.HO: "E7E6E6", SD.OURS: "FCE4D6", SD.WHY: "DDEBF7", SD.EVID: "E2EFDA"}
+
+
+def add_doc(ws, doc):
+    n = len(doc) + 1
+    merges = [CellRange(str(m)) for m in ws.merged_cells.ranges]
+    for m in merges:
+        ws.unmerge_cells(str(m))
+    heights = {i: d.height for i, d in ws.row_dimensions.items() if d.height}
+    ws.insert_rows(2, n)
+    for i in sorted(heights, reverse=True):
+        if i >= 2:
+            ws.row_dimensions[i + n].height = heights[i]
+            ws.row_dimensions[i].height = None
+    for m in merges:
+        if m.min_row >= 2:
+            m.shift(row_shift=n)
+        ws.merge_cells(m.coord)
+    if ws.auto_filter.ref:
+        af = CellRange(ws.auto_filter.ref); af.shift(row_shift=n); ws.auto_filter.ref = af.coord
+    if ws.freeze_panes:
+        fp = ws[ws.freeze_panes]; ws.freeze_panes = ws.cell(row=fp.row + n, column=fp.column).coordinate
+    last = max(6, min(ws.max_column, 10))
+    for i, (k, v) in enumerate(doc, 2):
+        a = ws.cell(row=i, column=1, value=k)
+        b = ws.cell(row=i, column=2, value=v)
+        a.font = Font(name=F, size=9, bold=True); b.font = Font(name=F, size=9)
+        a.fill = b.fill = PatternFill("solid", fgColor=DOC_FILL[k])
+        a.alignment = b.alignment = WRAP; a.border = b.border = BOX
+        ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=last)
+        ws.row_dimensions[i].height = max(18, 13 * (len(v) // 110 + 1))
+
+
+for name, doc in SD.SHEET_DOC.items():
+    add_doc(wb[name], doc)
 wb.save(OUT)
 print("saved", OUT)
