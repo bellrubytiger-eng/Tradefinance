@@ -95,7 +95,7 @@ nleaf = sum(1 for a in MG.LIVE if a["leaf"])
 
 # ---- 00 요약 ---------------------------------------------------------------------
 summary = [
-    ("차수", "4차 (2026-11-05) — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
+    ("차수", "5차 (2026-11-05) — 5단계 체계 반영(L6 → L5 또는 파라미터), TCS 기타·협회비·CSR 부채·직원 월적립 부채 / 4차 — 적금 L3 신설 요청, TDS·TCS·GST 11자리(신 소득세법·GST FRS), 고정자산(Schedule II)·영업비용(Sch.16) 헤드 / 3차 — LCR 분류·파라미터, TDS 미수, 은행 예치 구분 추가 / 2차 — 현행 GBS BS/PL(2026-07-07), ECL·신용위험 자본 개발명세 반영. 1차 대비 변경은 '이전안 관계' 열과 '철회' 구분으로 표시"),
     ("결정 반영", "D1 기준코드 = 11자리 통합코드(8자리는 이행 원천). D5 정상자산 충당금 = ECL Directions 2026 Stage별"),
     ("권고 (FN·NRO)", "외국인 비거주자(FN)는 NRO의 부분집합. GL은 NRO 상품별 L5 하나, FN은 nr_subtype 속성으로 부분합. 재무제표·RBI 보고·TDS·송금한도가 같고 GL이 바뀌는 사건은 거주성 변경뿐 (시트 07)"),
     ("이행 매핑", f"현행 인도 GBS leaf 계정 {nleaf}개 중 0930 GBS코드 열로 자동 대응 {nauto}개. 판정: " + " · ".join(f"{k} {v}" for k, v in mk.most_common())
@@ -116,11 +116,13 @@ summary = [
      "GL이 아닌 계좌 속성 + 일자 유효 파라미터(TB_LCR_*) (시트 11). TDS 미수는 10810200000 신설(선납법인세와 분리). 법정준비금 = Statutory Reserve(31110300000)"),
     ("4차 (적금·AOB)", "적금은 0930에 구분이 없음 → 정기예금과 동등한 L3 20190000000(+이자 50170000000, 미지급이자 20410120000) 신설 요청. 3차까지의 '정기예금 아래 L5' 제안은 철회. "
      "AOB 의미는 본점 확인 요청(0930 본점 매핑명은 올원뱅크) — 인도 미사용은 동일"),
-    ("4차 (세무)", "TDS: L5 신고서 × L6 납부 성격(현행 조문별 계정 30여 개를 1:1·n:1 이행) — 신법(392·393·394) 조문 변경에도 GL 불변. TCS: LRS 교육·의료/기타/해외여행 L6. "
-     "GST: 세목 L5 × 수수료/환전 L6, RCM·ITC·임시 ITC·전자현금원장·이자가산세 신설. GST FRS 신규안 20990040은 현행 TCS 계정과 충돌 (시트 12)"),
+    ("4차 (세무)", "TDS·TCS: 챌린 납부 성격 L5(현행 조문별 계정 30여 개를 1:1·n:1 이행) — 신법(392·393·394) 조문 변경에도 GL 불변. TCS: LRS 교육·의료/기타/해외여행/기타 L5. "
+     "GST: 세목 L5(수수료/환전은 파라미터), RCM·ITC·임시 ITC·전자현금원장·이자가산세 신설. GST FRS 신규안 20990040은 현행 TCS 계정과 충돌 (시트 12)"),
     ("4차 (고정자산·비용)", "표시는 BR Act Third Schedule(Sch.10·16), 인식은 인도 AS(은행 Ind AS 미적용), 내용연수는 Companies Act Schedule II, 세무는 감가상각 블록. "
-     "컴퓨터 단말·서버·전기설비·가구비품 계정 신설, FA 코드에 GL·내용연수·세무율 연결(시트 13). 감사보수·법률비용이 Service Commission에 섞여 Sch.16 VII·VIII을 GL로 못 냄 → 분리, "
+     "컴퓨터 단말·서버·전기설비·가구비품 계정 신설, FA 코드에 GL·내용연수·세무율 연결(시트 13). 감사보수·법률비용이 Service Commission에 섞여 Sch.16 VII·VIII을 GL로 못 냄 → L5 분리, "
      "복리비는 Sch.16 I, Service Commission ₹2.62 crore는 총수익 1% 초과 별도 공시 (시트 14)"),
+    ("5차 (5단계)", "시스템은 L5까지 → 4차의 L6은 모두 파라미터 또는 L5로. TDS·TCS = 챌린 납부 성격 L5 20개(TCS 기타 20510402000 포함), GST = 세목 L5, 수수료/환전·고령자·신고서는 파라미터. "
+     "0930 자체의 L6 36개(사무경비)도 L5 기장 + EP 코드 파라미터. 협회비 50940022700, CSR 50940029100·미집행 부채 20441000000, PF·ESIC·상여·Gratuity·연차·급여 미지급 L5 신설"),
     ("다음 단계", "시트 08 결정사항 중 '권고'·'미결' 확정 → coa_model.py 반영, 이행표(시트 09)를 본점 CoA 담당에 전달, ECL·RWA 개발명세의 계정코드를 11자리로 교체"),
 ]
 ws = wb.create_sheet("00 요약")
@@ -315,10 +317,14 @@ for i, w in enumerate([30, 22, 40, 50, 12, 16, 30, 8], 1):
 
 # ---- 12 세무 계정 --------------------------------------------------------------------
 NEWALL = {n[0]: n for n in TF.NEW3}
+CUR_NAME = {c: CM.ALL[c].get("br_name") or CM.ALL[c]["name"].strip() for c in CM.ALL}
+CUR_NAME.update({n[0]: n[3] for n in MG.NEW2})
+CUR_NAME.update({r["code"]: r["en"] for r in M.R if r["code"] != "-" and r["kind"] not in ("철회", "비활성")})
+CUR_NAME.update({n[0]: n[3] for n in TF.NEW3})
 ws = wb.create_sheet("12 세무계정(TDS·TCS·GST)")
 ws["A1"] = "TDS·TCS·GST 계정 — 11자리 (소득세법 2025, GST 2.0)"
 ws["A1"].font = Font(name=F, size=14, bold=True)
-ws["A2"] = "L5 = 납부·신고 단위(신고서·세목), L6 = 납부 성격. 조문번호·세율·한도는 TDS 산출물 Rate Master와 GST Charge Code 마스터(일자 유효)에서 관리하고 GL 이름에 넣지 않음."
+ws["A2"] = "시스템 5단계: L5가 기장 단위. TDS·TCS L5 = 챌린 납부 성격, GST L5 = 세목. 신고서·조문·세율·한도·수수료/환전 구분은 파라미터(③) — TDS 산출물 Rate Master와 GST Charge Code 마스터(일자 유효)에서 관리하고 GL 이름에 넣지 않음."
 ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP; ws.merge_cells("A2:F2"); ws.row_dimensions[2].height = 30
 r = 4
 r = section(ws, r, "① 개정 대응·설계 판단", ["항목", "내용"], TF.TAX_NOTES)
@@ -326,10 +332,11 @@ tax_live = [m for m in MIG if m["code"].startswith(("2099", "1099", "1092001", "
 rows = []
 for m in sorted(tax_live, key=lambda m: m["tgt"]):
     t = MG.targets_of(m["tgt"])
-    nm = " / ".join(NEWALL[x][3] if x in NEWALL else (CM.ALL[x]["name"].strip() if x in CM.ALL else x) for x in t)
+    nm = " / ".join(CUR_NAME.get(x, x) for x in t)
     rows.append((m["code"], m["name"], m["amt"] or None, m["tgt"], nm, m["kind"], m["note"]))
 r = section(ws, r, "② 현행 세무 계정 → 11자리", ["현행코드", "현행 계정명", "잔액(INR)", "11자리", "11자리 계정명", "판정", "비고"], rows)
-r = section(ws, r, "③ 신설 세무 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"],
+r = section(ws, r, "③ 세금 L5 ↔ 파라미터 (TAX_GL_PARAM, 일자 유효)", ["L5", "세목", "신고서", "구 조문", "신 조문(2025법)", "파라미터로 관리할 하위 구분"], TF.TAX_GL_PARAM)
+r = section(ws, r, "④ 신설 세무 계정", ["코드", "Lv", "상위", "영문명", "한글명", "사유"],
             [n[:6] for n in TF.NEW3 if n[6] == "세무"])
 for i, w in enumerate([14, 36, 16, 40, 44, 12, 60], 1):
     ws.column_dimensions[get_column_letter(i)].width = w
@@ -373,7 +380,7 @@ ws["A2"].font = Font(name=F, size=9, color="595959"); ws["A2"].alignment = WRAP;
 r = 4
 r = section(ws, r, "① Sch.16 줄", ["줄", "명칭"], list(TF.SCH16_LINES.items()))
 mig_by = {m["code"]: m for m in MIG}
-_lv = {a["code"]: a["lv"] for a in CM.BASE}
+_lv = {a["code"]: a["lv"] for a in CM.BASE if a["lv"] <= 5}  # 시스템 5단계
 _lv.update({n[0]: n[1] for n in TF.NEW3}); _lv.update({n[0]: n[1] for n in MG.NEW2})
 
 
@@ -386,7 +393,7 @@ def _is_parent(c):
 opex = []
 for a in CM.BASE + [dict(code=n[0], name=n[3], lv=n[1]) for n in TF.NEW3 if n[6] in ("비용", "고정자산")] + [dict(code=n[0], name=n[3], lv=n[1]) for n in MG.NEW2 if n[0].startswith("509")]:
     c = a["code"]
-    if (c.startswith(("509", "5101", "51204", "51211"))) and a.get("lv", 0) >= 4 and not c.startswith(("509202001", "509202002", "509202099", "5101004")) and not _is_parent(c):
+    if (c.startswith(("509", "5101", "51204", "51211"))) and 4 <= a.get("lv", 0) <= 5 and not c.startswith(("509202001", "509202002", "509202099", "5101004")) and not _is_parent(c):
         line = TF.sch16_of(c)
         note = next((v for k, v in TF.SCH16_NOTE.items() if c.startswith(k)), "")
         live = [m for m in MIG if c in MG.targets_of(m["tgt"]) and m["stmt"] == "PL"]
