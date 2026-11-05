@@ -14,6 +14,7 @@
 | `docs/06_통합표준CoA_0930_인도지점반영.xlsx` | **본점 회신용**: 본점 0930 '통합표준CoA_계정상태표' 양식(A~J열 그대로)에 인도 반영 9열(상태·인도 원장 기장(사용/미사용/본점 IFRS 조정 전용)·인도 표시명·현행 8자리·잔액·사유·재무제표 줄·정정 권고·용어 정의), 신설 계정은 코드 순서에 삽입, 요약 집계·읽는 법·용어집 |
 | `docs/07_인도_총계정원장_검토가이드_본점용.docx` | **본점 담당자용 Word 가이드**: 인도 GAAP(AS·RBI·Third Schedule)과 IFRS 수렴 일정, GAAP 차이와 처리 위치, GST 구조·세목 결정 순서도·환전 과세가액·월간 흐름·분개 예, TDS·TCS 조문(2025법)·거주성 두 판정 순서도·세율 계산 예·LRS TCS·연말 미경과 이자, 기타 인도 기준, 원장 검토 체크리스트, 용어집 |
 | `docs/08_IFRS_갭분석_노이다지점.xlsx` | **본점 IFRS 확인 요청서 회신본**(원본 양식 유지): 총괄표 노이다 칸, IFRS 조정 7건, 금융상품 분류 10건, COMMISSION 13계정, 리스 7건, 기타 7건, 뉴욕 이슈 해당 여부. 노란 칸은 계약서 대조가 남은 항목 |
+| `docs/08_IFRS_Gap_Analysis_Noida_EN.xlsx` | **English edition for local staff review**: same content and HO layout in English (sheets, dropdowns, NY pre-fill translated) plus a `Review_Request` sheet with 10 questions and reviewer-response columns |
 | `db/ddl_oracle.sql` | Oracle DDL (테이블·코멘트·인덱스·FK·파라미터 초기적재·보고용 뷰 예시) |
 | `screens/index.html` | HTML 화면 시안 26종 (브라우저로 바로 열기). `screens/app.html`은 Artifact 게시용 원본 |
 | `screens/forms.html` | 고객 서식 A4 인쇄 시안 4종·14개 변형 (DB 매핑 표시, DUPLICATE 보기) |
@@ -30,6 +31,7 @@ python3 build_ddl.py ../db/ddl_oracle.sql
 python3 build_ho_format.py     # 본점 양식 반영본(06)
 python3 export_guide_data.py /tmp/guide.json && node build_guide_docx.js /tmp/guide.json "../docs/07_인도_총계정원장_검토가이드_본점용.docx"   # 본점용 Word 가이드
 python3 build_ifrs_gap.py   # 본점 IFRS 갭분석 회신본(원본 양식: data/ifrs_gap_template.xlsx)
+python3 build_ifrs_gap.py en   # 영문 검토본(현지 직원용, 내용: ifrs_gap_en.py)
 python3 build_coa_review.py   # CoA 검토의견 (원천 coa_review_model.py, 이행·ECL은 coa_migration_model.py + data/gbs_live_20260707.json, 세무·고정자산·비용은 tax_fa_model.py + data/fa_code_list.json·ep_code_list.json, LCR은 lcr_model.py, 시트별 근거는 sheet_doc_model.py, 용어 정의는 glossary_model.py, 결정은 decisions_model.py, 리스·GAAP은 lease_model.py·gaap_model.py)
 node build_docx.js /tmp/model.json "../docs/01_요건정의_설계서.docx"
 python3 build_forms.py

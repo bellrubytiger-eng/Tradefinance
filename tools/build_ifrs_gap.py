@@ -7,18 +7,25 @@
       GBS 현행 BS/PL(2026-07-07), gaap_model.GAAP_DIFF, decisions_model(G9·F2·L3~L6).
       금액은 INR(현지통화), 기준일 2026-03-31 (별도 표기 시 제외).
 
-python3 tools/build_ifrs_gap.py  →  docs/08_IFRS_갭분석_노이다지점.xlsx
+python3 tools/build_ifrs_gap.py       →  docs/08_IFRS_갭분석_노이다지점.xlsx
+python3 tools/build_ifrs_gap.py en    →  docs/08_IFRS_Gap_Analysis_Noida_EN.xlsx (현지 직원 검토용 영문본, ifrs_gap_en.py)
 """
 import math
 import os
 import sys
 
+import re
+import types
+from copy import copy
+
 import openpyxl
-from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment, PatternFill
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "tools", "data", "ifrs_gap_template.xlsx")
 OUT = os.path.join(ROOT, "docs", "08_IFRS_갭분석_노이다지점.xlsx")
+OUT_EN = os.path.join(ROOT, "docs", "08_IFRS_Gap_Analysis_Noida_EN.xlsx")
+HANGUL = re.compile("[\uac00-\ud7a3]")
 BR = "노이다지점"
 BASE = "2026-03-31"
 CHECK = PatternFill("solid", fgColor="FFFFF2CC")  # 계약서 대조 등 지점 확인이 남은 칸
@@ -279,15 +286,88 @@ def _first_empty(ws, start=5):
 
 
 def _needs_check(v):
-    return isinstance(v, str) and ("확인 필요" in v or v == "확인 중")
+    return isinstance(v, str) and any(k in v for k in ("확인 필요", "To be confirmed")) or v in ("확인 중", "Checking")
 
 
-def build(src=SRC, out=OUT):
+def _ko():
+    g = globals()
+    c = types.SimpleNamespace(**{k: g[k] for k in (
+        "BR", "SUMMARY", "IFRS_ADJ", "FIN", "COMM", "LEASE", "OTHER", "NY_ISSUE")})
+    c.NA, c.COMM_PREFIX, c.CHECKING = "해당없음", "FY25-26 실적.", "확인 중"
+    return c
+
+
+def _en():
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import ifrs_gap_en as c
+    c.NA = "N/A"
+    return c
+
+
+def _translate(wb, c):
+    """원본 양식 문구·드롭다운·수식을 영문으로 바꾸고 시트명을 바꾼다. 남은 한글이 있으면 실패."""
+    for ws in wb:
+        for row in ws.iter_rows():
+            for cell in row:
+                v = cell.value
+                if not isinstance(v, str):
+                    continue
+                if v in c.TPL:
+                    cell.value = c.TPL[v]
+                elif v.startswith("="):
+                    for a, b in c.FORMULA_SUBS:
+                        v = v.replace(a, b)
+                    cell.value = v
+        for dv in ws.data_validations.dataValidation:
+            if dv.formula1 in c.TPL:
+                dv.formula1 = c.TPL[dv.formula1]
+    for ws in wb:
+        ws.title = c.SHEETS[ws.title]
+
+
+def _review_sheet(wb, c):
+    ws = wb.create_sheet("Review_Request", 0)
+    head_src = wb["Summary"]["A4"]
+    body_src = wb["Summary"]["I8"]
+    ws["A1"] = c.REVIEW_TITLE
+    ws["A1"].font = copy(wb["Instructions"]["A1"].font)
+    ws.merge_cells("A2:F2")
+    ws["A2"] = c.REVIEW_INTRO
+    ws["A2"].alignment = Alignment(wrap_text=True, vertical="top")
+    ws["A2"].font = copy(body_src.font)
+    ws.row_dimensions[2].height = 80
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.fitToWidth, ws.page_setup.fitToHeight = 1, 0
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    for j, h in enumerate(c.REVIEW_HEAD, start=1):
+        cell = ws.cell(4, j, h)
+        for attr in ("font", "fill", "border", "alignment"):
+            setattr(cell, attr, copy(getattr(head_src, attr)))
+    for i, item in enumerate(c.REVIEW, start=1):
+        r = 4 + i
+        for j, v in enumerate((i,) + item + ("", ""), start=1):
+            cell = ws.cell(r, j, v)
+            for attr in ("font", "border", "alignment"):
+                setattr(cell, attr, copy(getattr(body_src, attr)))
+            if j >= 5:
+                cell.fill = CHECK
+    for col, w in zip("ABCDEF", (6, 26, 60, 44, 40, 16)):
+        ws.column_dimensions[col].width = w
+    for r in range(5, 5 + len(c.REVIEW)):
+        _fit(ws, r, min_h=30)
+    ws.freeze_panes = "A5"
+    wb.active = 0
+
+
+def build(lang="ko", src=SRC, out=None):
+    c = _en() if lang == "en" else _ko()
+    out = out or (OUT_EN if lang == "en" else OUT)
+    BR = c.BR
     wb = openpyxl.load_workbook(src)
 
     ws = wb["총괄표"]
     ws.column_dimensions["I"].width = 42
-    for r, v in SUMMARY.items():
+    for r, v in c.SUMMARY.items():
         _put(ws, r, 9, v, check=r in SUMMARY_CHECK)
     for r in range(5, 26):
         _fit(ws, r, min_h=ws.row_dimensions[r].height or 24)
@@ -296,7 +376,7 @@ def build(src=SRC, out=OUT):
     for col, w in (("E", 34), ("H", 16), ("J", 44)):
         ws.column_dimensions[col].width = w
     r = _first_empty(ws)
-    for item in IFRS_ADJ:
+    for item in c.IFRS_ADJ:
         _put(ws, r, 2, BR)
         for j, v in enumerate(item, start=3):
             _put(ws, r, j, v)
@@ -307,7 +387,7 @@ def build(src=SRC, out=OUT):
     for col, w in (("C", 12), ("D", 30), ("E", 18), ("M", 40)):
         ws.column_dimensions[col].width = w
     r = _first_empty(ws)
-    for item in FIN:
+    for item in c.FIN:
         _put(ws, r, 2, BR)
         for j, v in enumerate(item, start=3):
             _put(ws, r, j, v)
@@ -318,7 +398,7 @@ def build(src=SRC, out=OUT):
     for col, w in (("D", 34), ("E", 26), ("I", 14), ("N", 44)):
         ws.column_dimensions[col].width = w
     r = _first_empty(ws)
-    for code, name, nature, prod, gi, tb, amt, note in COMM:
+    for code, name, nature, prod, gi, tb, amt, note in c.COMM:
         _put(ws, r, 2, BR)
         _put(ws, r, 3, code)
         _put(ws, r, 4, name)
@@ -326,13 +406,13 @@ def build(src=SRC, out=OUT):
         _put(ws, r, 6, prod)
         if gi:
             _put(ws, r, 7, gi)
-            _put(ws, r, 8, "해당없음")
+            _put(ws, r, 8, c.NA)
             _put(ws, r, 9, tb)
-            _put(ws, r, 10, "해당없음")
+            _put(ws, r, 10, c.NA)
             _put(ws, r, 11, "-")
         _put(ws, r, 12, amt)
         _put(ws, r, 13, 0)
-        _put(ws, r, 14, f"FY25-26 실적. {note}")
+        _put(ws, r, 14, f"{c.COMM_PREFIX} {note}")
         _fit(ws, r)
         r += 1
 
@@ -340,7 +420,7 @@ def build(src=SRC, out=OUT):
     for col, w in (("H", 18), ("I", 14), ("K", 16), ("P", 14), ("Q", 14), ("U", 40)):
         ws.column_dimensions[col].width = w
     r = _first_empty(ws)
-    for item in LEASE:
+    for item in c.LEASE:
         _put(ws, r, 2, BR)
         for col, v in item.items():
             _put(ws, r, openpyxl.utils.column_index_from_string(col), v, check=_needs_check(v))
@@ -351,7 +431,7 @@ def build(src=SRC, out=OUT):
     for col, w in (("E", 34), ("F", 30), ("H", 34), ("I", 20)):
         ws.column_dimensions[col].width = w
     r = _first_empty(ws)
-    for item in OTHER:
+    for item in c.OTHER:
         _put(ws, r, 2, BR)
         for j, v in enumerate(item, start=3):
             _put(ws, r, j, v, check=_needs_check(v))
@@ -359,11 +439,20 @@ def build(src=SRC, out=OUT):
         r += 1
 
     ws = wb["뉴욕지점_이슈처리"]
-    for r, (mark, note) in NY_ISSUE.items():
-        _put(ws, r, 7, mark, check=mark == "확인 중")
+    for r, (mark, note) in c.NY_ISSUE.items():
+        _put(ws, r, 7, mark, check=mark == c.CHECKING)
         prev = ws.cell(r, 15).value
         _put(ws, r, 15, f"{prev}\n{note}" if prev else note)
         _fit(ws, r, min_h=ws.row_dimensions[r].height or 42)
+
+    if lang == "en":
+        _translate(wb, c)
+        _review_sheet(wb, c)
+        left = [(ws.title, cell.coordinate) for ws in wb for row in ws.iter_rows() for cell in row
+                if isinstance(cell.value, str) and HANGUL.search(cell.value)]
+        left += [(ws.title, str(dv.sqref)) for ws in wb for dv in ws.data_validations.dataValidation
+                 if dv.formula1 and HANGUL.search(dv.formula1)]
+        assert not left, f"untranslated: {left[:10]}"
 
     os.makedirs(os.path.dirname(out), exist_ok=True)
     wb.save(out)
@@ -371,4 +460,4 @@ def build(src=SRC, out=OUT):
 
 
 if __name__ == "__main__":
-    print(build(*sys.argv[1:3]))
+    print(build(*sys.argv[1:2]))
