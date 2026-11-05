@@ -12,6 +12,7 @@
 | `docs/04_화면흐름도.pptx` | 화면 연결 다이어그램 13장 (전체 지도, 당발·타발·FDI 초과반환·무역금융·LC/BG·본지점/RA·Vostro/SWIFT/환전, 서식·보고 허브, 화면 목록) |
 | `docs/05_CoA검토_RBI보고속성.xlsx` | **통합 표준 CoA(0930) 검토의견**: GL vs 속성 판정원칙·Third Schedule 대응, 예금명세서 GBS 8자리 코드 충돌 자동대조, 계정 신규·변경·속성전환·비활성(이전 반영안 정정 포함), 예금상품→계정 매핑, RBI 보고용 속성 57개, 보고서별 요구, PSL·INR Nostro·FN/NRO 상세, **현행 인도 GBS(2026-07-07 BS/PL) → 11자리 이행표(대차 검증)**, **ECL·RWA 개발명세 계정 매핑**, 결정사항, **LCR 분류·파라미터(TB_LCR_*)**, **적금 L3·TDS/TCS/GST 11자리(신 소득세법·GST FRS)·고정자산(Schedule II, FA코드 연결)·영업비용 Sch.16 매핑(EP코드)**, 시트별 '본점 원안 / 변경 / 이유 / FY25-26 결산 증거' 블록과 결산근거 시트, 모든 표의 「인도 용어 정의」 열(시트 17 용어집) |
 | `docs/06_통합표준CoA_0930_인도지점반영.xlsx` | **본점 회신용**: 본점 0930 '통합표준CoA_계정상태표' 양식(A~J열 그대로)에 인도 반영 9열(상태·인도 원장 기장(사용/미사용/본점 IFRS 조정 전용)·인도 표시명·현행 8자리·잔액·사유·재무제표 줄·정정 권고·용어 정의), 신설 계정은 코드 순서에 삽입, 요약 집계·읽는 법·용어집 |
+| `docs/07_인도_총계정원장_검토가이드_본점용.docx` | **본점 담당자용 Word 가이드**: 인도 GAAP(AS·RBI·Third Schedule)과 IFRS 수렴 일정, GAAP 차이와 처리 위치, GST 구조·세목 결정 순서도·환전 과세가액·월간 흐름·분개 예, TDS·TCS 조문(2025법)·거주성 두 판정 순서도·세율 계산 예·LRS TCS·연말 미경과 이자, 기타 인도 기준, 원장 검토 체크리스트, 용어집 |
 | `db/ddl_oracle.sql` | Oracle DDL (테이블·코멘트·인덱스·FK·파라미터 초기적재·보고용 뷰 예시) |
 | `screens/index.html` | HTML 화면 시안 26종 (브라우저로 바로 열기). `screens/app.html`은 Artifact 게시용 원본 |
 | `screens/forms.html` | 고객 서식 A4 인쇄 시안 4종·14개 변형 (DB 매핑 표시, DUPLICATE 보기) |
@@ -26,6 +27,7 @@ python3 model.py /tmp/model.json
 python3 build_xlsx.py "../docs/02_데이터사전_업무규칙.xlsx"
 python3 build_ddl.py ../db/ddl_oracle.sql
 python3 build_ho_format.py     # 본점 양식 반영본(06)
+python3 export_guide_data.py /tmp/guide.json && node build_guide_docx.js /tmp/guide.json "../docs/07_인도_총계정원장_검토가이드_본점용.docx"   # 본점용 Word 가이드
 python3 build_coa_review.py   # CoA 검토의견 (원천 coa_review_model.py, 이행·ECL은 coa_migration_model.py + data/gbs_live_20260707.json, 세무·고정자산·비용은 tax_fa_model.py + data/fa_code_list.json·ep_code_list.json, LCR은 lcr_model.py, 시트별 근거는 sheet_doc_model.py, 용어 정의는 glossary_model.py, 결정은 decisions_model.py, 리스·GAAP은 lease_model.py·gaap_model.py)
 node build_docx.js /tmp/model.json "../docs/01_요건정의_설계서.docx"
 python3 build_forms.py
