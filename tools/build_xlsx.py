@@ -86,7 +86,8 @@ def main(out):
              ("17.CoA(인도지점)", "06 인도 반영 CoA 전체 1,360계정: 신규(주황)·변경/용도지정/기한부(연주황)·비활성/철회(회색)·IFRS 전용(하늘)·0930 정정권고(노랑), 현행 8자리·잔액"),
              ("18.업무별분개", "업무별 예시 분개(통화별 대차 검증 수식 포함). 금액은 고객 서식 샘플과 일치"),
              ("19.계정이행맵핑", "현행 인도 GBS 8자리 → 차세대 11자리 이행표(06) + 현행 BS/PL 전체 대사·미연결 132개 맵핑 제안"),
-             ("20.CoA검토의견", "06 인도 반영 CoA 검토 의견(추가·수정·삭제)")]
+             ("20.CoA검토의견", "06 인도 반영 CoA 검토 의견(추가·수정·삭제)"),
+             ("21.추후고려사항", "현행 미연결 '확인' 32건: 추천안 확정 적용 + 재검토 시점·담당·상태(드롭다운)")]
     for k, v in guide:
         ws.cell(r, 2, k).font = f(bold=True); ws.cell(r, 3, v).font = f(); r += 1
     r += 1
@@ -177,6 +178,7 @@ def main(out):
     build_journal(wb)
     build_map(wb)
     build_review(wb)
+    build_future(wb)
     wb.save(out)
     print("saved", out)
 
@@ -382,7 +384,7 @@ def build_map(wb):
     for u in d["CUR_UNMAPPED"]:
         r += 1
         vals = [u["cur"], u["kind"], u["code"], u["name"], u["cur_name"], u["post"], "", u["dr"], "", "", u["why"], ""]
-        f = {"신규맵핑": MOD_FILL, "이행제외": INACT_FILL, "확인": FIX_FILL}[u["kind"]]
+        f = {"신규맵핑": MOD_FILL, "이행제외": INACT_FILL, "추천확정": FIX_FILL}[u["kind"]]
         for c, v in enumerate(vals, 1):
             x = ws.cell(r, c, v); x.border = BORDER; x.font = Font(name=FONT, size=9); x.alignment = Alignment(vertical="top", wrap_text=c in (4, 5, 11))
             if c in (2, 3):
@@ -393,6 +395,32 @@ def build_map(wb):
         ws.column_dimensions[get_column_letter(c)].width = w
     ws.freeze_panes = "B5"
     ws.auto_filter.ref = f"A4:L{last}"
+
+
+def build_future(wb):
+    ws = wb.create_sheet("21.추후고려사항")
+    d = M.as_dict()
+    F = d["FUTURE"]
+    ws.cell(1, 1, "추후 고려사항 — 현행 CoA 미연결 계정 중 '확인' 32건 (추천안 확정, 2026-11-06)").font = Font(name=FONT, bold=True, size=13, color="1F4E79")
+    ws.cell(2, 1, "지금은 추천안으로 이행표에 확정 반영(모두 잔액 0). 아래 시점이 오면 '추후 고려' 내용을 다시 판단하고 이행표·CoA를 정정합니다.").font = Font(name=FONT, italic=True, size=9, color="595959")
+    _hdr(ws, 4, ["#", "현행 계정", "현행 계정명", "적용(현재)", "대상 11자리", "대상 계정명", "적용 근거", "추후 고려", "재검토 시점", "담당", "상태"])
+    for i, u in enumerate(F, 5):
+        vals = [i - 4, u["cur"], u["cur_name"], u["applied"], u["code"], u["name"], u["why"], u["future"], u["when"], u["owner"], "미결"]
+        for c, v in enumerate(vals, 1):
+            x = ws.cell(i, c, v); x.border = BORDER; x.font = Font(name=FONT, size=9, bold=c == 8); x.alignment = WRAP
+        ws.cell(i, 8).fill = FIX_FILL
+    r = 6 + len(F)
+    ws.cell(r, 1, "묶음 요약").font = Font(name=FONT, bold=True, size=11, color="1F4E79"); r += 1
+    from collections import Counter
+    for (fut, when), n in Counter((u["future"], u["when"]) for u in F).items():
+        ws.cell(r, 2, f"{n}건").font = Font(name=FONT, size=9, bold=True); ws.cell(r, 3, fut).font = Font(name=FONT, size=9); ws.cell(r, 9, when).font = Font(name=FONT, size=9)
+        ws.cell(r, 3).alignment = WRAP; r += 1
+    dv = DataValidation(type="list", formula1='"미결,검토중,완료,해당없음"', allow_blank=True)
+    ws.add_data_validation(dv); dv.add(f"K5:K{4 + len(F)}")
+    for c, w in enumerate([4, 11, 34, 11, 13, 30, 46, 56, 20, 16, 8], 1):
+        ws.column_dimensions[get_column_letter(c)].width = w
+    ws.freeze_panes = "C5"
+    ws.auto_filter.ref = f"A4:K{4 + len(F)}"
 
 
 def build_review(wb):

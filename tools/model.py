@@ -2020,7 +2020,7 @@ def as_dict():
             "RBI_REVIEW": RBI_REVIEW, "TF_FLOW": TF_FLOW, "REG_INDEX": REG_INDEX,
             "COA": COA.coa_rows(), "JOURNAL": COA.journal_rows(), "ACCT_RULE": COA.rule_rows(),
             "COA_ADD": COA.ADD, "COA_DEACT": COA.DEACT, "COA_FIX": COA.FIX, "COA_MAP": COA.MAPPING, "COA_REVIEW": COA.REVIEW,
-            "CUR_UNMAPPED": COA.CUR_UNMAPPED, "CUR_STATS": COA.CUR_STATS, "BAL_DIFF": COA.BAL_DIFF}
+            "CUR_UNMAPPED": COA.CUR_UNMAPPED, "CUR_STATS": COA.CUR_STATS, "BAL_DIFF": COA.BAL_DIFF, "FUTURE": COA.FUTURE}
 
 
 if __name__ == "__main__":

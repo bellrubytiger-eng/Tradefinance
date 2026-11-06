@@ -80,7 +80,7 @@ def main(out):
     for u in COA.CUR_UNMAPPED:
         if u["code"]:
             L.append("INSERT INTO TB_COA_MIGR_MAP (CUR_GBS_CD, ACCT_CD, MAP_TYPE, SPLIT_RULE, BAL_INR_BASE, REVIEW_STS, REVIEW_NOTE, REG_USER_ID, REG_TS) VALUES ("
-                     f"{q(u['cur'])}, {q(u['code'])}, '1:1', NULL, {u['dr']}, {q('제안-' + u['kind'])}, {q(u['why'])}, 'SYSTEM', SYSTIMESTAMP);")
+                     f"{q(u['cur'])}, {q(u['code'])}, '1:1', NULL, {u['dr']}, {q(('확정-' if u['kind'] == '추천확정' else '제안-') + u['kind'])}, {q(u['why'])}, 'SYSTEM', SYSTIMESTAMP);")
         else:
             L.append(f"-- {u['cur']} {u['cur_name']} : {u['kind']} - {u['why']}")
     L.append("")
