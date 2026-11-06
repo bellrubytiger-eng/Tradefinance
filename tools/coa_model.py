@@ -696,3 +696,33 @@ if __name__ == "__main__":
           sum(1 for m in MAPPING if m["sev"] != "OK"), "to review")
     from collections import Counter
     print("current CoA", CUR_STATS, Counter(r["kind"] for r in CUR_UNMAPPED), "balance diffs", BAL_DIFF)
+
+
+# ---------------------------------------------------------------------------
+# 정정 후 최종 이행 맵핑 (06 정정본 생성용): 현행 8자리 → [11자리]
+# ---------------------------------------------------------------------------
+def _final_map():
+    fm, why, excl = defaultdict(list), {}, []
+    for m in MAPPING:
+        g, t = m["cur"], m["target"]
+        if g == "54010091" and m["code"] == "20990000000":
+            why[(g, m["code"])] = "비용 코드의 부채 계정 연결 삭제(오류)"
+            continue
+        if g == "53090014" and m["code"] == "50440000000":
+            why[(g, m["code"])] = "중복 연결 삭제 — 처분손실 50430201000 단일(매입부대비용 계정은 손실 아님), 투자분류는 속성"
+            continue
+        if t == "이행 제외":
+            excl.append((g, CUR[g]["name"] if g in CUR else "", m["code"], "비활성 계정 대상 — 현행 폐지(이행 제외), 잔액 0"))
+            continue
+        if t != m["code"]:
+            why[(g, m["code"])] = f"상위 계정 → leaf {t}"
+        fm[g].append(t)
+    for u in CUR_UNMAPPED:
+        if u["code"]:
+            fm[u["cur"]].append(u["code"])
+        else:
+            excl.append((u["cur"], u["cur_name"], "", u["why"]))
+    return {g: list(dict.fromkeys(v)) for g, v in fm.items()}, why, excl
+
+
+FINAL_MAP, FINAL_WHY, EXCLUDED = _final_map()
