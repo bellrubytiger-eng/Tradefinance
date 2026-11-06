@@ -32,7 +32,7 @@ SUMMARY = {
         "(2) guarantees (GUARANTEE(Bond) 42010013) (3) remittance (42020601/602/603/606/629) "
         "(4) reimbursement, extension, postage (42020401/402/403, 42020307)",
     15: "1 deferred / 11 upfront. Guarantee commission (42010013) is taken to unearned income (20920017 Income On "
-        "Guarantee Money, ₹72,838 at 2026-03-31) and spread over the guarantee period — same as Indian GAAP AS 9 "
+        "Guarantee Money, ₹72,838 at 2026-03-31 → ₹39,021 at 2026-10-31 with guarantees unchanged) and spread over the guarantee period — same as Indian GAAP AS 9 "
         "(recognised as the service is performed) and IFRS 9 financial guarantees. Others are recognised when received "
         "(AS 9). Loan processing fees form part of the EIR under IFRS 9 and should be deferred",
     16: "Fee income",
@@ -49,10 +49,10 @@ SUMMARY = {
         "fit-out), so it must also be provided under Indian GAAP "
         "(AS 29, undiscounted) → to be recognised from a reinstatement quotation. New account 20940000000 in the "
         "next-gen CoA",
-    25: "(1) No interest recognised on NPAs (IRACP) (2) guarantees as financial guarantee contracts / ECL (no undrawn "
-        "commitments) (3) 25% statutory reserve (transfer within equity) (4) prior-period items under AS 5 "
-        "(5) maintenance charges are not a lease (service) (6) gap narrows after RBI ECL/EIR from 2027-04. "
-        "Detail in 13_Others",
+    25: "(1) No interest recognised on NPAs (IRACP) (2) guarantees as financial guarantee contracts / ECL; nature of the "
+        "₹30.01 crore Reserved Credit Line Commitment at 2026-10-31 to be confirmed (3) 25% statutory reserve (transfer "
+        "within equity) (4) prior-period items under AS 5 (5) AS 19 rent not straight-lined (maintenance charges are not "
+        "a lease) (6) gap narrows after RBI ECL/EIR from 2027-04. Detail in 13_Others",
 }
 
 # ───────────────────────── 2_IFRS_Adjustments ─────────────────────────
@@ -77,7 +77,7 @@ IFRS_ADJ = [
      "Directions 2026 moves the local books to deferral; until then an HO adjustment is needed. "
      "GBS to produce LOF deferral and EIR amortisation data"),
     ("Rent (leases)\n(52032421 RENTAL EXPENSE / next-gen 50940021405) — 1 office, 5 staff residences",
-     "AS 19 operating leases: rent expensed on a straight-line basis over the lease term (FY25-26 ₹3,88,82,301), "
+     "AS 19 operating leases: rent expensed as billed, not straight-lined (FY25-26 ₹3,88,82,301), "
      "future minimum lease payments disclosed. No right-of-use asset or lease liability",
      "IFRS 16: right-of-use asset and lease liability, interest expense and depreciation. "
      "Optional exemptions for leases of 12 months or less and low-value assets",
@@ -145,6 +145,10 @@ FIN = [
     ("Other", "Guarantees (bond guarantees, off-balance-sheet)", "Contingent liability (Sch.12)", "N/A", "N/A",
      "N/A", "N/A", "N/A", 5695709, "-",
      "IFRS 9 financial guarantee: initially at the fee, then higher of ECL and unamortised amount. See 13_Others no.2"),
+    ("Other", "Loan commitment (Reserved Credit Line Commitment, off-balance-sheet)", "Commitment (off-B/S, 62040001)",
+     "N/A", "N/A", "N/A", "N/A", "N/A", 300104291, "-",
+     "Balance at 2026-10-31 (nil in Sch.12 'other items' at 2026-03-31). If an undrawn sanctioned limit, within IFRS 9 "
+     "commitment ECL. See 13_Others no.2"),
 ]
 
 # ───────────────────────── 4-7_COMMISSION ─────────────────────────
@@ -159,8 +163,9 @@ COMM = [
      "Deferred", "Fee income", 38716,
      "Received into unearned income (20920017 Income On Guarantee Money) and recognised as fee income over the "
      "guarantee period — same as Indian GAAP AS 9 (service performed over time) and IFRS 9 financial guarantees. "
-     "Guarantees outstanding at year end ₹56,95,709. Next-gen unearned income 20420170000, daily straight-line",
-     dict(H="Fee income", J="Straight-line", K="Guarantee period", M=72838, check=True)),
+     "Unearned balance fell to ₹39,021 at 2026-10-31 with guarantees unchanged at ₹56,95,709 — spreading confirmed. "
+     "Next-gen unearned income 20420170000, daily straight-line",
+     dict(H="Fee income", J="Straight-line", K="Guarantee period", M=72838)),
     ("42020601", "COMMISSION - REMITTANCE OF OUTWARD", "Outward remittance handling fee", "Remittance", "Upfront",
      "Fee income", 193250, "Recognised when the service is rendered — same as IFRS 15"),
     ("42020606", "Commission - Remittance Of Outward(OUR)", "Recovery of intermediary-bank charges on OUR remittances",
@@ -206,7 +211,7 @@ LEASE = [
            "option. Full 9 years used (termination not expected)",
          Q="Yes (cl.24 Reinstatement; cl.12(a)(b))", R="Not recognised", S="Not yet estimated",
          T="Not yet estimated — also required under AS 29; to be recognised from a reinstatement quotation",
-         U="AS 19 straight-line applied (108 months, rent-free 4 months 7 days and escalations equalised). Lease template "
+         U="AS 19 straight-lining not applied (rent expensed as billed, 13_Others no.5). Lease template "
            "submitted marked 'N/A' → IFRS 16 not reflected (2_IFRS_Adjustments no.3). Interest-free deposit ₹87,32,922 "
            "(cl.10(a), 6 months' rent). Maintenance under a separate agreement. Leasehold improvements at cost ₹4,78,38,399"),
     dict(C="Staff residence 1", D="Residence", E="2024-08 (first rent month)", H="2026-12 (schedule)", J=_NO_TPL,
@@ -240,12 +245,14 @@ OTHER = [
      "Structural difference only; no amount now"),
     ("Guarantees and undrawn commitments (off-balance-sheet)", "Allowance for financial guarantees and loan commitments",
      "Disclosed as contingent liabilities (Sch.12; guarantees ₹56,95,709). No guarantee provision (standard). "
-     "No undrawn commitments (all limits fully drawn)",
-     "IFRS 9 financial guarantee: initially at the fee, then higher of ECL and unamortised amount",
-     "Guarantees outstanding 5,695,709",
-     "Include guarantees in HO ECL. Next-gen ECL scope includes off-balance-sheet guarantees and commitments "
-     "(decision L6), with CCF attributes",
-     "No undrawn commitments, so no commitment ECL"),
+     "Commitments: nil at 2026-03-31 (Sch.12 other items 0); Reserved Credit Line Commitment ₹30,01,04,291 at "
+     "2026-10-31 (off-B/S 62040001). IRACP sets no provision on undrawn commitments",
+     "IFRS 9 financial guarantee: initially at the fee, then higher of ECL and unamortised amount. ECL on undrawn "
+     "loan commitments",
+     "Guarantees 5,695,709 / commitment 300,104,291 (2026-10-31)",
+     "Include guarantees and commitments in HO ECL. Next-gen ECL scope includes off-balance-sheet guarantees and "
+     "commitments (decision L6), with CCF attributes",
+     "To be confirmed: nature of the ₹30.01 crore commitment (undrawn sanctioned limit?)"),
     ("Statutory reserve (next-gen 31110300000)", "Transfer to statutory reserve",
      "BR Act s.17: 25% of net profit to statutory reserve (appropriation). FY25-26 ₹54,20,250",
      "Transfer within retained earnings in equity; no P&L effect", 5420250,
@@ -254,13 +261,15 @@ OTHER = [
      "AS 5: shown separately as 'prior period items' in current-year P&L",
      "IAS 8: material errors corrected retrospectively (restate comparatives)", "-",
      "Restate HO comparatives if a material item arises", "-"),
-    ("Rent 52032421", "AS 19 straight-line rent",
-     "Straight-line expense over the lease term (2022-04-13 to 2031-04-12) applied, with rent-free 4 months 7 days and "
-     "3-yearly escalations equalised",
-     "Replaced by ROU depreciation and interest under IFRS 16", "-",
-     "No local GAAP gap. Under an IFRS 16 adjustment the straight-line equalisation balance is offset against the ROU "
-     "asset. Next-gen lease register produces the straight-line schedule",
-     "FY25-26 rent ₹3,88,82,301"),
+    ("Rent 52032421", "AS 19 straight-lining not applied",
+     "Monthly billed rent is expensed as is. Rent-free 4 months 7 days and 3-yearly escalations are not equalised — "
+     "no lease-equalisation liability in the 2026-10-31 BS",
+     "Resolved under IFRS 16 (ROU depreciation and interest replace rent)",
+     "Cumulative gap about ₹56–90 lakh at 2026-03-31 (depending on the actual rent start)",
+     "AS 19 para 23 requires straight-line expense over the lease term → Indian GAAP fix. Agree timing and treatment "
+     "of the cumulative amount with the auditor; next-gen lease register produces the straight-line schedule and "
+     "equalisation liability",
+     "FY25-26 rent ₹3,88,82,301. Straight-line ₹15,51,550/month (deed terms) vs. current billing ₹16,01,036"),
     ("Loan-loss allowance / loan fees", "RBI ECL and EIR from 2027-04-01",
      "RBI ECL Directions 2026: stage-based ECL (regulatory floors) and EIR amortisation of loan fees. "
      "First-time impact through retained earnings",
@@ -302,20 +311,23 @@ REVIEW_INTRO = (
 REVIEW_HEAD = ("No.", "Sheet / cell", "Question for local review", "Draft answer in this file", "Reviewer response",
                "Reviewer / date")
 REVIEW = [
-    ("Summary I19, 8-12 row 6 (F, G)",
+    ("Summary I19, 8-12 row 6 (F, G), 13_Others no.5",
      "Actual rent start: the deed gives 4 months 7 days rent-free (to 2022-08-19), or until operations start if earlier. "
-     "The branch said 3 months, and the AS 19 rent schedule in the FY25-26 file shows rent from 2022-04-13. "
-     "What was the date of the first rent invoice?",
+     "The AS 19 rent schedule in the FY25-26 file shows rent from 2022-04-13. What was the date of the first rent "
+     "invoice? It sets the straight-line gap (about ₹90 lakh if rent started 2022-08-20, about ₹56 lakh if 2022-04-13).",
      "Deed basis: Rent Commencement 2022-08-20."),
     ("13_Others no.5",
-     "Straight-line rent: where is the lease-equalisation balance? On the deed terms (rent from 2022-08-20, steps in "
-     "April 2025/2028), straight-line rent is ₹15,51,550/month and cumulative straight-line minus rent payable at "
-     "2026-03-31 is about ₹90,40,612. No such liability appears in the 2026-03-31 TB.",
-     "Shown as 'straight-line applied'."),
-    ("Summary I15, 4-7_COMMISSION row for 42010013",
-     "Guarantee commission: the 2026-03-31 TB carries 20920017 'Income On Guarantee Money' ₹72,838.44 under "
-     "Other liabilities (Sch.5), which is unearned income. Is the commission already spread over the guarantee period?",
-     "Shown as 'Deferred, straight-line'. If it is truly taken upfront, change to 'Upfront' and explain the 20920017 balance."),
+     "Straight-lining is not applied (no equalisation liability in the 2026-10-31 BS). Discuss with the auditor whether to "
+     "book the cumulative equalisation liability and from when.",
+     "Reported as an Indian GAAP gap."),
+    ("13_Others no.2, 3_Fin_Instruments (commitment row)",
+     "The 2026-10-31 BS shows 62040001 RESERVED CREDIT LINE COMMITMENT ₹30,01,04,291 off-balance-sheet. The branch said "
+     "all limits are fully drawn. What is this line (undrawn sanctioned limit, or something else)?",
+     "Shown as a commitment at 2026-10-31, nature to be confirmed."),
+    ("2_IFRS_Adjustments (leases)",
+     "RENTAL EXPENSE for Apr–Oct 2026 is ₹3,31,79,797 (about ₹47 lakh/month), but known rents (office + 3 residences) "
+     "are about ₹26 lakh/month. Which other contracts or charges are in this account (new residences, GST, arrears)?",
+     "Not reflected; lease list may be incomplete."),
     ("8-12 row 6 (S), 2_IFRS_Adjustments (restoration)",
      "Reinstatement cost estimate (quotation) for the AS 29 provision — removal of fit-outs back to warm shell (cl.24).",
      "Obligation confirmed by cl.24; amount not estimated."),
@@ -329,7 +341,7 @@ REVIEW = [
 ]
 REVIEW_DONE_TITLE = "Confirmed by the branch (2026-11-06)"
 REVIEW_DONE = [
-    ("Office lease", "AS 19 straight-line rent. From the registered deed: term 2022-04-13 to 2031-04-12 (cl.3(a)); "
+    ("Office lease", "Rent expensed as billed (2026-10-31 BS has no equalisation liability). From the registered deed: term 2022-04-13 to 2031-04-12 (cl.3(a)); "
                      "rent-free 4 months 7 days; +10% / +10.5% after 3 and 6 years (cl.4(f)); lock-in 36 months; "
                      "reinstatement to warm shell (cl.24); IFRSD ₹87,32,922 (cl.10(a))."),
     ("Lease template", "Submitted to HO but marked 'N/A'."),
@@ -338,7 +350,8 @@ REVIEW_DONE = [
     ("Loan processing fees", "Recognised upfront, not deferred."),
     ("Loan-loss allowance", "Branch computes standard assets × 0.4% (standard method); the extra ₹30,00,000 is the UFCE "
                             "incremental provision."),
-    ("Undrawn commitments", "None — all limits fully drawn."),
+    ("Guarantee commission", "Spread over the guarantee period: unearned income 20920017 fell from ₹72,838 "
+                             "(2026-03-31) to ₹39,021 (2026-10-31) with guarantees unchanged."),
 ]
 
 # ───────────────────────── template translation ─────────────────────────
