@@ -76,7 +76,7 @@ IFRS_ADJ = [
      "NY issue 4 applies (larger gap than NY: no deferral at all). From 2027-04-01 EIR under the RBI ECL "
      "Directions 2026 moves the local books to deferral; until then an HO adjustment is needed. "
      "GBS to produce LOF deferral and EIR amortisation data"),
-    ("Rent (leases)\n(52032421 RENTAL EXPENSE / next-gen 50940021405) — 1 office, 5 staff residences",
+    ("Rent (leases)\n(52032421 RENTAL EXPENSE / next-gen 50940021405) — 1 office, 5 staff residences, 1 alternate site (Nxtra DC)",
      "AS 19 operating leases: rent expensed as billed, not straight-lined (FY25-26 ₹3,88,82,301), "
      "future minimum lease payments disclosed. No right-of-use asset or lease liability",
      "IFRS 16: right-of-use asset and lease liability, interest expense and depreciation. "
@@ -84,7 +84,8 @@ IFRS_ADJ = [
      "Not performed", "TBD", "Estimated lease liability (office) ₹8,21,57,515", BASE,
      "The HO lease template is submitted but marked 'N/A' (no IFRS 16 calculation) → IFRS 16 not reflected in HO "
      "consolidation. Estimate = PV of the remaining 60 office payments of ₹10,21,14,084 at 9% (assumed rate) — "
-     "materiality to be assessed. Local ledger stays on Indian GAAP (Ind AS 116 not applied to banks). Next-gen GBS "
+     "materiality to be assessed. The alternate site (Nxtra) space component, about ₹48 lakh remaining "
+     "(undiscounted), is minor. Local ledger stays on Indian GAAP (Ind AS 116 not applied to banks). Next-gen GBS "
      "keeps IFRS 16 accounts (ROU 107, lease liability 206, interest 50320500000) for HO adjustments only and produces "
      "the monthly schedule from lease-register attributes"),
     ("Lease security deposit\n(10999002 Security Deposit / next-gen 10490700100)",
@@ -229,6 +230,20 @@ LEASE = [
     dict(C="Staff residence 5", D="Residence", E="2026-02 (first rent month)", H="2026-12 (schedule)", J=_NO_TPL,
          M="No escalation (₹3,83,500/month)", P="-", Q="Residential (minor)", R="Not recognised", S="-", T=_RES,
          U="Period = first and last rent month in the rent schedule"),
+    dict(C="Alternate site / DR centre (Nxtra Data, Manesar DC) — 2 racks in a dedicated cage, 5-seat closed cabin",
+         D="Alternate site (DR)", E="2023-02-15 (MSA effective date)", F="0", G="2023-02-15",
+         H="2028-02-14 (5 years, Annex 1A)", I="No rent-free", J=_NO_TPL, K=_NO_TPL,
+         M="Rack space only rises 5% a year on the PO anniversary (cl.3.6): ₹9,00,000→₹10,93,956. Seats ₹15,00,000, "
+           "power ₹4,80,000 and cross-connects ₹80,000 fixed. ₹29,60,000 a year (year 1) → ₹31,53,956 (year 5), "
+           "billed quarterly in advance",
+         N=_NO_TPL,
+         P="Auto-renews for 3-month periods after expiry (cl.10.1). Early termination by the customer costs all "
+           "remaining contract amounts (cl.10.4, 11.2) → in effect non-cancellable for 5 years",
+         Q="No reinstatement (equipment removal only, cl.11.3)", R="N/A", S="-", T="-",
+         U="IFRS 16: the dedicated cage and cabin can be identified assets, so a lease component is likely (cl.6.4 "
+           "relocation only for customer reasons — no substantive supplier substitution right). Power, cooling, "
+           "security and cross-connects are non-lease (service) components. Remaining space payments about ₹48 lakh at "
+           "2026-03-31 (undiscounted) — minor. Expensed in rent (52032421); one-time set-up ₹9,80,000 (2023)"),
     dict(C="Maintenance charges (SUNDRY OFFICE RENTAL EXPENSE 52032261)", D="Maintenance", E="-", H="-", J="N/A",
          K="N/A", P="-", Q="-", R="N/A", S="-", T="-",
          U="Not a lease: maintenance of common areas and the office (electricity excluded). Non-lease (service) "
@@ -325,9 +340,11 @@ REVIEW = [
      "all limits are fully drawn. What is this line (undrawn sanctioned limit, or something else)?",
      "Shown as a commitment at 2026-10-31, nature to be confirmed."),
     ("2_IFRS_Adjustments (leases)",
-     "RENTAL EXPENSE for Apr–Oct 2026 is ₹3,31,79,797 (about ₹47 lakh/month), but known rents (office + 3 residences) "
-     "are about ₹26 lakh/month. Which other contracts or charges are in this account (new residences, GST, arrears)?",
-     "Not reflected; lease list may be incomplete."),
+     "RENTAL EXPENSE for Apr–Oct 2026 is ₹3,31,79,797. Known contracts explain about ₹2,00,34,172 (office "
+     "₹1,12,07,252, 3 residences ₹70,17,500, Nxtra alternate site ₹18,09,420 for 7 months). What is the remaining "
+     "₹1,31,45,625 (new residences, quarterly advance billing not prepaid, arrears, GST)? For FY25-26 the same check "
+     "leaves only about ₹21 lakh.",
+     "Nxtra added; remainder unexplained."),
     ("8-12 row 6 (S), 2_IFRS_Adjustments (restoration)",
      "Reinstatement cost estimate (quotation) for the AS 29 provision — removal of fit-outs back to warm shell (cl.24).",
      "Obligation confirmed by cl.24; amount not estimated."),
@@ -345,6 +362,7 @@ REVIEW_DONE = [
                      "rent-free 4 months 7 days; +10% / +10.5% after 3 and 6 years (cl.4(f)); lock-in 36 months; "
                      "reinstatement to warm shell (cl.24); IFRSD ₹87,32,922 (cl.10(a))."),
     ("Lease template", "Submitted to HO but marked 'N/A'."),
+    ("Alternate site", "RENTAL EXPENSE includes the Nxtra alternate site / DR centre (MSA 2023-02-15, 5 years)."),
     ("Other rentals", "SUNDRY OFFICE RENTAL EXPENSE is maintenance of common areas and the office, excluding electricity — not a lease."),
     ("Staff residences", "Exact contract dates not needed: IFRS 16 is not applied; rent-schedule months are shown."),
     ("Loan processing fees", "Recognised upfront, not deferred."),
