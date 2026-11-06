@@ -38,13 +38,15 @@ SUMMARY = {
     16: "Fee income",
     17: "Straight-line",
     18: "Incl. rent-free",
-    19: "Lease term 2022-04-13 to 2031-04-12 (108 months), 3 months rent-free → Rent Commencement 2022-07-13 "
-        "(computed as 3 months after commencement). Rent paid on the 13th",
+    19: "Registered lease deed (stamped 2022-08-02): Commencement (possession) 2022-04-13 / Rent Commencement "
+        "2022-08-20 (rent-free 4 months 7 days per the definitions, or earlier if operations started earlier) / "
+        "Expiration 2031-04-12 (9 years, cl.3(a)). Rent ₹14,55,487 + GST, payable in advance by the 7th (cl.4(a)(b))",
     20: "N/A",
     21: "N/A",
-    22: "Yes",
+    22: "Yes (cl.24 Reinstatement)",
     23: "Not recognised",
-    24: "Not yet estimated. A reinstatement obligation exists, so it must also be provided under Indian GAAP "
+    24: "Not yet estimated. A reinstatement obligation exists (cl.24: return in warm-shell condition as handed over for "
+        "fit-out), so it must also be provided under Indian GAAP "
         "(AS 29, undiscounted) → to be recognised from a reinstatement quotation. New account 20940000000 in the "
         "next-gen CoA",
     25: "(1) No interest recognised on NPAs (IRACP) (2) guarantees as financial guarantee contracts / ECL (no undrawn "
@@ -56,14 +58,15 @@ SUMMARY = {
 # ───────────────────────── 2_IFRS_Adjustments ─────────────────────────
 IFRS_ADJ = [
     ("Loan-loss allowance\n(10690001 Allowance For Loan Losses-General / next-gen 10380101000)",
-     "RBI IRACP standard method: the branch computes the general provision as standard assets × 0.4% (specific "
-     "provision for NPAs). 2026-03-31: ₹1,52,70,000 (all standard, no NPA; disclosed as 'provision towards standard "
-     "assets and UFCE')",
+     "RBI IRACP standard method, computed by the branch. 2026-03-31: ₹1,52,70,000 = standard advances ₹306.75 crore "
+     "× 0.4% ₹1,22,70,000 + incremental provision for unhedged foreign-currency exposure (UFCE) ₹30,00,000 "
+     "(all standard, no NPA)",
      "IFRS 9 expected credit loss (Stage 1/2/3, 12-month/lifetime). Includes bank placements, call loans, "
      "HTM bonds, off-balance-sheet commitments and guarantees",
      "Performed", "Global Business Dept", "Computed by HO", BASE,
      "Per HO note in Summary 2-1 (ECL computed by HO). From 2027-04-01 the RBI ECL Directions 2026 move the local "
-     "books to stage-based ECL (with regulatory floors) → only floor/model differences remain. "
+     "books to stage-based ECL (with regulatory floors) → only floor/model differences remain. The UFCE provision "
+     "has no IFRS 9 equivalent and is replaced by ECL (next-gen decision L8: absorbed into stage allowance, UFCE tag). "
      "Next-gen CoA stage L5 10380103000~105000"),
     ("Loan processing fees\n(42020701 LOAN APPLICATION FEE / next-gen 40580010000, deferral LOF 10370100000)",
      "Recognised upfront when received (AS 9). FY25-26 ₹26,40,000; FY26-27 (to 07-07) ₹16,40,000",
@@ -85,7 +88,8 @@ IFRS_ADJ = [
      "keeps IFRS 16 accounts (ROU 107, lease liability 206, interest 50320500000) for HO adjustments only and produces "
      "the monthly schedule from lease-register attributes"),
     ("Lease security deposit\n(10999002 Security Deposit / next-gen 10490700100)",
-     "Carried at nominal ₹1,31,30,642, not discounted",
+     "Carried at nominal, not discounted. Security Deposit ₹1,31,30,642 includes the office interest-free refundable "
+     "deposit (IFRSD) ₹87,32,922 (deed cl.10(a))",
      "Amortised cost (present value). Difference between nominal and PV added to ROU asset; "
      "unwinding is interest income (IFRS 9 / IFRS 16)",
      "Not performed", "TBD", "To be computed", BASE,
@@ -188,15 +192,23 @@ COMM_PREFIX = "FY25-26 income."
 _NO_TPL = "N/A (template submitted marked 'N/A')"
 _RES = "Residential; restoration cost expected to be minor"
 LEASE = [
-    dict(C="Noida Branch office premises", D="Office", E="2022-04-13", F="3",
-         G="2022-07-13 (3 months after commencement)", H="2031-04-12", I="Incl. rent-free", J=_NO_TPL, K=_NO_TPL,
-         M="Escalation clause exists (clause no. to be confirmed). Rent schedule steps: +10% 2025-04 "
-           "(₹14,55,487→₹16,01,036), +10.5% 2028-04 (→₹17,69,145)",
-         N=_NO_TPL, P=TBC, Q="Yes (clause no. to be confirmed)", R="Not recognised", S="Not yet estimated",
+    dict(C="Noida Branch office premises (registered lease deed)", D="Office",
+         E="2022-04-13 (possession for fit-out, cl.3(a))", F="4 months 7 days",
+         G="2022-08-20 (definitions: 4 months 7 days after commencement, or start of operations if earlier)",
+         H="2031-04-12 (9 years, cl.3(a))", I="Incl. rent-free", J=_NO_TPL, K=_NO_TPL,
+         M="Cl.4(f): two 3-yearly steps — +10% after 3 years from Rent Commencement (₹14,55,487→₹16,01,036), +10.5% "
+           "after 6 years (→₹17,69,145). Cl.4(f) counts from Rent Commencement (2025-08-20, 2028-08-20) but the "
+           "definition counts from Lease Commencement (2025-04-13, 2028-04-13) — branch applies the commencement basis "
+           "(2025-04, 2028-04)",
+         N=_NO_TPL,
+         P="Lessee lock-in 36 months (to 2025-04-12), then may terminate on 3 months' notice (cl.12(b)). Lessor cannot "
+           "terminate except for breach (cl.12(d)). Renewal only by a fresh, mutually agreed deed (cl.13) → not a renewal "
+           "option. Full 9 years used (termination not expected)",
+         Q="Yes (cl.24 Reinstatement; cl.12(a)(b))", R="Not recognised", S="Not yet estimated",
          T="Not yet estimated — also required under AS 29; to be recognised from a reinstatement quotation",
-         U="AS 19 straight-line applied (108 months, 3 months rent-free and escalations equalised). Lease template "
-           "submitted marked 'N/A' → IFRS 16 not reflected (2_IFRS_Adjustments no.3). Security deposit ₹1,31,30,642 "
-           "(nominal). Leasehold improvements at cost ₹4,78,38,399"),
+         U="AS 19 straight-line applied (108 months, rent-free 4 months 7 days and escalations equalised). Lease template "
+           "submitted marked 'N/A' → IFRS 16 not reflected (2_IFRS_Adjustments no.3). Interest-free deposit ₹87,32,922 "
+           "(cl.10(a), 6 months' rent). Maintenance under a separate agreement. Leasehold improvements at cost ₹4,78,38,399"),
     dict(C="Staff residence 1", D="Residence", E="2024-08 (first rent month)", H="2026-12 (schedule)", J=_NO_TPL,
          M="2025-07 monthly ₹3,23,000→₹3,25,000", P="-", Q="Residential (minor)", R="Not recognised", S="-", T=_RES,
          U="Period = first and last rent month in the rent schedule (contract dates not needed as IFRS 16 is not applied)"),
@@ -243,8 +255,8 @@ OTHER = [
      "IAS 8: material errors corrected retrospectively (restate comparatives)", "-",
      "Restate HO comparatives if a material item arises", "-"),
     ("Rent 52032421", "AS 19 straight-line rent",
-     "Straight-line expense over the lease term (2022-04-13 to 2031-04-12) applied, with 3 months rent-free and "
-     "escalations equalised",
+     "Straight-line expense over the lease term (2022-04-13 to 2031-04-12) applied, with rent-free 4 months 7 days and "
+     "3-yearly escalations equalised",
      "Replaced by ROU depreciation and interest under IFRS 16", "-",
      "No local GAAP gap. Under an IFRS 16 adjustment the straight-line equalisation balance is offset against the ROU "
      "asset. Next-gen lease register produces the straight-line schedule",
@@ -290,30 +302,23 @@ REVIEW_INTRO = (
 REVIEW_HEAD = ("No.", "Sheet / cell", "Question for local review", "Draft answer in this file", "Reviewer response",
                "Reviewer / date")
 REVIEW = [
-    ("Summary I19, 8-12 row 6 (G)",
-     "Rent-free: is the 3-month rent-free inside the lease term, i.e. first rent on 2022-07-13? The AS 19 rent schedule "
-     "in the FY25-26 file shows rent of ₹14,55,487 from 2022-04-13.",
-     "Rent Commencement 2022-07-13 (computed). If rent-free was before 2022-04-13, change Summary I18 to 'After rent-free'."),
-    ("8-12 row 6 (M)",
-     "Escalation clause: number and frequency. Branch says rent rises every year, but the rent schedule changes only "
-     "on 2025-04 (+10%) and 2028-04 (+10.5%), i.e. every 3 years.",
-     "Clause no. to be confirmed; schedule steps shown."),
+    ("Summary I19, 8-12 row 6 (F, G)",
+     "Actual rent start: the deed gives 4 months 7 days rent-free (to 2022-08-19), or until operations start if earlier. "
+     "The branch said 3 months, and the AS 19 rent schedule in the FY25-26 file shows rent from 2022-04-13. "
+     "What was the date of the first rent invoice?",
+     "Deed basis: Rent Commencement 2022-08-20."),
     ("13_Others no.5",
-     "Straight-line rent: where is the lease-equalisation balance? Using the schedule (108 months, 3 months free), "
-     "straight-line rent is ₹15,68,126/month and the cumulative straight-line minus cash at 2026-03-31 is about "
-     "₹80,26,536. No such liability appears in the 2026-03-31 TB.",
+     "Straight-line rent: where is the lease-equalisation balance? On the deed terms (rent from 2022-08-20, steps in "
+     "April 2025/2028), straight-line rent is ₹15,51,550/month and cumulative straight-line minus rent payable at "
+     "2026-03-31 is about ₹90,40,612. No such liability appears in the 2026-03-31 TB.",
      "Shown as 'straight-line applied'."),
     ("Summary I15, 4-7_COMMISSION row for 42010013",
      "Guarantee commission: the 2026-03-31 TB carries 20920017 'Income On Guarantee Money' ₹72,838.44 under "
      "Other liabilities (Sch.5), which is unearned income. Is the commission already spread over the guarantee period?",
      "Shown as 'Deferred, straight-line'. If it is truly taken upfront, change to 'Upfront' and explain the 20920017 balance."),
-    ("8-12 row 6 (Q, S), 2_IFRS_Adjustments (restoration)",
-     "Reinstatement clause number, and a reinstatement cost estimate (quotation) for the AS 29 provision.",
-     "Obligation exists; amount not estimated."),
-    ("2_IFRS_Adjustments (allowance)",
-     "Allowance ₹1,52,70,000 vs. 0.4% × standard advances ₹306.75 crore = ₹1,22,70,000. Is the ₹30,00,000 difference "
-     "the incremental provision for unhedged foreign-currency exposure (UFCE)? The note says 'standard assets and UFCE'.",
-     "Described as 0.4% standard method plus UFCE wording from the note."),
+    ("8-12 row 6 (S), 2_IFRS_Adjustments (restoration)",
+     "Reinstatement cost estimate (quotation) for the AS 29 provision — removal of fit-outs back to warm shell (cl.24).",
+     "Obligation confirmed by cl.24; amount not estimated."),
     ("Summary I7–I8, 2_IFRS_Adjustments (allowance)",
      "Does HO compute IFRS 9 ECL for Noida, or does the branch send any ECL figure?",
      "Per HO's own note: 'Performed / Global Business Dept'."),
@@ -324,13 +329,15 @@ REVIEW = [
 ]
 REVIEW_DONE_TITLE = "Confirmed by the branch (2026-11-06)"
 REVIEW_DONE = [
-    ("Office lease", "Term 2022-04-13 to 2031-04-12; 3 months rent-free; escalation clause; reinstatement obligation; "
-                     "AS 19 straight-line rent."),
+    ("Office lease", "AS 19 straight-line rent. From the registered deed: term 2022-04-13 to 2031-04-12 (cl.3(a)); "
+                     "rent-free 4 months 7 days; +10% / +10.5% after 3 and 6 years (cl.4(f)); lock-in 36 months; "
+                     "reinstatement to warm shell (cl.24); IFRSD ₹87,32,922 (cl.10(a))."),
     ("Lease template", "Submitted to HO but marked 'N/A'."),
     ("Other rentals", "SUNDRY OFFICE RENTAL EXPENSE is maintenance of common areas and the office, excluding electricity — not a lease."),
     ("Staff residences", "Exact contract dates not needed: IFRS 16 is not applied; rent-schedule months are shown."),
     ("Loan processing fees", "Recognised upfront, not deferred."),
-    ("Loan-loss allowance", "Branch computes standard assets × 0.4% (standard method)."),
+    ("Loan-loss allowance", "Branch computes standard assets × 0.4% (standard method); the extra ₹30,00,000 is the UFCE "
+                            "incremental provision."),
     ("Undrawn commitments", "None — all limits fully drawn."),
 ]
 
