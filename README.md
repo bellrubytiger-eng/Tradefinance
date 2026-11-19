@@ -12,6 +12,8 @@
 | `docs/04_화면흐름도.pptx` | 화면 연결 다이어그램 13장 (전체 지도, 당발·타발·FDI 초과반환·무역금융·LC/BG·본지점/RA·Vostro/SWIFT/환전, 서식·보고 허브, 화면 목록) |
 | `docs/06_통합표준CoA_0930_인도반영_정정본.xlsx` | 06 인도 반영 CoA 정정본: 본점 원안(A~J) 불변, 인도 열 정정 + T·U열 정정 내용·근거, 정정이력·현행이행제외·이행분할기준·추후고려사항 시트 (`python3 build_coa06_fix.py`) |
 | `docs/07_CoA_인도반영_본점협의_설명자료.docx` | 본점 협의용 국문 설명자료: 한 장 요약·회의 순서, 인도 특화 기준 7개 영역, 본점과 합의할 중요 기준 7개, 본점 요청 10건, 이행 결과, 추후 고려, 예상 질문, 용어·결정 부록 (`python3 ho_brief_data.py x.json && node build_ho_brief.js x.json out.docx`) |
+| `docs/08_해외지점_비교맵핑_초안.xlsx` | 해외지점 공통 모듈: 한국 기준과 7개 지점(노이다·북경·하노이·홍콩·뉴욕·런던·시드니) 비교 맵핑, 지점확인질문지, 출처 (`python3 build_branch_mapping.py out.xlsx`) |
+| `docs/09_RT11_RT13_개선설계.xlsx` · `screens/rt_common.html` | RT11·RT13 현행 화면 기준 개선 설계: 고객구분, 필드 50개 현행→개선, 지점정책표, 증빙 매트릭스, 검증룰 V01~V18, 확인필요 + 지점·고객구분 전환 목업 (`python3 build_rt_design.py out.xlsx out.html`) |
 | `db/ddl_oracle.sql` | Oracle DDL (테이블·코멘트·인덱스·FK·파라미터 초기적재·보고용 뷰 예시) |
 | `screens/index.html` | HTML 화면 시안 26종 (브라우저로 바로 열기). `screens/app.html`은 Artifact 게시용 원본 |
 | `screens/forms.html` | 고객 서식 A4 인쇄 시안 4종·14개 변형 (DB 매핑 표시, DUPLICATE 보기) |

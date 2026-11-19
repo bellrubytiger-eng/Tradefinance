@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RT11 · RT13 개선 목업</title>
+<style>
+:root{--bg:#eef1f5;--panel:#fff;--ink:#1d2733;--mute:#5f6b7a;--line:#c9d2dd;--bar:#1f5fa8;--sec:#e7edf5;--in:#fffbe0;--ro:#cfe0f3;
+--k-com:#2f6fd6;--k-pol:#c99a00;--k-ext:#d9622b;--k-new:#1f9d55;--warn:#b42318;--ok:#1f7a3f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181e;--panel:#1c222b;--ink:#e3e8ef;--mute:#9aa6b5;--line:#36404d;--bar:#2a5d99;--sec:#232b36;--in:#2e2b1c;--ro:#22344a;--warn:#f0857a;--ok:#6fcf97}}
+:root[data-theme="dark"]{--bg:#14181e;--panel:#1c222b;--ink:#e3e8ef;--mute:#9aa6b5;--line:#36404d;--bar:#2a5d99;--sec:#232b36;--in:#2e2b1c;--ro:#22344a;--warn:#f0857a;--ok:#6fcf97}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.4 "Segoe UI",Arial,"Malgun Gothic",sans-serif}
+.tool{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.tool label{display:flex;gap:6px;align-items:center;color:var(--mute)}
+.tool select,.tool input{font:inherit;padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--ink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.seg button{font:inherit;border:0;padding:4px 10px;background:var(--panel);color:var(--ink);cursor:pointer}
+.seg button.on{background:var(--bar);color:#fff}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--mute)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.wrap{padding:16px;max-width:1000px;margin:0 auto}
+.scr{background:var(--panel);border:1px solid var(--line);overflow-x:auto}
+.ttl{background:var(--bar);color:#fff;font-weight:600;padding:7px 12px;display:flex;justify-content:space-between;gap:10px}
+.inner{min-width:860px;padding:8px 12px}
+.sec{margin:8px 0;border:1px solid var(--line)}
+.sec>h4{margin:0;padding:4px 8px;background:var(--sec);font-size:12px}
+.g{display:grid;grid-template-columns:110px minmax(0,1fr) 110px minmax(0,1fr) 110px minmax(0,1fr);gap:5px 8px;padding:8px;align-items:center}
+.g>.l{text-align:right;color:var(--mute);font-size:12px}
+.f{border:1px solid var(--line);background:var(--in);padding:2px 6px;min-height:22px;font-size:12px;border-radius:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f.ro{background:var(--ro)}
+.f.off{opacity:.45}
+.span2{grid-column:span 3}.span5{grid-column:span 5}
+.tabs{display:flex;gap:2px;padding:6px 8px 0}
+.tabs span{padding:5px 14px;border:1px solid var(--line);border-bottom:0;background:var(--sec);border-radius:4px 4px 0 0;cursor:pointer;font-weight:600;font-size:12px}
+.tabs span.on{background:var(--panel)}
+.tabbody{border-top:1px solid var(--line);padding:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th,td{border:1px solid var(--line);padding:3px 6px;text-align:left}
+th{background:var(--sec)}
+.strip{display:flex;flex-wrap:wrap;gap:6px 16px;padding:6px 10px;font-size:12px;align-items:center}
+.bad{color:var(--warn);font-weight:600}.good{color:var(--ok);font-weight:600}
+.chips{display:flex;gap:6px}
+.chip{border:1px solid var(--line);padding:3px 10px;border-radius:12px;font-size:12px;cursor:pointer;background:var(--panel);color:var(--ink)}
+.chip.on{background:var(--bar);color:#fff;border-color:var(--bar)}
+.chip.dis{opacity:.4;cursor:not-allowed}
+.note{color:var(--mute);font-size:11px}
+/* change marks */
+.mk{position:relative}
+body.marks .mk{outline:2px solid var(--kc);outline-offset:1px;border-radius:2px}
+body.marks .mk::after{content:attr(data-k);position:absolute;top:-9px;right:-4px;background:var(--kc);color:#fff;font-size:9px;line-height:1;padding:2px 4px;border-radius:6px;white-space:nowrap}
+.sub{grid-column:1/-1;display:grid;grid-template-columns:subgrid;gap:5px 8px;align-items:center}
+.k-com{--kc:var(--k-com)}.k-pol{--kc:var(--k-pol)}.k-ext{--kc:var(--k-ext)}.k-new{--kc:var(--k-new)}
+.chk li{margin:2px 0}
+.chk{margin:0;padding:6px 10px 6px 28px;font-size:12px;columns:2}
+</style>
+</head>
+<body class="marks">
+<div class="tool">
+  <label>지점 <select id="br"></select></label>
+  <label>고객구분 <span class="seg" id="segs"></span></label>
+  <label>Product Type <select id="pt"><option>01</option><option>02</option><option selected>03</option><option>04</option></select></label>
+  <label>금액(USD) <input id="amt" type="number" value="60000" step="1000" style="width:100px"></label>
+  <label><input type="checkbox" id="mk" checked> 변경 표시</label>
+  <div class="legend"><span><i style="background:var(--k-com)"></i>공통 변경</span><span><i style="background:var(--k-pol)"></i>정책값</span><span><i style="background:var(--k-ext)"></i>국가 확장</span><span><i style="background:var(--k-new)"></i>신규</span></div>
+</div>
+<div class="wrap"><div class="scr" id="scr"></div>
+<p class="note">현행 RT13 배치를 유지한 개선 목업입니다. 값은 예시이고, 노이다 외 지점의 값은 08 비교맵핑의 2차 자료 기준 가정값(“확인”)입니다. 은행명은 예시 이름입니다.</p></div>
+<script>
+const D=/*DATA*/null;
+const SEG=["개인","기업 일반","기업 수출입"];
+const S={br:"IN",seg:2,tab:0,pt:"03",amt:60000,route:"SERIAL"};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KC={"공통":"k-com","정책값":"k-pol","확장":"k-ext","신규":"k-new"};
+const mk=(k,h,t)=>`<span class="mk ${KC[k]}" data-k="${esc(t||k)}">${h}</span>`;
+const mkb=(k,h,t)=>`<div class="mk ${KC[k]}" data-k="${esc(t||k)}">${h}</div>`;
+const mkr=(k,h,t)=>`<div class="mk sub ${KC[k]}" data-k="${esc(t||k)}">${h}</div>`;
+const fld=(v,cls="")=>`<div class="f ${cls}">${esc(v)}</div>`;
+const L=t=>`<div class="l">${esc(t)}</div>`;
+const fmt=n=>Number(n).toLocaleString("en-US");
+const NOSTRO=[{id:"N1",nm:"USD Nostro A",bic:"NSTAUS33XXX"},{id:"N2",nm:"USD Nostro B",bic:"NSTBUS33XXX"}];
+
+function init(){
+  $("br").innerHTML=D.br.map(k=>`<option value="${k}">${esc(D.nm[k])} (${k})</option>`).join("");
+  $("br").onchange=e=>{S.br=e.target.value;S.tab=0;render()};
+  $("segs").innerHTML=SEG.map((s,i)=>`<button data-i="${i}">${s}</button>`).join("");
+  $("segs").onclick=e=>{const i=e.target.dataset.i;if(i!==undefined){S.seg=+i;S.tab=0;render()}};
+  $("pt").onchange=e=>{S.pt=e.target.value;render()};
+  $("amt").oninput=e=>{S.amt=+e.target.value||0;render()};
+  $("mk").onchange=e=>document.body.classList.toggle("marks",e.target.checked);
+  render();
+}
+function tabsFor(P){
+  if(S.seg<2) return [];
+  const t=[["Default","공통"],["증빙","정책값"]];
+  if(P.corp!==false) t.push(["한도","정책값"]);
+  if(P.dealing!=="N") t.push(["Dealing Information","정책값"]);
+  return t;
+}
+function ext(P){
+  const rt11=S.seg<2, out=[];
+  if(P.ext==="IN"){
+    if(!rt11) out.push([ "IEC CODE", "0512345678"]);
+    out.push(["TCS Y/N", S.seg===0?"Y · 5%":"N"]);
+    if(S.seg===0||!rt11) out.push(["LRS Y/N", S.seg===0?"Y":"N"]);
+  } else if(P.ext==="CN"){
+    out.push(["국제수지 거래코드", S.seg===2?"121010 (货物贸易, 확인)":"22xxxx (서비스, 확인)"]);
+    if(S.seg===2) out.push(["무역기업 명부", "Y (조회 결과)"]);
+    if(S.seg===1) out.push(["세무등록번호", S.amt>50000?"필수 — 입력 필요":"USD 5만 이하 불요"]);
+  } else if(P.ext==="VN"){
+    out.push(["송금목적 분류", S.seg===0?"유학 (허용 목적)":S.seg===1?"서비스 대금":"수입 대금"]);
+    out.push(["증빙 확인자", "OPR001"]); out.push(["보관 위치", "문서고 / 이미지"]);
+  } else if(P.ext==="US" && S.seg===0){
+    out.push(["사전 고지서", "출력 완료 10:12"]); out.push(["영수증", "취결 시 출력"]); out.push(["취소 가능", "결제 후 30분 (10:44까지)"]);
+  }
+  return out;
+}
+function routeOpts(){
+  return [["DIRECT","Direct","수취은행이 Nostro와 같은 은행"],["SERIAL","Serial","전문을 Nostro · 중계은행으로"],["COV","COV","전문은 수취은행 직접, 자금은 pacs.009 COV"]];
+}
+function render(){
+  const P=D.mock[S.br], rt11=S.seg<2, scr=rt11?"RT11":"RT13", tabs=tabsFor(P);
+  [...$("segs").children].forEach((b,i)=>b.classList.toggle("on",i===S.seg));
+  $("pt").disabled=rt11;
+  const exts=ext(P), checks=[];
+  let h=`<div class="ttl"><span>REMITTANCE ${rt11?"(Personal / Corporate General)":"(Trade Finance)"} — ${scr}</span><span>${esc(D.nm[S.br])} · ${esc(P.ccy)}</span></div><div class="inner">`;
+  // top
+  h+=`<div class="g">${L("Ref No")}${fld("OR26111900123")}${L("MT / MX")}${fld("● MX  ○ MT")}${L("Product Type")}${mk("정책값",fld(rt11?(S.seg===0?"P1 개인 송금":"C1 기업 일반"):S.pt+" · 매트릭스 "+P.mtx),rt11?"정책값: 송금종류 코드":"정책값: 매트릭스")}`;
+  h+=`${L("고객구분")}${mk("신규",fld(SEG[S.seg]+" (CIF 자동)","ro"))}<div></div><div></div><div></div><div></div></div>`;
+  // basic
+  h+=`<div class="sec"><h4>Basic Processing Info</h4><div class="g">`;
+  h+=`${L("Amount")}${fld("USD  "+fmt(S.amt)+".00")}${L("In Lieu comm")}${fld("1 NORMAL")}${L("Trx Type")}${fld("1 INTERNATIONAL","ro")}`;
+  h+=`${L("Remit comm")}${mk("정책값",fld("1 NORMAL  "+P.ccy+"  0.00"),"정책값: 현지통화")}${L("Cable Charge")}${mk("정책값",fld("2 WAIVE  "+P.ccy+"  0.00"),"정책값: 현지통화")}${L("Charge Type")}${fld("1 OUR → DEBT")}`;
+  h+=`${L("Cust No")}${mk("공통",fld("C0012345  ▸ 주소 · LEI 자동"),"공통: CIF 연동")}${L("Remi Acct")}${fld("1234-01-000123")}${L("Fee Acct")}${fld("1234-01-000123")}`;
+  h+=`${L("Agent Y/N")}${fld("N")}${L("Agent No")}${fld("")}${L("Remit Type")}${fld("4 T/T","ro")}`;
+  h+=`${L("Value Date")}${mk("정책값",fld("2026/11/19  (USD 마감 15:00 전)"),"정책값: 마감 · 휴일")}${L("Purpose Code")}${mk("정책값",fld(P.purpose||"미사용 (지점정책)",P.purpose?"":"off"),"정책값: 코드셋")}${L("Country")}${fld("US  UNITED STATES")}`;
+  const leiReq=P.lei && S.seg>0;
+  h+=`${L("Nationality")}${fld("KR")}${L("LEI NO")}${mk("정책값",fld(S.seg===0?"해당 없음 (개인)":"5493001KJTIIGC8Y1R12 · 2027/03/31"+(leiReq?"  — 필수조건: "+P.lei:"  — 선택")),"정책값: 필수조건")}<div></div><div></div>`;
+  h+=`</div>`;
+  if(exts.length){
+    h+=mkb("확장",`<div class="g" style="border-top:1px dashed var(--line)">${exts.map(([k,v])=>L(k)+fld(v,/필수 —/.test(v)?"":"ro")).join("")}</div>`,"확장 영역: "+P.ext);
+    if(P.ext==="CN"&&S.seg===1&&S.amt>50000) checks.push(["bad","V14 세무등록번호 필수 (서비스 대외지급 USD 5만 초과)"]);
+  }
+  if(S.seg===0 && P.plim){
+    const tot=P.plim.used+S.amt, rem=P.plim.cap-tot, over=rem<0;
+    h+=mkb("정책값",`<div class="strip" style="border-top:1px dashed var(--line)"><b>개인 한도</b><span>${esc(P.plim.per)}</span><span>누계 USD ${fmt(P.plim.used)}</span><span>금회 ${fmt(S.amt)}</span><span>상한 ${fmt(P.plim.cap)}</span><span class="${over?"bad":"good"}">잔여 ${fmt(rem)}</span>${over?`<span class="bad">초과 → ${esc(P.plim.over)}</span>`:""}</div>`,"정책값: 개인 한도");
+    checks.push([over?"bad":"good",`V10 개인 한도 ${over?"초과 ("+P.plim.over+")":"이내"}`]);
+  }
+  if(P.trav){
+    h+=mkb("정책값",`<div class="strip" style="border-top:1px dashed var(--line)"><b>송금인 정보</b><span>기준금액 ${esc(P.trav)} 이상 → 이름 · 계좌 · 주소 완비</span><span class="good">완비</span></div>`,"정책값: 기준금액");
+  }
+  h+=`</div>`;
+  // parties
+  const party=(t,a)=>`<div class="sec"><h4>${t}</h4><div class="g" style="grid-template-columns:90px minmax(0,1fr) 90px minmax(0,1fr)">${L("Acct No.")}${fld(a.acct)}${L("Name")}${fld(a.nm)}`+
+    mkr("공통",`${L("국가 Ctry")}${fld(a.c)}${L("주 CtrySubDvsn")}${fld(a.st)}${L("도시 TwnNm")}${fld(a.city)}${L("우편 PstCd")}${fld(a.zip)}${L("도로 StrtNm")}${fld(a.str)}${L("건물번호 BldgNb")}${fld(a.no)}${L("건물명 BldgNm")}${fld(a.bn)}${L("층 Flr")}${fld(a.fl)}${L("주소줄 AdrLine")}<div class="f" style="grid-column:span 3">${esc(a.al)}</div>`,"공통: ISO 구조화 주소")+
+    `${L("Remark")}<div class="f" style="grid-column:span 3"></div></div></div>`;
+  const app={acct:"1234-01-000123",nm:S.seg===0?"KIM MINJI":"SAMPLE TRADING PVT LTD",c:"IN  INDIA",st:"UP",city:"NOIDA",zip:"201301",str:"SECTOR 62",no:"A-12",bn:"TOWER B",fl:"5",al:"(구조화 주소 사용 시 비움)"};
+  const ben={acct:"9988776655",nm:S.seg===0?"KIM JIHO":"GLOBAL PARTS INC",c:"US  UNITED STATES",st:"NJ",city:"NEWARK",zip:"07102",str:"BROAD ST",no:"100",bn:"",fl:"",al:""};
+  if(rt11){
+    h+=mkb("공통",`<div class="two">${party("Applicant",app)}${party("Beneficiary",ben)}</div>`,"RT11: 탭 없이 본문 고정 (현행 위치 확인 필요)");
+  } else {
+    if(S.tab>=tabs.length) S.tab=0;
+    h+=`<div class="sec"><div class="tabs">${tabs.map(([t,k],i)=>mk(k==="공통"?"공통":"정책값",`<span data-t="${i}" class="${i===S.tab?"on":""}">${t}</span>`,i===0?"공통":"정책: 표시")).join("")}</div><div class="tabbody">`;
+    const tn=tabs[S.tab][0];
+    if(tn==="Default") h+=`<div class="two">${party("Applicant",app)}${party("Beneficiary",ben)}</div>`;
+    if(tn==="증빙"){
+      const row=D.matrix.find(r=>r[0]===P.mtx&&(r[1]===S.pt||r[1]==="01~04"))||D.matrix[0];
+      h+=mkb("정책값",`<div class="strip"><b>증빙 요건 (${esc(row[0])} · ${esc(S.pt)})</b><span>Invoice: <b>${esc(row[3])}</b></span><span>세관신고: <b>${esc(row[4])}</b></span><span>Dealing: <b>${esc(row[5])}</b></span><span class="note">${esc(row[6])}</span></div>`,"정책값: 매트릭스");
+      const invReq=/필수/.test(row[3]), invNo=/불가/.test(row[3]);
+      h+=`<table><tr><th></th><th>Invoice No</th><th>Date</th><th>Input Amt</th><th>Balance Amt</th><th>Used</th><th class="mk k-com" data-k="공통: 증빙 헤더">관리번호</th><th class="mk k-com" data-k="공통: 증빙 헤더">상태</th></tr>`+
+        (invNo?`<tr><td colspan="8" class="note">이 Product Type은 Invoice 입력 불가</td></tr>`:
+        `<tr><td>☑</td><td>INV-2026-0811</td><td>2026/10/02</td><td>${fmt(Math.min(S.amt,70000))}</td><td>${fmt(70000-Math.min(S.amt,70000))}</td><td>0</td><td>EV2610-0007</td><td>등록</td></tr>`)+`</table>`;
+      if(invReq||!invNo) checks.push([S.amt<=70000||invNo?"good":"bad",`V01 송금금액 ≤ Invoice 합계 (${fmt(Math.min(S.amt,70000))})`]);
+      if(P.customs){
+        h+=mkb("정책값",`<div class="g" style="grid-template-columns:150px minmax(0,1fr) 150px minmax(0,1fr)"><div class="l"><b>세관신고: ${esc(P.customs)}</b></div><div></div><div></div><div></div>${L("문서번호")}${fld(/불가/.test(row[4])?"입력 불가":"7712345")}${L("Management Ref No")}${fld("BE2610-0031","ro")}${L("Registration Date")}${fld("2026/10/20")}${L("Due / Receive Date")}${fld("2027/01/18 / -")}</div>`,"이동 + 정책값: 문서명");
+      } else h+=`<p class="note">세관신고 구역: 지점정책 미사용 → 숨김</p>`;
+    }
+    if(tn==="한도"){
+      h+=mkb("정책값",`<div class="strip"><b>Total Remittance</b><span>규제연도 시작월 ${P.fy}월</span><span>집계 ${P.corp?"3년":"(확인)"}</span><span>집계통화 USD</span></div><table><tr><th>YEAR</th><th>Start</th><th>End</th><th>Total USD Amt</th><th>상한</th><th>잔여</th></tr><tr><td>FY2026</td><td>2026/${String(P.fy).padStart(2,"0")}/01</td><td>…</td><td>${fmt(420000+S.amt)}</td><td>정책</td><td>-</td></tr><tr><td>FY2025</td><td colspan="5" class="note">…</td></tr></table>`,"정책값: 기간 · 통화 · 상한");
+    }
+    if(tn==="Dealing Information"){
+      h+=`<div class="g">${L("Deal Type")}${fld("FW")}${L("Exchange Rate")}${fld("")}${L("Date")}${fld("")}`+
+        mkr("정책값",`${L("Current ("+P.ccy+")")}${fld("")}${L("Total ("+P.ccy+")")}${fld("")}`,"정책값: 현지통화")+`${L("Deal Ref No")}${fld("")}</div>`;
+      if(P.dealing!=="Y") h+=`<p class="note">Dealing 탭 사용 여부: ${esc(P.dealing)} (7개 지점 확인 후 정책 확정)</p>`;
+    }
+    h+=`</div></div>`;
+  }
+  // bank info
+  const opts=routeOpts();
+  h+=`<div class="sec"><h4>Bank Information</h4>`+mkb("신규",`<div class="strip"><b>송금 경로</b><span class="chips">${opts.map(([k,t,d])=>`<span class="chip ${S.route===k?"on":""} ${k==="DIRECT"?"dis":""}" data-r="${k}" title="${esc(d)}">${t}</span>`).join("")}</span><span class="note">Serial · COV 모두 가능 → 운영자 선택</span><span>선택사유 <span class="f" style="display:inline-block">${S.route==="COV"?"C2 중계은행 수수료 회피":"S1 중계은행 SSI 확인됨"}</span></span></div>`,"공통: 노이다 경로판정")+`<div class="g">`;
+  const cdtr="BENFUS33XXX";
+  h+=`${L("Msg Rcv Bank")}${mk("공통",fld(S.route==="SERIAL"?NOSTRO[0].bic+" (Nostro)":cdtr+" (수취은행)","ro"),"공통: 경로 자동")}${L("Nostro")}${mk("정책값",fld(NOSTRO[0].nm+" · "+NOSTRO[0].bic+"  ▾ 2개"),"정책값: 통화별 기본 · 복수")}${L("Acct #")}${fld("9988776655")}`;
+  h+=`${L("57A 수취은행")}${fld(cdtr+"  SAMPLE BENEFICIARY BANK · US · gpi")}${L("54 Receiver's Corres")}${mk("공통",fld(S.route==="COV"?NOSTRO[0].bic+" (자동)":"-","ro"),"공통: 자동")}${L("56 Intermediary")}${mk("공통",fld(S.route==="SERIAL"?"INTMUS33XXX · 출처 SSI":"-"),"공통: SSI 제안")}`;
+  h+=`</div></div>`;
+  h+=`<div class="sec"><h4>TAG 70 → RmtInf/Ustrd (140)</h4><div class="g">${L("Details")}<div class="f span5">INV-2026-0811 AUTO PARTS</div></div></div>`;
+  h+=`<div class="sec"><h4>TAG 72 → InstrForNxtAgt / InstrForCdtrAgt</h4><div class="g">${L("Next Agent")}<div class="f span2"></div>${L("Creditor Agent")}<div class="f"></div></div></div>`;
+  // checks
+  checks.unshift(["good","V12 구조화 주소: 국가 · 도시 입력"],["good",`V13 경로 ${S.route} · 선택사유 입력`]);
+  if(rt11 && S.seg===1) checks.push(["good","V09 무역성 Purpose 아님 (RT11 처리 가능)"]);
+  if(P.cons && S.seg===0) checks.push(["good","V17 사전 고지서 출력 확인"]);
+  checks.push(["good",`필터링 (${P.sanc}) 대상 아님 · REF F26111900088`]);
+  const bad=checks.some(c=>c[0]==="bad");
+  h+=mkb("신규",`<div class="sec"><h4>필터링 · 검증 결과 ${bad?'<span class="bad">— 오류 있음, 취결 불가</span>':'<span class="good">— 취결 가능</span>'}</h4><ul class="chk">${checks.map(([c,t])=>`<li class="${c}">${c==="bad"?"✕":"✓"} <span style="color:var(--ink);font-weight:400">${esc(t)}</span></li>`).join("")}</ul></div>`,"신규: 검증 패널");
+  h+=`</div>`;
+  $("scr").innerHTML=h;
+  $("scr").querySelectorAll("[data-t]").forEach(e=>e.onclick=()=>{S.tab=+e.dataset.t;render()});
+  $("scr").querySelectorAll("[data-r]").forEach(e=>e.onclick=()=>{if(e.dataset.r!=="DIRECT"){S.route=e.dataset.r;render()}});
+}
+init();
+</script>
+</body>
+</html>
